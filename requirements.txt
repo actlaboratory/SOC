@@ -1,0 +1,8 @@
+﻿wxPython == 4.0.7.post2
+pywin32
+winpaths
+pdf2image
+google-api-python-client
+PyInstaller
+requests
+requests_oauthlib
