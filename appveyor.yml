@@ -44,6 +44,8 @@ artifacts:
 
 deploy:
   release: SOC-latestcommit
+  skip_tags: true
+  Force update: true
   description: 'automatic build from master branch'
   provider: GitHub
   auth_token:
