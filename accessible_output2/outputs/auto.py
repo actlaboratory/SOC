@@ -9,7 +9,6 @@ class Auto(Output):
 		self.outputs = []
 		for output in output_classes:
 			try:
-				print(output)
 				self.outputs.append(output())
 			except OutputError:
 				pass
