@@ -144,3 +144,4 @@ cython_debug/
 errorLog.txt
 test.py
 test.txt
+/log.txt
