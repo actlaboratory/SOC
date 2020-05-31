@@ -3,6 +3,7 @@
 python -m pip install -r requirements.txt
 ## 実行
 python soc.py
+
 ## build
 python -m venv pyenv
 pyenv/scripts/activate
