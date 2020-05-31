@@ -248,7 +248,7 @@ class Events(BaseEvents):
 			shortCut = os.environ["APPDATA"]+"\\Microsoft\\Windows\\SendTo\\"+_("SOCで文字認識を開始.lnk")
 			ws = win32com.client.Dispatch("wscript.shell")
 			scut=ws.CreateShortcut(shortCut)
-			scut.TargetPath=os.path.abspath(__file__)
+			scut.TargetPath=sys.argv[0]
 			scut.Save()
 			dialog(_("送るメニューの登録が完了しました。送るメニューから「SOCで文字認識を開始」で実行できます。"), _("完了"))
 		if selected == menuItemsStore.getRef("ABOUT"):
