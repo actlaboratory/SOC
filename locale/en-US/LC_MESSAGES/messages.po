@@ -1,0 +1,292 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the SOC package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: SOC\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-06-01 00:48+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: CredentialManager.py:44
+msgid ""
+"googleでの認証手続きが完了しました。このブラウザを閉じ、処理結果を確認してく"
+"ださい。<script>window.close();</script>"
+msgstr "Google authentication has successfully finished. Close the browser window, and see the result."
+
+#: simpleDialog.py:25 views\base.py:81 views\fontManager.py:24
+#: views\fontManager.py:48 views\main.py:242
+msgid "エラー"
+msgstr "Error"
+
+#: views\base.py:48
+msgid "現在メニューは操作できません"
+msgstr "You cannot use the menu bar."
+
+#: views\base.py:78
+msgid ""
+"で設定されたショートカットキーが正しくありません。キーが重複しているか、存在"
+"しないキー名を指定しています。以下のキーの設定内容をご確認ください。\n"
+"\n"
+msgstr ""
+
+#: views\convert.py:18
+msgid "変換中"
+msgstr "Converting"
+
+#: views\convert.py:26 views\convert.py:27
+msgid "進行状況"
+msgstr "Progress"
+
+#: views\convert.py:26
+msgid "変換中..."
+msgstr "Converting"
+
+#: views\convert.py:27
+msgid "読み込み中..."
+msgstr "Loading"
+
+#: views\convert.py:29
+msgid "キャンセル"
+msgstr "Cancel"
+
+#: views\converted.py:19
+msgid "認識結果"
+msgstr "Result"
+
+#: views\converted.py:27
+msgid "OK"
+msgstr "OK"
+
+#: views\fontManager.py:24
+msgid ""
+"設定されているフォント情報が不正です。デフォルトのフォントを適用します。"
+msgstr "Font configuration is invalid. Default settings will be applied."
+
+#: views\fontManager.py:48
+msgid "原因不明のエラーにより、フォントの変更に失敗しました。"
+msgstr "Can't change the font."
+
+#: views\main.py:53
+msgid "ファイル一覧"
+msgstr "File list"
+
+#: views\main.py:58
+msgid "追加"
+msgstr "Add"
+
+#: views\main.py:59
+msgid "削除"
+msgstr "Remove"
+
+#: views\main.py:61
+msgid "OCRエンジン"
+msgstr "OCR engine"
+
+#: views\main.py:61
+msgid "google (インターネット)"
+msgstr "google (Internet)"
+
+#: views\main.py:61
+msgid "tesseract (ローカル)"
+msgstr "tesseract (local)"
+
+#: views\main.py:62
+msgid "モード"
+msgstr "Mode"
+
+#: views\main.py:62
+msgid "横書き通常"
+msgstr "Horizontal"
+
+#: views\main.py:62
+msgid "横書き低負荷版"
+msgstr "Horizontal(light)"
+
+#: views\main.py:62
+msgid "縦書き通常"
+msgstr "Vertical"
+
+#: views\main.py:62
+msgid "縦書き低負荷版"
+msgstr "Vertical(light)"
+
+#: views\main.py:65
+msgid "変換"
+msgstr "Convert"
+
+#: views\main.py:66
+msgid "終了"
+msgstr "Exit"
+
+#: views\main.py:76
+msgid "変換ファイルの追加(&o)"
+msgstr "Add file(&o)"
+
+#: views\main.py:77
+msgid "終了(&x)"
+msgstr "Exit(&x)"
+
+#: views\main.py:79
+msgid "Googleと連携する(&g)"
+msgstr "Register Google account"
+
+#: views\main.py:80
+msgid "送るメニューにショートカットを作成(&s)"
+msgstr "Add to SendTo"
+
+#: views\main.py:82
+msgid "ホームページを開く(&p)"
+msgstr "Open the home page(&p)"
+
+#: views\main.py:83 views\main.py:255
+msgid "このソフトについて"
+msgstr "About"
+
+#: views\main.py:86
+msgid "ファイル(&f)"
+msgstr "File(&f)"
+
+#: views\main.py:87
+msgid "ツール(&t)"
+msgstr "Tools(&t)"
+
+#: views\main.py:88
+msgid "ヘルプ(&h)"
+msgstr "Help(&h)"
+
+#: views\main.py:103
+msgid "画像ファイルを選択"
+msgstr "Select image files"
+
+#: views\main.py:125
+msgid ""
+"変換をおこなうには最低ひとつの画像ファイルが追加されている必用があります。"
+msgstr "To start conversion, you must add at least one image files."
+
+#: views\main.py:128
+msgid "OCRエンジンを選択してください。"
+msgstr "Select OCR engine."
+
+#: views\main.py:131
+msgid "tesseract-ocrのモードが指定されていません。"
+msgstr "tesseract-ocr mode is not configured."
+
+#: views\main.py:133
+msgid "変換を開始します。よろしいですか？"
+msgstr "Conversion will be started. Are you sure?"
+
+#: views\main.py:133 views\main.py:201
+msgid "確認"
+msgstr "Question"
+
+#: views\main.py:143
+msgid "キャンセルされました。"
+msgstr "Cancelled."
+
+#: views\main.py:143 views\main.py:172
+msgid "結果"
+msgstr "Result"
+
+#: views\main.py:146
+msgid "画像ファイルが存在しなかったためキャンセルされました。"
+msgstr "Image files don't exist. Conversion has been cancelled."
+
+#: views\main.py:149
+msgid "この機能は対応していません"
+msgstr "This function is not supported."
+
+#: views\main.py:152
+msgid ""
+"この機能を使用するには事前にグーグルと連携しておく必用があります。ツールメ"
+"ニューより連携を行ってください。"
+msgstr "To use this function, add your Google account from tools menu."
+
+#: views\main.py:155
+msgid ""
+"通信中にエラーが発生しました。ネット接続を確認するか時間をおいてから再度お試"
+"しください。"
+msgstr "Connection failed. Check the Internet connection."
+
+#: views\main.py:158
+msgid ""
+"エラーが発生しました。ファイルが画像ファイルか、ファイルが破損していないかな"
+"どを確認してください。"
+msgstr "Error. Check if these files are image files."
+
+#: views\main.py:161
+msgid "このエンジンではこのファイル形式は対応していません。"
+msgstr "This file type is not supported."
+
+#: views\main.py:172
+msgid "変換が完了しました。"
+msgstr "Converted."
+
+#: views\main.py:201
+msgid "ブラウザを開き、認証を開始します。よろしいですか？"
+msgstr "Browser will open, and authentication will be started. Are you sure?"
+
+#: views\main.py:210
+msgid "ブラウザを開いています..."
+msgstr "Opening browser..."
+
+#: views\main.py:233
+msgid "認証が完了しました"
+msgstr "Authentication has successfully finished."
+
+#: views\main.py:233 views\main.py:236 views\main.py:238 views\main.py:240
+msgid "認証結果"
+msgstr "Result"
+
+#: views\main.py:236
+msgid ""
+"認証に成功しましたが、ファイルの保存に失敗しました。ディレクトリのアクセス権"
+"限などを確認してください。"
+msgstr "Authentication has finished, but cannot save data in the file."
+
+#: views\main.py:238
+msgid "ブラウザが閉じられたため、認証をキャンセルしました。"
+msgstr "Authentication has been cancelled."
+
+#: views\main.py:240
+msgid "認証が拒否されました。"
+msgstr "Authentication has been denied"
+
+#: views\main.py:242
+msgid "不明なエラーが発生しました。"
+msgstr "Unknown errors has occured."
+
+#: views\main.py:248
+msgid "SOCで文字認識を開始.lnk"
+msgstr "Start OCR by SOC.lnk"
+
+#: views\main.py:253
+msgid ""
+"送るメニューの登録が完了しました。送るメニューから「SOCで文字認識を開始」で実"
+"行できます。"
+msgstr "SOC's shortcut has been created in the sendto folder."
+
+#: views\main.py:253
+msgid "完了"
+msgstr "Done"
+
+#: views\main.py:255
+#, python-format
+msgid ""
+"SimpleOcrController（%s） version %s.\n"
+"Copyright (C) %s %s.\n"
+"このソフトは公開されているOCRエンジンを使いやすくした物です。"
+msgstr "SimpleOcrController（%s） version %s.\nCopyright (C) %s %s.\nThis software is created to make OCR engines easy to use."
+
+#: views\web.py:30
+msgid "googleアカウント認証"
+msgstr "Google account authentication"
