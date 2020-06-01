@@ -31,6 +31,10 @@ class Main(wx.App):
 		locale.setlocale(locale.LC_TIME,self.config["general"]["locale"])
 		self.SetTimeZone()
 		self.InitTranslation()
+		for s in os.getcwd():
+			if ord(s) >= 128:
+				errorDialog(_("アプリケーションが全角文字の入ったディレクトリに置かれているため軌道することができません。"))
+				return false
 
 		# 音声読み上げの準備
 		reader=self.config["speech"]["reader"]

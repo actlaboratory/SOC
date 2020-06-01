@@ -18,7 +18,9 @@ import globalVars
 def main():
 	app=application.Main()
 	globalVars.app=app
-	app.initialize()
+	result = app.initialize()
+	if not result:
+		return
 	app.MainLoop()
 	app.config.write()
 
