@@ -41,10 +41,17 @@ class ConfigManager(configparser.ConfigParser):
 			self.add_section(key)
 			return self.__getitem__(key)
 
-	def getint(self,section,key,default=0):
+	def getint(self,section,key,default=0,min=None,max=None):
+		if type(default)!=int:
+			raise ValueError("default value must be int")
 		try:
-			return super().getint(section,key)
-		except configparser.NoOptionError as e:
+			ret = super().getint(section,key)
+			if (min!=None and ret<min) or (max!=None and ret>max):
+				self.log.debug("intvalue "+str(ret)+" out of range.  at section "+section+", key "+key)
+				self[section][key]=str(default)
+				return int(default)
+			return ret
+		except (configparser.NoOptionError,ValueError) as e:
 			self.log.debug("add new intval "+str(default)+" at section "+section+", key "+key)
 			self[section][key]=str(default)
 			return int(default)

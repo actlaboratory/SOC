@@ -19,6 +19,7 @@ class BaseView(object):
 	"""ビューの基本クラス。"""
 	def __init__(self):
 		self.shortcutEnable=True
+		self.viewMode=globalVars.app.config.getint("view","colorMode",1,0,1)
 
 	def Initialize(self, ttl, x, y,px,py,style=wx.DEFAULT_FRAME_STYLE):
 		"""タイトルとウィンドウサイズとポジションを指定して、ウィンドウを初期化する。"""
@@ -28,7 +29,7 @@ class BaseView(object):
 		self.hFrame.Bind(wx.EVT_SIZE,self.events.WindowResize)
 
 		self.hPanel=views.ViewCreator.makePanel(self.hFrame)
-		self.creator=views.ViewCreator.ViewCreator(1,self.hPanel,None, wx.VERTICAL)
+		self.creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,None, wx.VERTICAL)
 
 	def Show(self):
 		self.creator.GetPanel().Layout()

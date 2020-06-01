@@ -22,7 +22,7 @@ class ConvertDialog(BaseDialog):
 	def InstallControls(self):
 		"""いろんなwidgetを設置する。"""
 
-		self.creator=views.ViewCreator.ViewCreator(1,self.panel,self.sizer,wx.VERTICAL,20)
+		self.creator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.sizer,wx.VERTICAL,20)
 		self.creator.staticText(_("進行状況"), _("変換中..."),layout=wx.ALIGN_CENTER,style=wx.ALIGN_CENTER)
 		self.static = self.creator.staticText(_("進行状況"), _("読み込み中..."),x=530,layout=wx.ALIGN_CENTER,style=wx.ALIGN_CENTER | wx.ST_ELLIPSIZE_MIDDLE)
 

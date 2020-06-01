@@ -11,6 +11,7 @@ class BaseDialog(object):
 	"""モーダルダイアログの基本クラス。"""
 	def __init__(self):
 		self.app=globalVars.app
+		self.viewMode=globalVars.app.config.getint("view","colorMode",1,0,1)
 		self.value=None
 
 	def Initialize(self, parent,ttl,style=wx.DEFAULT_DIALOG_STYLE):

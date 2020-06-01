@@ -4,7 +4,7 @@
 
 import wx
 import _winxptheme
-import wx.adv
+#import wx.adv
 import ctypes
 from . import fontManager
 
@@ -269,6 +269,7 @@ class ViewCreator():
 		Add(self.sizer,web,0)
 		return web
 
+	"""
 	def timepicker(self,defaultValue=wx.DateTime.Now()):
 		hTimePicker=wx.adv.TimePickerCtrl(self.parent,-1)
 		hTimePicker.SetValue(defaultValue)
@@ -293,7 +294,7 @@ class ViewCreator():
 		Add(self.sizer,hCalendar)
 		self.AddSpace(self.space)
 		return hCalendar
-
+	"""
 
 
 	def GetPanel(self):
