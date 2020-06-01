@@ -74,7 +74,7 @@ msgstr "Font configuration is invalid. Default settings will be applied."
 
 #: views\fontManager.py:48
 msgid "原因不明のエラーにより、フォントの変更に失敗しました。"
-msgstr "Can't change the font."
+msgstr "Font configuration has failed."
 
 #: views\main.py:53
 msgid "ファイル一覧"
@@ -138,7 +138,7 @@ msgstr "Exit(&x)"
 
 #: views\main.py:79
 msgid "Googleと連携する(&g)"
-msgstr "Register Google account"
+msgstr "Link a Google account"
 
 #: views\main.py:80
 msgid "送るメニューにショートカットを作成(&s)"
@@ -150,7 +150,7 @@ msgstr "Open the home page(&p)"
 
 #: views\main.py:83 views\main.py:255
 msgid "このソフトについて"
-msgstr "About"
+msgstr "About SOC"
 
 #: views\main.py:86
 msgid "ファイル(&f)"
@@ -171,7 +171,7 @@ msgstr "Select image files"
 #: views\main.py:125
 msgid ""
 "変換をおこなうには最低ひとつの画像ファイルが追加されている必用があります。"
-msgstr "To start conversion, you must add at least one image files."
+msgstr "To start conversion, at least one files must be added ."
 
 #: views\main.py:128
 msgid "OCRエンジンを選択してください。"
@@ -199,7 +199,7 @@ msgstr "Result"
 
 #: views\main.py:146
 msgid "画像ファイルが存在しなかったためキャンセルされました。"
-msgstr "Image files don't exist. Conversion has been cancelled."
+msgstr "Since image files don't exist, Conversion has been cancelled."
 
 #: views\main.py:149
 msgid "この機能は対応していません"
@@ -209,7 +209,7 @@ msgstr "This function is not supported."
 msgid ""
 "この機能を使用するには事前にグーグルと連携しておく必用があります。ツールメ"
 "ニューより連携を行ってください。"
-msgstr "To use this function, add your Google account from tools menu."
+msgstr "To use this function, link your Google account from tools menu."
 
 #: views\main.py:155
 msgid ""
@@ -251,7 +251,7 @@ msgstr "Result"
 msgid ""
 "認証に成功しましたが、ファイルの保存に失敗しました。ディレクトリのアクセス権"
 "限などを確認してください。"
-msgstr "Authentication has finished, but cannot save data in the file."
+msgstr "Authentication has finished, but data cannot be saved in the file."
 
 #: views\main.py:238
 msgid "ブラウザが閉じられたため、認証をキャンセルしました。"
@@ -273,7 +273,7 @@ msgstr "Start OCR by SOC.lnk"
 msgid ""
 "送るメニューの登録が完了しました。送るメニューから「SOCで文字認識を開始」で実"
 "行できます。"
-msgstr "SOC's shortcut has been created in the sendto folder."
+msgstr "SOC's shortcut has been created in the SendTo folder."
 
 #: views\main.py:253
 msgid "完了"
@@ -285,7 +285,7 @@ msgid ""
 "SimpleOcrController（%s） version %s.\n"
 "Copyright (C) %s %s.\n"
 "このソフトは公開されているOCRエンジンを使いやすくした物です。"
-msgstr "SimpleOcrController（%s） version %s.\nCopyright (C) %s %s.\nThis software is created to make OCR engines easy to use."
+msgstr "SimpleOcrController（%s） version %s.\nCopyright (C) %s %s.\nThis software will make OCR engines easy to use."
 
 #: views\web.py:30
 msgid "googleアカウント認証"
