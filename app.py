@@ -28,6 +28,10 @@ class Main(wx.App):
 		self.frozen=hasattr(sys,"frozen")
 		self.InitLogger()
 		self.LoadSettings()
+		if self.config["general"]["language"] == "":
+			# 翻訳
+			dialog(_("setting.ini not found. please select language.", "information)
+			self.langSelecter()
 		locale.setlocale(locale.LC_TIME,self.config["general"]["locale"])
 		self.SetTimeZone()
 		self.InitTranslation()

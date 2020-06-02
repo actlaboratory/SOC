@@ -8,7 +8,7 @@ class DefaultSettings:
 	def get():
 		config = ConfigManager()
 		config["general"]={
-			"language": "ja-JP",
+			"language": "",
 			"fileVersion": "100",
 			"locale": "ja-JP"
 		}
