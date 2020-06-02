@@ -50,7 +50,7 @@ deploy:
     description: 'automatic build from master branch'
     auth_token:
       secure: UcoHc3nVwi+4feNv3QuMZy2qgZmTVElAD9iMr9UxcEUTA0PP2beWDMuiNhBoNYeA
-    artifact: SOC-snapshot.zip                # upload all NuGet packages to release assets
+    artifact: SOC.zip                # upload all NuGet packages to release assets
     draft: false
     prerelease: false
     on:
@@ -59,7 +59,7 @@ deploy:
     description: 'SOC official release'
     auth_token:
       secure: UcoHc3nVwi+4feNv3QuMZy2qgZmTVElAD9iMr9UxcEUTA0PP2beWDMuiNhBoNYeA
-    artifact: SOC-$(appveyor_repo_tag_name).zip
+    artifact: SOC.zip
     draft: false
     prerelease: false
     on:
