@@ -15,7 +15,7 @@ class langDialog(BaseDialog):
 		self.identifier="language selecter"#このビューを表す文字列
 		self.log=getLogger("Soc%s" % (self.identifier))
 		self.log.debug("created")
-		super().Initialize(self.app.hMainView.hFrame,_("language settings"),0)
+		super().Initialize(None,_("language settings"),0)
 		self.InstallControls()
 		return True
 
