@@ -14,6 +14,7 @@ import pathlib
 import datetime
 from logging import getLogger, FileHandler, Formatter
 from simpleDialog import *
+import views.langDialog as langDialog
 
 import constants
 import DefaultSettings
@@ -30,7 +31,7 @@ class Main(wx.App):
 		self.LoadSettings()
 		if self.config["general"]["language"] == "":
 			# 翻訳
-			dialog(_("setting.ini not found. please select language."), _("information"))
+			dialog("setting.ini not found. please select language.", "information")
 			self.langSelecter()
 		locale.setlocale(locale.LC_TIME,self.config["general"]["locale"])
 		self.SetTimeZone()
@@ -110,10 +111,10 @@ class Main(wx.App):
 		"""スクリーンリーダーでしゃべらせる。"""
 		self.speech.speak(s)
 
-	def langSelecter():
-		langselect = langDialog.langDialog()
-		langDialog.show(False)
-		
+	def langSelecter(self):
+		langSelect = langDialog.langDialog()
+		langSelect.Show(False)
+		self.config["general"]["language"] = langSelect.getValue()
 	def OnExit(self):
 		return wx.App.OnExit(self)
 

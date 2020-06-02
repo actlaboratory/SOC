@@ -23,12 +23,12 @@ class langDialog(BaseDialog):
 		"""いろんなwidgetを設置する。"""
 		self.creator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.sizer,wx.VERTICAL,20)
 		#翻訳
-		self.langSelect = self.creator.combobox(_("select language", constants.SUPPORTED_LANGUAGE, stat=0)
-		self.ok = self.creator.bOk("ok")
+		self.langSelect = self.creator.combobox(_("select language"), constants.SUPPORTED_LANGUAGE, stat=0)
+		self.ok = self.creator.okbutton("ok", None)
 
 	def Destroy(self, events = None):
 		self.log.debug("destroy")
 		self.wnd.Destroy()
 
-	#def GetData(self):
-		return None
+	def GetData(self):
+		return self.langSelect.GetSelectionString()
