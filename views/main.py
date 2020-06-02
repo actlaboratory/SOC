@@ -99,7 +99,7 @@ class Events(BaseEvents):
 		self.parent.filebox.SetSelection(index-1)
 		return
 	def open(self, events=None):
-		dialog = wx.FileDialog(None, _("画像ファイルを選択"), style=wx.FD_OPEN|wx.FD_MULTIPLE)
+		dialog = wx.FileDialog(None, _("画像ファイルを選択"), style=wx.FD_OPEN|wx.FD_MULTIPLE, wildcard=_("画像ファイル(*.jpg,*.png,*.gif,*.pdf)|.jpg,.png,.gif,.pdf"))
 		if dialog.ShowModal() == wx.ID_CANCEL:
 			return
 		for path in dialog.GetPaths():
