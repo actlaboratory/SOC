@@ -30,7 +30,7 @@ class Main(wx.App):
 		self.LoadSettings()
 		if self.config["general"]["language"] == "":
 			# 翻訳
-			dialog(_("setting.ini not found. please select language.", "information)
+			dialog(_("setting.ini not found. please select language."), _("information"))
 			self.langSelecter()
 		locale.setlocale(locale.LC_TIME,self.config["general"]["locale"])
 		self.SetTimeZone()
@@ -110,6 +110,10 @@ class Main(wx.App):
 		"""スクリーンリーダーでしゃべらせる。"""
 		self.speech.speak(s)
 
+	def langSelecter():
+		langselect = langDialog.langDialog()
+		langDialog.show(False)
+		
 	def OnExit(self):
 		return wx.App.OnExit(self)
 
