@@ -43,16 +43,26 @@ artifacts:
   - path: SOC.zip
 
 deploy:
-  release: SOC-latestcommit
-  skip_tags: true
-  Force update: true
-  description: 'automatic build from master branch'
-  provider: GitHub
-  auth_token:
-    secure: UcoHc3nVwi+4feNv3QuMZy2qgZmTVElAD9iMr9UxcEUTA0PP2beWDMuiNhBoNYeA
-  artifact: SOC.zip                # upload all NuGet packages to release assets
-  draft: false
-  prerelease: false
-  on:
-    branch: master                 # release from master branch only
+  - provider: GitHub
+    release: SOC-latestcommit
+    skip_tags: true
+    Force update: true
+    description: 'automatic build from master branch'
+    auth_token:
+      secure: UcoHc3nVwi+4feNv3QuMZy2qgZmTVElAD9iMr9UxcEUTA0PP2beWDMuiNhBoNYeA
+    artifact: SOC-snapshot.zip                # upload all NuGet packages to release assets
+    draft: false
+    prerelease: false
+    on:
+      branch: master                 # release from master branch only
+  - provider: GitHub
+    release: SOC-$(appveyor_repo_tag_name)
+    description: 'SOC official release'
+    auth_token:
+      secure: UcoHc3nVwi+4feNv3QuMZy2qgZmTVElAD9iMr9UxcEUTA0PP2beWDMuiNhBoNYeA
+    artifact: SOC-$(appveyor_repo_tag_name).zip
+    draft: false
+    prerelease: false
+    on:
+      APPVEYOR_REPO_TAG: true
 
