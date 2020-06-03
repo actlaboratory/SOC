@@ -1,5 +1,5 @@
 ﻿# -*- coding: utf-8 -*-
-# converting dialog
+# language select dialog
 
 import wx
 import globalVars

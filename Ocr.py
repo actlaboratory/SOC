@@ -62,8 +62,6 @@ class OcrTool():
 		tools = pyocr.get_available_tools()
 		tool = tools[0]
 		if local_file_path.suffix == ".pdf":
-			print("PdfConvert")
-			print(os.cpu_count()-1)
 			images = []
 			pdfThread = threading.Thread(target = self.pdf_convert, args = (str(local_file_path), images), name = "pdfThread")
 			pdfThread.start()
@@ -78,7 +76,6 @@ class OcrTool():
 				builder = pyocr.builders.TextBuilder())
 				del images[i]
 				i+=1
-			print(len(text))
 			return text
 		text = tool.image_to_string(
 		Image.open(local_file_path.resolve()),
@@ -96,11 +93,9 @@ class OcrManager():
 		self.tool = OcrTool()
 		os.environ["PATH"] += os.pathsep + os.getcwd() + "/poppler/bin"
 	def TextSave(self, filePath, text):
-		print(len(text))
 		if isinstance(filePath, pathlib.WindowsPath):
 			filePath.write_text(text, encoding="utf-8")
 			txt = filePath.read_text(encoding="utf-8")
-			print(len(txt))
 			self.saved.append(filePath)
 			self.SavedText += text
 			return
@@ -110,11 +105,9 @@ class OcrManager():
 		return
 	def allDelete(self):
 		for path in self.saved:
-			print(path.exists())
 			path.unlink()
 		return
 	def ocr_exe(self, dialog):
-		print("ocr started")
 		if self.Engine == 0:
 			try:
 				self.Credential = CredentialManager.CredentialManager(True)
@@ -122,7 +115,6 @@ class OcrManager():
 				return errorCodes.NET_ERROR
 		for Path in self.OcrList:
 			if dialog.cancel:
-				print("canceled")
 				self.allDelete()
 				self.SavedText = ""
 				return errorCodes.CANCELED
@@ -152,7 +144,6 @@ class OcrManager():
 				self.allDelete()
 				self.SavedText = ""
 				return errorCodes.CANCELED
-			print(len(text))
 			self.TextSave(Path.with_suffix(".txt"), text)
 		return errorCodes.OK
 	def lapped_ocr_exe(self, dialog, result):
