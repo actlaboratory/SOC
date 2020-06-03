@@ -16,12 +16,15 @@ class BaseDialog(object):
 
 	def Initialize(self, parent,ttl,style=wx.DEFAULT_DIALOG_STYLE):
 		"""タイトルを指定して、ウィンドウを初期化し、親の中央に配置するように設定。"""
+		print("きた")
 		self.wnd=wx.Dialog(parent,-1, ttl,style= wx.CAPTION | wx.SYSTEM_MENU | wx.BORDER_DEFAULT | style)
+		print(self.wnd)
 		_winxptheme.SetWindowTheme(self.wnd.GetHandle(),"","")
 
 		self.wnd.Bind(wx.EVT_CLOSE,self.OnClose)
 
 		self.panel = wx.Panel(self.wnd,wx.ID_ANY)
+		print(self.panel)
 		self.sizer = wx.BoxSizer(wx.VERTICAL)
 		self.panel.SetSizer(self.sizer)
 

@@ -29,10 +29,6 @@ class Main(wx.App):
 		self.frozen=hasattr(sys,"frozen")
 		self.InitLogger()
 		self.LoadSettings()
-		if self.config["general"]["language"] == "":
-			# 翻訳
-			dialog("setting.ini not found. please select language.", "information")
-			self.langSelecter()
 		locale.setlocale(locale.LC_TIME,self.config["general"]["locale"])
 		self.SetTimeZone()
 		self.InitTranslation()
@@ -100,7 +96,16 @@ class Main(wx.App):
 
 	def InitTranslation(self):
 		"""翻訳を初期化する。"""
-		self.translator=gettext.translation("messages","locale", languages=[self.config["general"]["language"]], fallback=True)
+		lang=self.config.getstring("general","language","",constants.SUPPORTING_LANGUAGE)
+		if lang == "":
+			# 言語選択を表示
+			dialog("please select language.", "information")
+			langSelect = langDialog.langDialog()
+			langSelect.Initialize()
+			langSelect.Show()
+			self.config["general"]["language"] = langSelect.GetValue()
+			lang = langSelect.GetValue()
+		self.translator=gettext.translation("messages","locale", languages=[lang], fallback=True)
 		self.translator.install()
 
 	def GetFrozenStatus(self):
@@ -110,11 +115,6 @@ class Main(wx.App):
 	def say(self,s):
 		"""スクリーンリーダーでしゃべらせる。"""
 		self.speech.speak(s)
-
-	def langSelecter(self):
-		langSelect = langDialog.langDialog()
-		langSelect.Show(False)
-		self.config["general"]["language"] = langSelect.getValue()
 	def OnExit(self):
 		return wx.App.OnExit(self)
 

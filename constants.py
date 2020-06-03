@@ -10,6 +10,8 @@ APP_VERSION="0.5"
 APP_COPYRIGHT_YEAR="2020"
 APP_DEVELOPERS="Guredora"
 
+SUPPORTING_LANGUAGE=("ja-JP","en-US")
+
 #各種ファイル名
 SETTING_FILE_NAME="settings.ini"
 KEYMAP_FILE_NAME="keymap.ini"
