@@ -6,7 +6,8 @@ branches:
 skip_branch_with_pr: true
 
 environment:
-
+  gitHubPassword:
+    secure: s4pKVblYXP+c03qM8gH8tQ==
   matrix:
 
     # For Python versions available on Appveyor, see
@@ -20,9 +21,9 @@ install:
   # We need wheel installed to build wheels
   - "%PYTHON%\\python.exe -m pip install -r requirements.txt"
   - cmd: git tag -d SOC-latestcommit
-  - cmd: git push -d origin SOC-latestcommit
+  - cmd: git push -d https://actlab-auto@%gitHubPassword%@github.com/actlaboratory/soc.git SOC-latestcommit
   - cmd: git tag SOC-latestcommit
-  - cmd: git push origin SOC-latestcommit
+  - cmd: git push https://actlab-auto@%gitHubPassword%@github.com/actlaboratory/soc.git SOC-latestcommit
 
 build: off
 
