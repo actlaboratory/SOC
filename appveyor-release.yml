@@ -1,7 +1,7 @@
 version: development.{build}-{branch}
 branches:
   only:
-    - /v\d*\.\d*\.\d*/
+    - release
 
 skip_branch_with_pr: true
 
