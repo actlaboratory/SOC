@@ -17,6 +17,8 @@ if len(sys.argv)==2 and sys.argv[1]=="--appveyor":
 	appveyor=True
 
 print("Starting build (appveyor mode=%s)" % appveyor)
+build_filename=os.environ['APPVEYOR_REPO_TAG_NAME'] if 'APPVEYOR_REPO_TAG_NAME' in os.environ else 'snapshot'
+print("Will be built as %s" % build_filename)
 
 pyinstaller_path="pyinstaller.exe" if appveyor is False else "%PYTHON%\\Scripts\\pyinstaller.exe"
 hooks_path = os.path.join(PyInstaller.__path__[0], "hooks/")
@@ -39,5 +41,5 @@ shutil.copytree("tesseract-ocr\\", "dist\\SOC\\tesseract-ocr")
 shutil.copytree("poppler\\", "dist\\SOC\\poppler")
 shutil.copytree("locale\\","dist\\SOC\\locale", ignore=shutil.ignore_patterns("*.po", "*.pot", "*.po~"))
 print("Compressing into package...")
-shutil.make_archive('SOC','zip','dist')
+shutil.make_archive("SOC-%s" % (build_filename),'zip','dist')
 print("Done!")
