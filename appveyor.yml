@@ -19,10 +19,10 @@ environment:
 install:
   # We need wheel installed to build wheels
   - "%PYTHON%\\python.exe -m pip install -r requirements.txt"
-  - cmd git tag -d SOC-latestcommit
-  - cmd git push -d origin SOC-latestcommit
-  - cmd git tag SOC-latestcommit
-  - cmd git push origin SOC-latestcommit
+  - cmd: git tag -d SOC-latestcommit
+  - cmd: git push -d origin SOC-latestcommit
+  - cmd: git tag SOC-latestcommit
+  - cmd: git push origin SOC-latestcommit
 
 build: off
 
