@@ -23,7 +23,7 @@ class Dialog(BaseDialog):
 	def InstallControls(self):
 		"""いろんなwidgetを設置する。"""
 		self.creator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.sizer,wx.VERTICAL,20)
-		self.resultView,static = self.creator.inputbox("認識結果", x=800,defaultValue=self.result, style=wx.TE_MULTILINE|wx.TE_READONLY)
+		self.resultView,static = self.creator.inputbox("認識結果", x=800,defaultValue=self.result, style=wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_DONTWRAP)
 		self.bOk=self.creator.okbutton(_("OK"), None)
 
 	def Destroy(self, events = None):
