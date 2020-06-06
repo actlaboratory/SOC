@@ -3,11 +3,14 @@
 
 import requests
 import subprocess
-
+import errorCodes
 class update():
 	def check(self, app_name, current_version, check_url):
 		url = "%s?name=%s&version=%s" % (check_url, app_name, current_version)# 引数からURLを生成
-		response = requests.get(url)# サーバーに最新バージョンを問い合わせる
+		try:
+			response = requests.get(url)# サーバーに最新バージョンを問い合わせる
+		except requests.exceptions.ConnectionError as c:
+			return errorCodes.NET_ERROR
 		if response.text == "latest":
 			return False
 		info = response.text.split("\n")

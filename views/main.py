@@ -169,7 +169,6 @@ class Events(BaseEvents):
 			self.parent.OcrManager.SavedText = ""
 			self.parent.filebox.Clear()
 			self.parent.OcrManager.OcrList.clear()
-			dialog(_("変換が完了しました。"), _("結果"))
 		return
 	def OnMenuSelect(self,event):
 		"""メニュー項目が選択されたときのイベントハンドら。"""
@@ -255,6 +254,9 @@ class Events(BaseEvents):
 			dialog(_("SimpleOcrController（%s） version %s.\nCopyright (C) %s %s.\nこのソフトは公開されているOCRエンジンを使いやすくした物です。" % (constants.APP_NAME, constants.APP_VERSION, constants.APP_COPYRIGHT_YEAR, constants.APP_DEVELOPERS)), _("このソフトについて"))
 		if selected == menuItemsStore.getRef("UPDATE"):
 			latest = self.parent.app.update.check(constants.APP_NAME, constants.APP_VERSION, constants.UPDATE_URL)
+			if latest == errorCodes.NET_ERROR:
+				errorDialog(_("サーバーとの通信中にエラーが発生しました。インターネット接続などをご確認ください。"))
+				return
 			if latest == False:
 				dialog(_("現在お使いのバージョンは最新です。アップデートの必要はありません。"), _("アップデート"))
 				return
