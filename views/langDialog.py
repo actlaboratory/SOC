@@ -24,7 +24,7 @@ class langDialog(BaseDialog):
 		self.creator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.sizer,wx.VERTICAL,20)
 		#翻訳
 		self.langSelect = self.creator.combobox("select language", constants.SUPPORTING_LANGUAGE, None, state=0)
-		self.ok = self.creator.okbutton("ok", None)
+		self.ok = self.creator.okbutton("OK", None)
 
 	def Destroy(self, events = None):
 		self.log.debug("destroy")
