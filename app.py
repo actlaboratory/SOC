@@ -15,12 +15,12 @@ import datetime
 from logging import getLogger, FileHandler, Formatter
 from simpleDialog import *
 import views.langDialog as langDialog
-
 import constants
 import DefaultSettings
 import errorCodes
 import CredentialManager
 from views import main
+import update
 
 class Main(wx.App):
 	def initialize(self):
@@ -62,7 +62,8 @@ class Main(wx.App):
 
 		# googleのCredentialを準備
 		self.credentialManager=CredentialManager.CredentialManager()
-
+		# update関係を準備
+		self.update = update.update()
 		# メインビューを表示
 		self.hMainView=main.MainView()
 		i = 0

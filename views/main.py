@@ -80,6 +80,7 @@ class Menu(BaseMenu):
 		#ヘルプメニューの中身
 		self.Page = self.RegisterMenuCommand(self.hHelpMenu, "webpage", _("ホームページを開く(&p)"))
 		self.About = self.RegisterMenuCommand(self.hHelpMenu, "ABOUT", _("このソフトについて"))
+		self.Update = self.RegisterMenuCommand(self.hHelpMenu, "UPDATE", _("最新バージョンを確認"))
 		#メニューバーの生成
 		self.hMenuBar=wx.MenuBar()
 		self.hMenuBar.Append(self.hFileMenu, _("ファイル(&f)"))
@@ -252,3 +253,12 @@ class Events(BaseEvents):
 			dialog(_("送るメニューの登録が完了しました。送るメニューから「SOCで文字認識を開始」で実行できます。"), _("完了"))
 		if selected == menuItemsStore.getRef("ABOUT"):
 			dialog(_("SimpleOcrController（%s） version %s.\nCopyright (C) %s %s.\nこのソフトは公開されているOCRエンジンを使いやすくした物です。" % (constants.APP_NAME, constants.APP_VERSION, constants.APP_COPYRIGHT_YEAR, constants.APP_DEVELOPERS)), _("このソフトについて"))
+		if selected == menuItemsStore.getRef("UPDATE"):
+			latest = self.parent.app.update.check(constants.APP_NAME, constants.APP_VERSION, constants.UPDATE_URL)
+			if latest == False:
+				dialog(_("現在お使いのバージョンは最新です。アップデートの必要はありません。"), _("アップデート"))
+				return
+			result = qDialog(_("バージョン%dにアップデートすることができます。%dアップデートを開始しますか？" % (self.version, self.msg)), _("確認"))
+			if result == wx.ID_NO:
+				return
+			#self.parent.app.update.run(

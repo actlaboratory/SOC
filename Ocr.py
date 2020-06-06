@@ -1,4 +1,5 @@
 #Copyright (C) 2020 guredora <contact@guredora.com>
+
 import globalVars
 from PIL import Image
 import pyocr
@@ -17,9 +18,11 @@ import io
 import os
 import threading
 import wx
+
 class OcrTool():
 	def __init__(self):
-		self.available_language=("jpn", "jpn_fast", "jpn_vert", "jpn_vert_fast")
+		self.available_language=("jpn", "jpn_fast", "jpn_vert", "jpn_vert_fast")#tesseract-ocrの設定の保存
+	#folderの内容をすべて削除
 	def tmpDelete(self, tmp):
 		for path in tmp.iterdir():
 			if path.is_dir():
@@ -28,6 +31,7 @@ class OcrTool():
 				path.unlink()
 		tmp.rmdir()
 		return
+	# pdfを画像に変換する
 	def pdf_convert(self, path, images):
 		tmp = pathlib.Path(os.environ["TEMP"]).joinpath("OcrTool")
 		if tmp.exists():
@@ -35,6 +39,7 @@ class OcrTool():
 		tmp.mkdir()
 		result = convert_from_path(path, output_folder=str(tmp), thread_count=os.cpu_count()-1, fmt="png", dpi=400)
 		images += result
+	# googleのOcr呼び出し
 	def google_ocr(self, local_file_path, credential):
 		service = discovery.build("drive", "v3", credentials=credential)
 		media_body = MediaFileUpload(local_file_path, mimetype="application/vnd.google-apps.document", resumable=True)
@@ -56,6 +61,7 @@ class OcrTool():
 			status, done = downloader.next_chunk()
 		service.files().delete(fileId=ID).execute()
 		return fh.getvalue().decode("utf-8")
+	# tesseract-ocrの呼び出し
 	def tesseract_ocr(self, local_file_path, number, dialog):
 		lang = self.available_language[number]
 		text = ""
@@ -92,6 +98,7 @@ class OcrManager():
 		self.mode = -1
 		self.tool = OcrTool()
 		os.environ["PATH"] += os.pathsep + os.getcwd() + "/poppler/bin"
+	# ファイル名とテキストを渡すと保存する関数
 	def TextSave(self, filePath, text):
 		if isinstance(filePath, pathlib.WindowsPath):
 			filePath.write_text(text, encoding="utf-8")
@@ -103,27 +110,29 @@ class OcrManager():
 		self.saved.append(filePath)
 		self.SavedText += text
 		return
-	def allDelete(self):
+
+	def allDelete(self):#変換済みファイルを一掃する
 		for path in self.saved:
 			path.unlink()
 		return
+	# Ocrの実行
 	def ocr_exe(self, dialog):
 		if self.Engine == 0:
 			try:
 				self.Credential = CredentialManager.CredentialManager(True)
 			except Exception:
-				return errorCodes.NET_ERROR
+				return errorCodes.NET_ERROR#ネットワーク関係のエラー
 		for Path in self.OcrList:
-			if dialog.cancel:
+			if dialog.cancel:#キャンセル処理
 				self.allDelete()
 				self.SavedText = ""
 				return errorCodes.CANCELED
-			if not Path.exists():
+			if not Path.exists():#ファイルがなかった場合
 				self.allDelete()
 				self.SavedText = ""
 				return errorCodes.FILE_NOT_FOUND
 			wx.CallAfter(dialog.changeName, (Path.stem))
-			if self.Engine == 0:
+			if self.Engine == 0:#googleの呼び出し
 				if not self.Credential.isOK():
 					self.SavedText = ""
 					return errorCodes.NOT_AUTHORIZED
@@ -133,7 +142,7 @@ class OcrManager():
 				except(errors.HttpError) as error:
 					self.SavedText = ""
 					return errorCodes.UNKNOWN
-			if self.Engine == 1:
+			if self.Engine == 1:#tesseractの呼び出し
 				try:
 					text = self.tool.tesseract_ocr(Path, self.mode, dialog)
 				except(UnidentifiedImageError):
@@ -144,7 +153,7 @@ class OcrManager():
 				self.allDelete()
 				self.SavedText = ""
 				return errorCodes.CANCELED
-			self.TextSave(Path.with_suffix(".txt"), text)
+			self.TextSave(Path.with_suffix(".txt"), text)#ファイルに保存
 		return errorCodes.OK
 	def lapped_ocr_exe(self, dialog, result):
 		result.append(self.ocr_exe(dialog))
