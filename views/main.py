@@ -258,7 +258,7 @@ class Events(BaseEvents):
 			if latest == False:
 				dialog(_("現在お使いのバージョンは最新です。アップデートの必要はありません。"), _("アップデート"))
 				return
-			result = qDialog(_("バージョン%dにアップデートすることができます。%dアップデートを開始しますか？" % (self.version, self.msg)), _("確認"))
+			result = qDialog(_("バージョン%sにアップデートすることができます。%sアップデートを開始しますか？" % (self.parent.app.update.version, self.parent.app.update.msg)), _("確認"))
 			if result == wx.ID_NO:
 				return
-			#self.parent.app.update.run(
+			self.parent.app.update.run("")

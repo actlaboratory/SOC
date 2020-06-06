@@ -10,12 +10,13 @@ class update():
 		response = requests.get(url)# サーバーに最新バージョンを問い合わせる
 		if response.text == "latest":
 			return False
-		info = response.text.sprit("\n")
+		info = response.text.split("\n")
 		self.downLoad = info[0]
 		self.version = info[1]
-		self.msg = info[1]
+		self.msg = info[2]
 		return True
-	def run(self, path, wakeWord):
-		subprocess.Popen(("up.exe", self.download, wakeWord))
+	def run(self, wakeWord):
+		path = os.path.abspath(sys.argv[0])
+		subprocess.Popen(("up.exe", path, self.download, wakeWord))
 		sys.exit()
 
