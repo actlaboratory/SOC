@@ -267,7 +267,7 @@ class Events(BaseEvents):
 				self.parent.app.update.run("")
 			if code == errorCodes.UPDATER_VISIT_SITE:
 				URL = self.parent.app.update.URL
-				if qDialog(_("%sにアクセスする必要があります。ブラウザーでこのページを開きますか？"% (URL))) == wx.ID_NO:
+				if qDialog(_("緊急のお知らせがあります。\nタイトル:%s\n詳細をブラウザーで開きますか？"% (self.parent.app.update.description))) == wx.ID_NO:
 					return
 				webbrowser.open(URL)
 			if code == errorCodes.UPDATER_FAILED_PARAM:

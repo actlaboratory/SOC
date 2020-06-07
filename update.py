@@ -28,6 +28,7 @@ class update():
 			self.description = json["update_description"]
 		if code == errorCodes.UPDATER_VISIT_SITE:
 			self.URL = json["URL"]
+			self.description = json["info_description"]
 		return code
 	def run(self, wakeWord):
 		path = os.path.abspath(sys.argv[0])
