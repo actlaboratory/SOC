@@ -66,14 +66,7 @@ class Main(wx.App):
 		self.update = update.update()
 		# メインビューを表示
 		self.hMainView=main.MainView()
-		i = 0
-		for arg in sys.argv:
-			if i == 0:
-				continue
-			path = pathlib.Path(arg)
-			self.hMainView.OcrManager.OcrList.append(path)
-			self.hMainView.filebox.Append(path.name)
-			i +=1
+		self.addFileList(sys.argv[1:])
 		self.hMainView.Show()
 		return True
 
@@ -118,6 +111,21 @@ class Main(wx.App):
 		self.speech.speak(s)
 	def OnExit(self):
 		return wx.App.OnExit(self)
+
+	def addFileList(self, files):
+		error = False
+		for file in files:
+			path = pathlib.Path(file)
+			suffix = path.suffix.lower()
+			if suffix in constants.AVAILABLE_FORMATS:
+				if path in self.hMainView.OcrManager.OcrList:
+					continue
+				self.hMainView.OcrManager.OcrList.append(path)
+				self.hMainView.filebox.Append(path.name)
+			else:
+				error = True
+		if error == True:
+			errorDialog(_("対応していないフォーマットのファイルが検出されたためっじょが胃されました。"))
 
 	def SetTimeZone(self):
 		bias=win32api.GetTimeZoneInformation(True)[1][0]*-1

@@ -103,12 +103,7 @@ class Events(BaseEvents):
 		dialog = wx.FileDialog(None, _("画像ファイルを選択"), style=wx.FD_OPEN|wx.FD_MULTIPLE, wildcard=_("画像ファイル(*.jpg;*.png;*.gif;*.pdf) | *.jpg;*.png;*.gif;*.pdf | すべてのファイル(*.*) | *.*"))
 		if dialog.ShowModal() == wx.ID_CANCEL:
 			return
-		for path in dialog.GetPaths():
-			filePath = pathlib.Path(path)
-			if filePath in self.parent.OcrManager.OcrList:
-				continue
-			self.parent.OcrManager.OcrList.append(filePath)
-			self.parent.filebox.Append(filePath.name)
+		self.parent.app.addFileList(dialog.GetPaths())
 		return
 	def engine(self, events):
 		index = self.parent.engine.GetSelection()
@@ -188,12 +183,7 @@ class Events(BaseEvents):
 		if selected == menuItemsStore.getRef("PAST"):
 			c=clipboard.ClipboardFile()
 			pathList = c.GetFileList()
-			for path in pathList:
-				filePath = pathlib.Path(path)
-				if filePath in pathList:
-					continue
-				self.parent.OcrManager.OcrList.append(filePath)
-				self.parent.filebox.Append(filePath.name)
+			self.parent.app.addFileList(pathList)
 			return
 		if selected==menuItemsStore.getRef("GOOGLE"):
 			#確認ダイアログ表示

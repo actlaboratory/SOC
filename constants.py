@@ -9,9 +9,8 @@ APP_NAME="SOC"
 APP_VERSION="0.5.0"
 APP_COPYRIGHT_YEAR="2020"
 APP_DEVELOPERS="Guredora"
-
 SUPPORTING_LANGUAGE=("ja-JP","en-US")
-
+AVAILABLE_FORMATS = (".jpg", ".png", ".gif", ".pdf")
 #各種ファイル名
 SETTING_FILE_NAME="settings.ini"
 KEYMAP_FILE_NAME="keymap.ini"
