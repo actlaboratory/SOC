@@ -11,7 +11,7 @@ def winDialog(title,message):
 	ctypes.windll.user32.MessageBoxW(0,message,title,0x00000040)
 def qDialog(message, title="確認"):
 	dialog = wx.MessageDialog(None,message,title,wx.YES_NO|wx.ICON_QUESTION)
-	winsound.MessageBeep(winsound.MB_ICONQUESTION)
+	winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
 	result = dialog.ShowModal()
 	dialog.Destroy()
 	return result

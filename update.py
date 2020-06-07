@@ -24,6 +24,7 @@ class update():
 		print(code)
 		if code == errorCodes.UPDATER_NEED_UPDATE:
 			self.download = json["updater_url"]
+			self.version = json["update_version"]
 			self.description = json["update_description"]
 		if code == errorCodes.UPDATER_VISIT_SITE:
 			self.URL = json["URL"]
