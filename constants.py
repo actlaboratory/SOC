@@ -6,7 +6,7 @@ import wx
 import os
 #アプリケーション基本情報
 APP_NAME="SOC"
-APP_VERSION="0.5"
+APP_VERSION="0.5.0"
 APP_COPYRIGHT_YEAR="2020"
 APP_DEVELOPERS="Guredora"
 

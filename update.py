@@ -20,7 +20,8 @@ class update():
 			print(response.status_code)
 			return errorCodes.NET_ERROR
 		json = response.json()
-		self.code = json["code"]
+		code = json["code"]
+		print(code)
 		if code == errorCodes.UPDATER_NEED_UPDATE:
 			self.download = json["updater_url"]
 			self.description = json["update_description"]

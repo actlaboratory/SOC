@@ -270,4 +270,6 @@ class Events(BaseEvents):
 				if qDialog(_("%sにアクセスする必要があります。ブラウザーでこのページを開きますか？"% (URL))) == wx.ID_NO:
 					return
 				webbrowser.open(URL)
-			
+			if code == errorCodes.UPDATER_FAILED_PARAM:
+				dialog(_("リクエストパラメーターが不正です。開発者にお問い合わせください。"), _("アップデート"))
+				return
