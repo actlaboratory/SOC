@@ -92,13 +92,18 @@ class Main(wx.App):
 		"""翻訳を初期化する。"""
 		lang=self.config.getstring("general","language","",constants.SUPPORTING_LANGUAGE)
 		if lang == "":
-			# 言語選択を表示
-			dialog("please select language.", "information")
-			langSelect = langDialog.langDialog()
-			langSelect.Initialize()
-			langSelect.Show()
-			self.config["general"]["language"] = langSelect.GetValue()
-			lang = langSelect.GetValue()
+			if locale.getdefaultlocale()[0] == "ja_JP":
+				self.config["general"]["language"] = "ja-JP"
+			elif locale.getdefaultlocale()[0] == "en_US":
+				self.config["general"]["language"] = "en-US"
+			else:
+				# 言語選択を表示
+				dialog("please select language.", "information")
+				langSelect = langDialog.langDialog()
+				langSelect.Initialize()
+				langSelect.Show()
+				self.config["general"]["language"] = langSelect.GetValue()
+			lang = self.config["general"]["language"]
 		self.translator=gettext.translation("messages","locale", languages=[lang], fallback=True)
 		self.translator.install()
 

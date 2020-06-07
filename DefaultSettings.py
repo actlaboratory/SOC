@@ -2,15 +2,16 @@
 #default config
 
 from ConfigManager import *
-
+import locale
 
 class DefaultSettings:
 	def get():
 		config = ConfigManager()
+		loc = locale.getdefaultlocale()[0].replace("_", "-")
 		config["general"]={
 			"language": "",
 			"fileVersion": "100",
-			"locale": "ja-JP"
+			"locale": loc
 		}
 		config["view"]={
 			"font": "bold 'ＭＳ ゴシック' 22 windows-932",
