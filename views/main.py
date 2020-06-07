@@ -3,6 +3,7 @@
 #Copyright (C) 2019 Yukio Nozawa <personal@nyanchangames.com>
 #Copyright (C) 2019-2020 yamahubuki <itiro.ishino@gmail.com>
 #Copyright (C) 2020 guredora <contact@guredora.com>
+
 import logging
 import os
 import sys
@@ -53,16 +54,48 @@ class MainView(BaseView):
 		fileListKeymap = keymap.KeymapHandler(defaultKeymap.defaultKeymap)
 		acceleratorTable = fileListKeymap.GetTable("fileList")
 		self.filebox.SetAcceleratorTable(acceleratorTable)
+		self.filebox.SetDropTarget(DropTarget(self))	#D&Dの受け入れ
+
 		vCreator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,creator.GetSizer(),wx.VERTICAL,20)
 		self.open = vCreator.button(_("追加"), self.events.open)
 		self.delete = vCreator.button(_("削除"), self.events.delete)
+
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),views.ViewCreator.FlexGridSizer,10)
 		self.engine = creator.combobox(_("OCRエンジン"), (_("google (インターネット)"), _("tesseract (ローカル)")), self.events.engine)
 		self.tesseract = creator.combobox(_("モード"), (_("横書き通常"), _("横書き低負荷版"), _("縦書き通常"), _("縦書き低負荷版")), self.events.tesseract_mode)
 		self.tesseract.Disable()
+
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),wx.HORIZONTAL,20,style=wx.ALIGN_RIGHT)
 		self.convert = creator.button(_("変換"), self.events.convert)
 		self.exit = creator.button(_("終了"), self.events.Exit)
+
+# D&D受入関連
+class DropTarget(wx.DropTarget):
+	def __init__(self,parent):
+		super().__init__(wx.FileDataObject())
+		self.parent=parent			#mainViewオブジェクトが入る
+
+	#マウスオーバー時に呼ばれる
+	#まだマウスを放していない
+	def OnDragOver(self,x,y,defResult):
+		return defResult
+
+	#ドロップされずにマウスが外に出た
+	#戻り値不要
+	def OnLeave(self):
+		pass
+
+	#マウスが放されたら呼ばれる
+	#現在データの受け入れが可能ならTrue
+	def OnDrop(self,x,y):
+		return True
+
+	#データを受け入れ、結果を返す
+	def OnData(self,x,y,defResult):
+		self.GetData()
+		globalVars.app.addFileList(self.DataObject.GetFilenames())
+		return defResult		#推奨されたとおりに返しておく
+
 
 class Menu(BaseMenu):
 	def Apply(self,target):
@@ -263,3 +296,8 @@ class Events(BaseEvents):
 			if code == errorCodes.UPDATER_FAILED_PARAM:
 				dialog(_("リクエストパラメーターが不正です。開発者にお問い合わせください。"), _("アップデート"))
 				return
+
+
+
+
+
