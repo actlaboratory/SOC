@@ -4,22 +4,34 @@
 import requests
 import subprocess
 import errorCodes
+import ConfigManager
+import os
+import pathlib
+import sys
+
 class update():
 	def check(self, app_name, current_version, check_url):
-		url = "%s?name=%s&version=%s" % (check_url, app_name, current_version)# 引数からURLを生成
+		url = "%s?name=%s&updater_version=1.0.0&version=%s" % (check_url, app_name, current_version)# 引数からURLを生成
 		try:
 			response = requests.get(url)# サーバーに最新バージョンを問い合わせる
 		except requests.exceptions.ConnectionError as c:
 			return errorCodes.NET_ERROR
-		if response.text == "latest":
-			return False
-		info = response.text.split("\n")
-		self.downLoad = info[0]
-		self.version = info[1]
-		self.msg = info[2]
-		return True
+		if not response.status_code == 200:
+			print(response.status_code)
+			return errorCodes.NET_ERROR
+		json = response.json()
+		self.code = json["code"]
+		if code == errorCodes.UPDATER_NEED_UPDATE:
+			self.download = json["updater_url"]
+			self.description = json["update_description"]
+		if code == errorCodes.UPDATER_VISIT_SITE:
+			self.URL = json["URL"]
+		return code
 	def run(self, wakeWord):
 		path = os.path.abspath(sys.argv[0])
-		subprocess.Popen(("up.exe", path, self.download, wakeWord))
+		response = requests.get(self.download)
+		up_name = os.path.basename(self.download)
+		pathlib.Path(up_name).write_bytes(response.content)
+		subprocess.Popen(("up.exe", path, up_name, wakeWord))
 		sys.exit()
 
