@@ -21,6 +21,7 @@ import errorCodes
 import CredentialManager
 from views import main
 import update
+import webbrowser
 
 class Main(wx.App):
 	def initialize(self):
@@ -64,6 +65,8 @@ class Main(wx.App):
 		self.credentialManager=CredentialManager.CredentialManager()
 		# update関係を準備
 		self.update = update.update()
+		if self.config.getboolean("general", "update"):
+			self.autoUpdate()
 		# メインビューを表示
 		self.hMainView=main.MainView()
 		self.addFileList(sys.argv[1:])
@@ -116,6 +119,22 @@ class Main(wx.App):
 		self.speech.speak(s)
 	def OnExit(self):
 		return wx.App.OnExit(self)
+
+	def autoUpdate(self):
+		code = self.update.check(constants.APP_NAME, constants.APP_VERSION, constants.UPDATE_URL)
+		if code == errorCodes.NET_ERROR:
+			dialog(_("サーバーとの通信に失敗しました。"), _("アップデート"))
+			return
+		if code == errorCodes.UPDATER_NEED_UPDATE:
+			result = qDialog(_("バージョン%sにアップデートすることができます。%sアップデートを開始しますか？" % (self.update.version, self.update.description)), _("アップデート"))
+			if result == wx.ID_NO:
+				return
+			self.update.run("")
+		if code == errorCodes.UPDATER_VISIT_SITE:
+			URL = self.update.URL
+			if qDialog(_("緊急のお知らせがあります。\nタイトル:%s\n詳細をブラウザーで開きますか？"% (self.update.description))) == wx.ID_NO:
+				return
+			webbrowser.open(URL)
 
 	def addFileList(self, files):
 		error = False

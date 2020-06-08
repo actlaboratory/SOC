@@ -11,7 +11,8 @@ class DefaultSettings:
 		config["general"]={
 			"language": "",
 			"fileVersion": "100",
-			"locale": loc
+			"locale": loc,
+			"update": True
 		}
 		config["view"]={
 			"font": "bold 'ＭＳ ゴシック' 22 windows-932",
