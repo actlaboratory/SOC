@@ -119,6 +119,7 @@ class Main(wx.App):
 
 	def addFileList(self, files):
 		error = False
+		add = False
 		for file in files:
 			path = pathlib.Path(file)
 			suffix = path.suffix.lower()
@@ -127,10 +128,14 @@ class Main(wx.App):
 					continue
 				self.hMainView.OcrManager.OcrList.append(path)
 				self.hMainView.filebox.Append(path.name)
+				add = True
 			else:
 				error = True
-		if error == True:
-			errorDialog(_("対応していないフォーマットのファイルが検出されたためっじょが胃されました。"))
+		if error:
+			if add:
+				errorDialog(_("対応していないフォーマットのファイルは除外され、一部のファイルのみ追加されました。"))
+			else:
+				errorDialog(_("このフォーマットのファイルには対応していないため、追加できませんでした。"))
 
 	def SetTimeZone(self):
 		bias=win32api.GetTimeZoneInformation(True)[1][0]*-1
