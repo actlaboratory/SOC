@@ -11,6 +11,7 @@ WAITING_USER=6		#ユーザの操作待ち
 FILE_NOT_SUPPORTED=7#対応していないファイル
 NOT_AUTHORIZED=8#グーグルで認証していない
 NET_ERROR=9#通信関連のエラー
+GOOGLE_ERROR = 10
 UPDATER_VERSION = "1.0.0"
 UPDATER_NEED_UPDATE = 200# アップデートが必要
 UPDATER_LATEST = 204# アップデートが無い

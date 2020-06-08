@@ -166,7 +166,6 @@ class Events(BaseEvents):
 		ocrThread = threading.Thread(target=self.parent.OcrManager.lapped_ocr_exe, args=(convertDialog, result))
 		ocrThread.start()
 		convertDialog.Show(True)
-		print(result)
 		if errorCodes.CANCELED in result:
 			dialog(_("キャンセルされました。"), _("結果"))
 			return
@@ -182,9 +181,11 @@ class Events(BaseEvents):
 		if errorCodes.NET_ERROR in result:
 			errorDialog(_("通信中にエラーが発生しました。ネット接続を確認するか時間をおいてから再度お試しください。"))
 			return
-		if errorCodes.UNKNOWN in result:
+		if errorCodes.GOOGLE_ERROR in result:
 			errorDialog(_("エラーが発生しました。ファイルが画像ファイルか、ファイルが破損していないかなどを確認してください。"))
 			return
+		if errorCodes.UNKNOWN in result:
+			errorDialog(_("何らかの理由により変換に失敗しました。errorlog.txtをご確認ください。"))
 		if errorCodes.FILE_NOT_SUPPORTED in result:
 			errorDialog(_("このエンジンではこのファイル形式は対応していません。"))
 			return
