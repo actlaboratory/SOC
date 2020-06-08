@@ -142,6 +142,9 @@ class Main(wx.App):
 		for file in files:
 			path = pathlib.Path(file)
 			suffix = path.suffix.lower()
+			if path.is_dir():
+				error=True
+				continue
 			if suffix in constants.AVAILABLE_FORMATS:
 				if path in self.hMainView.OcrManager.OcrList:
 					continue
