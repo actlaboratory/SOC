@@ -18,6 +18,7 @@ import io
 import os
 import threading
 import wx
+import traceback
 
 class OcrTool():
 	def __init__(self):
@@ -141,7 +142,7 @@ class OcrManager():
 					text = self.tool.google_ocr(Path, self.Credential.credential)
 				except(errors.HttpError) as error:
 					self.SavedText = ""
-					return errorCodes.UNKNOWN
+					return errorCodes.GOOGLE_ERROR
 			if self.Engine == 1:#tesseractの呼び出し
 				try:
 					text = self.tool.tesseract_ocr(Path, self.mode, dialog)
@@ -156,6 +157,11 @@ class OcrManager():
 			self.TextSave(Path.with_suffix(".txt"), text)#ファイルに保存
 		return errorCodes.OK
 	def lapped_ocr_exe(self, dialog, result):
-		result.append(self.ocr_exe(dialog))
-		wx.CallAfter(dialog.end)
-		return
+		try:
+			result.append(self.ocr_exe(dialog))
+		except exception as c:
+			result.append(errorCodes.UNKNOWN)
+			pathlib.Path("errorlog.txt").write_text(traceback.format_exc())
+		finally:
+			wx.CallAfter(dialog.end)
+			return
