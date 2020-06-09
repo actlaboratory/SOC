@@ -21,7 +21,7 @@ class ConfigManager(configparser.ConfigParser):
 		if os.path.exists(fileName):
 			self.log.info("read configFile:"+fileName)
 			try:
-				with open(self.fileName,"r") as f: return super().read(f,"utf-8")
+				with open(self.fileName,"r",encoding="utf-8") as f: return super().read(f)
 			except configparser.ParsingError:
 				self.log.warning("configFile parse failed.")
 				return []
@@ -31,7 +31,7 @@ class ConfigManager(configparser.ConfigParser):
 
 	def write(self):
 		self.log.info("write configFile:"+self.fileName)
-		with open(self.fileName,"w") as f: return super().write(f,"utf-8")
+		with open(self.fileName,"w",encoding="utf-8") as f: return super().write(f)
 
 	def __getitem__(self,key):
 		try:
