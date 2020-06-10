@@ -27,7 +27,7 @@ from simpleDialog import *
 import Ocr
 import views.convert
 import views.converted
-
+import views.fontManager
 class MainView(BaseView):
 	def __init__(self):
 		super().__init__()

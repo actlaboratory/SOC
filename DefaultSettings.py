@@ -8,6 +8,10 @@ class DefaultSettings:
 	def get():
 		config = ConfigManager()
 		loc = locale.getdefaultlocale()[0].replace("_", "-")
+		if loc == "en-US":
+			font = "Bold 'times new roman' 22 windows-1252"
+		if loc == "ja-JP":
+			font = "bold 'ＭＳ ゴシック' 22 windows-932"
 		config["general"]={
 			"language": "",
 			"fileVersion": "100",
@@ -15,7 +19,7 @@ class DefaultSettings:
 			"update": True
 		}
 		config["view"]={
-			"font": "bold 'ＭＳ ゴシック' 22 windows-932",
+			"font": font,
 			"colorMode":1
 		}
 		config["speech"]={
@@ -23,8 +27,5 @@ class DefaultSettings:
 		}
 		config["mainView"]={
 
-		}
-		config["ocr"] = {
-			"pdf_pages":  20
 		}
 		return config
