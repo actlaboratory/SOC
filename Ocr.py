@@ -1,3 +1,4 @@
+#Soc OCR module
 #Copyright (C) 2020 guredora <contact@guredora.com>
 
 import globalVars

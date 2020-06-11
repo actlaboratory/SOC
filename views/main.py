@@ -27,7 +27,6 @@ from simpleDialog import *
 import Ocr
 import views.convert
 import views.converted
-import views.fontManager
 class MainView(BaseView):
 	def __init__(self):
 		super().__init__()
@@ -192,6 +191,9 @@ class Events(BaseEvents):
 		if errorCodes.OK in result:
 			converted = views.converted.Dialog()
 			converted.result = self.parent.OcrManager.SavedText
+			if self.parent.OcrManager.Engine == 1:
+				converted.tesseract_flag = True
+				converted.list = self.parent.OcrManager.saved
 			converted.Initialize()
 			converted.Show()
 			converted.Destroy()
