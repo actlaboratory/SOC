@@ -44,21 +44,18 @@ class OcrTool():
 	# googleのOcr呼び出し
 	def google_ocr(self, local_file_path, credential):
 		service = discovery.build("drive", "v3", credentials=credential)
-		with local_file_path.open() as f:
+		with local_file_path.open("rb") as f:
 			media_body = MediaIoBaseUpload(f, mimetype="application/vnd.google-apps.document", resumable=True)
-		print("execting")
-		file = service.files().create(
-				body = {
-					"name": local_file_path.name,
-					"mimeType":"application/vnd.google-apps.document"
-				},
-				media_body = media_body,
-				ocrLanguage = "ja",
-				fields="id"
-		).execute()
-		print(file)
+			file = service.files().create(
+					body = {
+						"name": local_file_path.name,
+						"mimeType":"application/vnd.google-apps.document"
+					},
+					media_body = media_body,
+					ocrLanguage = "ja",
+					fields="id"
+			).execute()
 		ID = file.get("id")
-		print(ID)
 		request = service.files().export_media(fileId=ID, mimeType = "text/plain")
 		fh = io.BytesIO()
 		downloader = MediaIoBaseDownload(fh, request)
@@ -126,7 +123,7 @@ class OcrManager():
 		if self.Engine == 0:
 			try:
 				self.Credential = CredentialManager.CredentialManager(True)
-			except Exception:
+			except:
 				return errorCodes.NET_ERROR#ネットワーク関係のエラー
 		for Path in self.OcrList:
 			if dialog.cancel:#キャンセル処理
@@ -137,7 +134,7 @@ class OcrManager():
 				self.allDelete()
 				self.SavedText = ""
 				return errorCodes.FILE_NOT_FOUND
-			wx.CallAfter(dialog.changeName, (Path.stem))
+			wx.CallAfter(dialog.changeName, (Path.name))
 			if self.Engine == 0:#googleの呼び出し
 				if not self.Credential.isOK():
 					self.SavedText = ""
@@ -164,9 +161,11 @@ class OcrManager():
 	def lapped_ocr_exe(self, dialog, result):
 		try:
 			result.append(self.ocr_exe(dialog))
-		except exception as c:
+		except:
+			traceback.print_exc()
 			result.append(errorCodes.UNKNOWN)
 			pathlib.Path("errorlog.txt").write_text(traceback.format_exc())
+			self.allDelete()
 		finally:
 			wx.CallAfter(dialog.end)
 			return
