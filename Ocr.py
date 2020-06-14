@@ -12,7 +12,7 @@ import CredentialManager
 from PIL import UnidentifiedImageError
 import httplib2
 from apiclient import discovery
-from googleapiclient.http import MediaFileUpload
+from googleapiclient.http import MediaIoBaseUpload
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient import errors
 import io
@@ -44,7 +44,9 @@ class OcrTool():
 	# googleのOcr呼び出し
 	def google_ocr(self, local_file_path, credential):
 		service = discovery.build("drive", "v3", credentials=credential)
-		media_body = MediaFileUpload(local_file_path, mimetype="application/vnd.google-apps.document", resumable=True)
+		with local_file_path.open() as f:
+			media_body = MediaIoBaseUpload(f, mimetype="application/vnd.google-apps.document", resumable=True)
+		print("execting")
 		file = service.files().create(
 				body = {
 					"name": local_file_path.name,
@@ -53,8 +55,10 @@ class OcrTool():
 				media_body = media_body,
 				ocrLanguage = "ja",
 				fields="id"
-			).execute()
+		).execute()
+		print(file)
 		ID = file.get("id")
+		print(ID)
 		request = service.files().export_media(fileId=ID, mimeType = "text/plain")
 		fh = io.BytesIO()
 		downloader = MediaIoBaseDownload(fh, request)
