@@ -20,6 +20,7 @@ import os
 import threading
 import wx
 import traceback
+import PyPDF2
 
 class OcrTool():
 	def __init__(self):
@@ -45,7 +46,13 @@ class OcrTool():
 	def google_ocr(self, local_file_path, credential):
 		service = discovery.build("drive", "v3", credentials=credential)
 		with local_file_path.open("rb") as f:
-			media_body = MediaIoBaseUpload(f, mimetype="application/vnd.google-apps.document", resumable=True)
+			reader = PyPDF2.PdfFileReader(str(local_file_path))
+			writer = PyPDF2.PdfFileWriter()
+			res = writer.cloneDocumentFromReader(reader)
+			writer.removeText()
+			fv = io.BytesIO()
+			writer.write(fv)
+			media_body = MediaIoBaseUpload(fv, mimetype="application/vnd.google-apps.document", resumable=True)
 			file = service.files().create(
 					body = {
 						"name": local_file_path.name,
