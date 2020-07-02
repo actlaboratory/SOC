@@ -7,11 +7,13 @@ import subprocess
 import shutil
 import distutils.dir_util
 import PyInstaller
+import diff_archiver
 def runcmd(cmd):
 	proc=subprocess.Popen(cmd.split(), shell=True, stdout=1, stderr=2)
 	proc.communicate()
 
 appveyor=False
+BASE_PACKAGE_URL="https://github.com/actlaboratory/SOC/releases/download/0.0.5/SOC-0.0.5.zip"
 
 if len(sys.argv)==2 and sys.argv[1]=="--appveyor":
 	appveyor=True
@@ -42,4 +44,8 @@ shutil.copytree("poppler\\", "dist\\SOC\\poppler")
 shutil.copytree("locale\\","dist\\SOC\\locale", ignore=shutil.ignore_patterns("*.po", "*.pot", "*.po~"))
 print("Compressing into package...")
 shutil.make_archive("SOC-%s" % (build_filename),'zip','dist')
+
+print("Making patch...")
+archiver=diff_archiver.DiffArchiver(BASE_PACKAGE_URL,"SOC-%s.zip" % (build_filename),"SOC-%spatch" % (build_filename))
+archiver.work()
 print("Done!")
