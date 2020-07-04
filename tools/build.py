@@ -45,7 +45,10 @@ shutil.copytree("locale\\","dist\\SOC\\locale", ignore=shutil.ignore_patterns("*
 print("Compressing into package...")
 shutil.make_archive("SOC-%s" % (build_filename),'zip','dist')
 
-print("Making patch...")
-archiver=diff_archiver.DiffArchiver(BASE_PACKAGE_URL,"SOC-%s.zip" % (build_filename),"SOC-%spatch" % (build_filename))
-archiver.work()
-print("Done!")
+if build_filename=="snapshot":
+	print("Skipping batch archiving because this is a snapshot release.")
+else:
+	print("Making patch...")
+	archiver=diff_archiver.DiffArchiver(BASE_PACKAGE_URL,"SOC-%s.zip" % (build_filename),"SOC-%spatch" % (build_filename))
+	archiver.work()
+print("Build finished!")
