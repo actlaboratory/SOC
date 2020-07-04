@@ -7,7 +7,6 @@ skip_branch_with_pr: true
 
 environment:
   matrix:
-
     # For Python versions available on Appveyor, see
     # http://www.appveyor.com/docs/installed-software#python
     # The list here is complete (excluding Python 2.6, which
@@ -43,12 +42,11 @@ artifacts:
 
 deploy:
   - provider: GitHub
-    description: 'SOC official release'
+    description: "SOC official release"
     auth_token:
       secure: UcoHc3nVwi+4feNv3QuMZy2qgZmTVElAD9iMr9UxcEUTA0PP2beWDMuiNhBoNYeA
-    artifact: SOC-$(APPVEYOR_REPO_TAG_NAME).zip
+    artifact: SOC-*.zip
     draft: false
     prerelease: false
     on:
       APPVEYOR_REPO_TAG: true
-
