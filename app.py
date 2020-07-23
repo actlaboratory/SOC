@@ -73,6 +73,8 @@ class Main(wx.App):
 		# メインビューを表示
 		self.hMainView=main.MainView()
 		self.addFileList(sys.argv[1:])
+		if self.config.getboolean(self.hMainView.identifier,"maximized",False):
+			self.hMainView.hFrame.Maximize()
 		self.hMainView.Show()
 		return True
 
