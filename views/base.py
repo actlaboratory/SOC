@@ -102,14 +102,20 @@ class BaseEvents(object):
 	def WindowMove(self,event):
 		#設定ファイルに位置を保存
 		globalVars.app.config[self.identifier]["positionX"]=self.parent.hFrame.GetPosition().x
-		globalVars.app.config[self.identifier]["positionY"]=self.parent.hFrame.GetPosition().x
+		globalVars.app.config[self.identifier]["positionY"]=self.parent.hFrame.GetPosition().y
 
 	# wx.EVT_SIZE→wx.SizeEvent
 	def WindowResize(self,event):
-		if self.parent.hFrame.GetWindowStyleFlag() | wx.RESIZE_BORDER==wx.RESIZE_BORDER:
-			#設定ファイルにサイズを保存
-			globalVars.app.config[self.identifier]["sizeX"]=event.GetSize().x
-			globalVars.app.config[self.identifier]["sizeY"]=event.GetSize().y
+		#ウィンドウがアクティブでない時(ウィンドウ生成時など)のイベントは無視
+		if self.parent.hFrame.IsActive():
+			#最大化状態でなければ、設定ファイルにサイズを保存
+			if not self.parent.hFrame.IsMaximized():
+				globalVars.app.config[self.identifier]["sizeX"]=event.GetSize().x
+				globalVars.app.config[self.identifier]["sizeY"]=event.GetSize().y
+
+			#設定ファイルに最大化状態か否かを保存
+			globalVars.app.config[self.identifier]["maximized"]=self.parent.hFrame.IsMaximized()
 
 		#sizerを正しく機能させるため、Skipの呼出が必須
 		event.Skip()
+
