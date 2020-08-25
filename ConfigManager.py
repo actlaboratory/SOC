@@ -21,7 +21,7 @@ class ConfigManager(configparser.ConfigParser):
 		if os.path.exists(fileName):
 			self.log.info("read configFile:"+fileName)
 			try:
-				with open(self.fileName,"r",encoding="utf-8") as f: return super().read(f)
+				return super().read(fileName, encoding='UTF-8')
 			except configparser.ParsingError:
 				self.log.warning("configFile parse failed.")
 				return []
