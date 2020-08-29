@@ -13,6 +13,8 @@ from logging import getLogger, FileHandler, Formatter
 
 import constants
 import DefaultSettings
+from views import langDialog
+
 
 class MaiｎBase(wx.App):
 	def __init__(self):
