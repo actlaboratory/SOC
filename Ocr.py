@@ -4,11 +4,13 @@
 import globalVars
 from PIL import Image
 import pyocr
+import constants
 import pyocr.builders
 from pdf2image import convert_from_path
 import pathlib
 import errorCodes
 import CredentialManager
+import simpleDialog
 from PIL import UnidentifiedImageError
 import httplib2
 from apiclient import discovery
@@ -18,8 +20,11 @@ from googleapiclient import errors
 import io
 import os
 import threading
+import time
 import wx
 import traceback
+import subprocess
+import namedPipe
 
 class OcrTool():
 	def __init__(self):
@@ -101,8 +106,8 @@ class OcrManager():
 		self.mode = -1
 		self.tool = OcrTool()
 		os.environ["PATH"] += os.pathsep + os.getcwd() + "/poppler/bin"
-	# ファイル名とテキストを渡すと保存する関数
 	def TextSave(self, filePath, text):
+		"""ファイル名とテキストを渡すと保存する。"""
 		if isinstance(filePath, pathlib.WindowsPath):
 			filePath.write_text(text, encoding="utf-8")
 			txt = filePath.read_text(encoding="utf-8")
@@ -114,12 +119,28 @@ class OcrManager():
 		self.SavedText += text
 		return
 
-	def allDelete(self):#変換済みファイルを一掃する
+	def allDelete(self):
+		"""変換済みファイルを一層する。"""
 		for path in self.saved:
 			path.unlink()
 		return
-	# Ocrの実行
+
+	def pdfTextChecker(self, path):
+		"""pathに指定されたpdfファイルにテキストが含まれているか判定する。"""
+		pipeServer = namedPipe.Server(constants.PIPE_NAME)
+		pipeServer.start()
+		subprocess.run(("pdftotext", path, pipeServer.getFullName()))
+		list = pipeServer.getNewMessageList()
+		pipeServer.exit()
+		print(list)
+		return True
+
+	def showPdfDialog(self):
+		self.qPdfImage = simpleDialog.qDialog(_("pdfからテキストが検出されたため画像に変換して送信します。よろしいですか？"))
+		return
+
 	def ocr_exe(self, dialog):
+		"""ocrを実行する。"""
 		if self.Engine == 0:
 			try:
 				self.Credential = CredentialManager.CredentialManager(True)
@@ -140,6 +161,17 @@ class OcrManager():
 					self.SavedText = ""
 					return errorCodes.NOT_AUTHORIZED
 				self.Credential.Authorize()
+				if Path.suffix == ".pdf":
+					print("きた")
+					isText = self.pdfTextChecker(str(Path.resolve()))
+					if isText:
+						self.qPdfImage = None
+						wx.CallAfter(self.showPdfDialog)
+						while True:
+							if self.qPdfImage is not None:
+								break
+							time.sleep(0.01)
+						continue
 				try:
 					text = self.tool.google_ocr(Path, self.Credential.credential)
 				except(errors.HttpError) as error:
