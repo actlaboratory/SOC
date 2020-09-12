@@ -8,6 +8,7 @@ import constants
 import pyocr.builders
 from pdf2image import convert_from_path
 import pathlib
+import sys
 import errorCodes
 import CredentialManager
 import simpleDialog
@@ -24,7 +25,6 @@ import time
 import wx
 import traceback
 import subprocess
-import namedPipe
 
 class OcrTool():
 	def __init__(self):
@@ -127,14 +127,19 @@ class OcrManager():
 
 	def pdfTextChecker(self, path):
 		"""pathに指定されたpdfファイルにテキストが含まれているか判定する。"""
-		pipeServer = namedPipe.Server(constants.PIPE_NAME)
-		pipeServer.start()
-		subprocess.run(("pdftotext", path, pipeServer.getFullName()))
-		list = pipeServer.getNewMessageList()
-		pipeServer.exit()
-		print(list)
-		return True
-
+		info = {}
+		output = subprocess.check_output(("pdfinfo", "-isodates", path), encoding="utf-8")
+		lines = output.split("\n")
+		for line in lines:
+			data = line.split(":", 1)
+			if len(data) == 2:
+				data[1] = data[1].strip()
+			else:
+				data.append("")
+			info[data[0]] = data[1]
+		if info["File size"] != "0 bytes":
+			return True
+		return False
 	def showPdfDialog(self):
 		self.qPdfImage = simpleDialog.qDialog(_("pdfからテキストが検出されたため画像に変換して送信します。よろしいですか？"))
 		return
@@ -171,7 +176,9 @@ class OcrManager():
 							if self.qPdfImage is not None:
 								break
 							time.sleep(0.01)
-						continue
+						if self.qPdfImage == wx.ID_YES:
+							print("pdf image convert")
+							continue
 				try:
 					text = self.tool.google_ocr(Path, self.Credential.credential)
 				except(errors.HttpError) as error:

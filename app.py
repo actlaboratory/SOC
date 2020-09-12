@@ -5,6 +5,7 @@ import AppBase
 from views import main
 import CredentialManager
 import sys
+import _locale
 import update
 import constants
 import errorCodes
