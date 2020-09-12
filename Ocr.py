@@ -128,7 +128,8 @@ class OcrManager():
 	def pdfTextChecker(self, path):
 		"""pathに指定されたpdfファイルにテキストが含まれているか判定する。"""
 		info = {}
-		output = subprocess.check_output(("pdfinfo", "-isodates", path), encoding="utf-8")
+		os.environ["PYTHONIOENCODING"] = "utf-8"
+		output = subprocess.check_output(("pdfinfo", path), encoding="utf-8")
 		lines = output.split("\n")
 		for line in lines:
 			data = line.split(":", 1)
