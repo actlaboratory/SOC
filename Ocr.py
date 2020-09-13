@@ -40,7 +40,7 @@ class OcrTool():
 		return
 	# pdfを画像に変換する
 	def pdf_convert(self, path, images):
-		tmp = pathlib.Path(os.environ["TEMP"]).joinpath("OcrTool")
+		tmp = pathlib.Path(os.environ["TEMP"]).joinpath("soc")
 		if tmp.exists():
 			self.tmpDelete(tmp)
 		tmp.mkdir()
@@ -129,7 +129,7 @@ class OcrManager():
 		"""pathに指定されたpdfファイルにテキストが含まれているか判定する。"""
 		info = {}
 		os.environ["PYTHONIOENCODING"] = "utf-8"
-		output = subprocess.check_output(("pdfinfo", path), encoding="utf-8")
+		output = subprocess.check_output(("pdfinfo", path), encoding="cp932")
 		lines = output.split("\n")
 		for line in lines:
 			data = line.split(":", 1)
@@ -179,6 +179,23 @@ class OcrManager():
 							time.sleep(0.01)
 						if self.qPdfImage == wx.ID_YES:
 							print("pdf image convert")
+							images = []
+							pdfThread = threading.Thread(target = self.tool.pdf_convert, args = (str(Path), images), name = "pdfThread")
+							pdfThread.start()
+							pdfThread.join()
+							file = pathlib.Path(os.environ["temp"]).joinpath("soc/tmp.png")
+							text = ""
+							count = 0
+							for image in images:
+								image.save(str(file))
+								try:
+									text += self.tool.google_ocr(file, self.Credential.credential)
+									print(text)
+								except(errors.HttpError) as error:
+									self.SavedText = ""
+									return errorCodes.GOOGLE_ERROR
+								del images[count]
+								count += 1
 							continue
 				try:
 					text = self.tool.google_ocr(Path, self.Credential.credential)
