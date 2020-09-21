@@ -18,3 +18,11 @@ def allDelete(dirname):
 	path.rmdir()
 	return
 
+
+def textSave(name, text):
+	if isinstance(name, pathlib.WindowsPath):
+		path = name
+	else:
+		path = pathlib.Path(name)
+	path.write_text(text)
+

@@ -27,9 +27,7 @@ def _pdf_convert(path, images):
 	if tmp.exists():
 		util.allDelete(tmp)
 	tmp.mkdir()
-	result = convert_from_path(path, output_folder=str(tmp), thread_count=os.cpu_count()-1, fmt="png", dpi=400)
-	print(type(result))
-	images += result
+	images += convert_from_path(path, output_folder=str(tmp), thread_count=os.cpu_count()-1, fmt="png", dpi=400)
 
 def pdf_to_image(name):
 	path = pathlib.Path(name)
