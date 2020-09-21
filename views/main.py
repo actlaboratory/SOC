@@ -49,7 +49,7 @@ class MainView(BaseView):
 		self.InstallMenuEvent(Menu(self.identifier),self.events.OnMenuSelect)
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),wx.HORIZONTAL)
 		vCreator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,creator.GetSizer(),wx.VERTICAL)
-		self.filebox, self.list = vCreator.Listbox(_("ファイル一覧"), (), None,size=(450,200))
+		self.filebox, self.list = vCreator.listbox(_("ファイル一覧"), (), None,-1,0,(450,200))
 		fileListKeymap = keymap.KeymapHandler(defaultKeymap.defaultKeymap)
 		acceleratorTable = fileListKeymap.GetTable("fileList")
 		self.filebox.SetAcceleratorTable(acceleratorTable)
@@ -60,8 +60,8 @@ class MainView(BaseView):
 		self.delete = vCreator.button(_("削除"), self.events.delete)
 
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),views.ViewCreator.FlexGridSizer,10)
-		self.engine = creator.combobox(_("OCRエンジン"), (_("google (インターネット)"), _("tesseract (ローカル)")), self.events.engine)
-		self.tesseract = creator.combobox(_("モード"), (_("横書き通常"), _("横書き低負荷版"), _("縦書き通常"), _("縦書き低負荷版")), self.events.tesseract_mode)
+		self.engine, self.engineStatic = creator.combobox(_("OCRエンジン"), (_("google (インターネット)"), _("tesseract (ローカル)")), self.events.engine)
+		self.tesseract, self.tesseractStatic = creator.combobox(_("モード"), (_("横書き通常"), _("横書き低負荷版"), _("縦書き通常"), _("縦書き低負荷版")), self.events.tesseract_mode)
 		self.tesseract.Disable()
 
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),wx.HORIZONTAL,20,style=wx.ALIGN_RIGHT)

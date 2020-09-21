@@ -9,6 +9,7 @@ import update
 import constants
 import errorCodes
 from simpleDialog import *
+import pathlib
 
 class Main(AppBase.MainBase):
 	def __init__(self):
