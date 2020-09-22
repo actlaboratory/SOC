@@ -11,7 +11,7 @@ def pdfTextChecker(path):
 		return False
 	info = {}
 	os.environ["PYTHONIOENCODING"] = "utf-8"
-	output = subprocess.check_output(("pdfinfo", path), encoding="cp932")
+	output = subprocess.check_output(("pdfinfo", path)).decode("utf-8", errors="replace")
 	lines = output.split("\n")
 	for line in lines:
 		data = line.split(":", 1)
