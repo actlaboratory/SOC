@@ -13,6 +13,8 @@ import pathlib
 import errorCodes
 from simpleDialog import *
 import pathlib
+import util
+import os
 
 class Main(AppBase.MainBase):
 	def __init__(self):
@@ -83,7 +85,9 @@ class Main(AppBase.MainBase):
 	def OnExit(self):
 		#設定の保存やリソースの開放など、終了前に行いたい処理があれば記述できる
 		#ビューへのアクセスや終了の抑制はできないので注意。
-
+		file = pathlib.Path(os.environ["temp"]).joinpath("soc")
+		if file.exists():
+			util.allDelete(file)
 
 		#戻り値は無視される
 		return 0
