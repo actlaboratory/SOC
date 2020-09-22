@@ -9,7 +9,7 @@ APP_NAME="SOC"
 APP_VERSION="0.5.0"
 APP_COPYRIGHT_YEAR="2020"
 APP_DEVELOPERS="Guredora"
-SUPPORTING_LANGUAGE={"ja-JP": "日本語","en-US": "English"}# 対応言語一覧
+SUPPORTING_LANGUAGE={"ja_JP": "日本語","en_US": "English"}# 対応言語一覧
 AVAILABLE_FORMATS = (".jpg", ".png", ".gif", ".pdf")# 対応フォーマット一覧
 #各種ファイル名
 LOG_PREFIX="app"
