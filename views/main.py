@@ -130,7 +130,7 @@ class Events(BaseEvents):
 		self.parent.filebox.SetSelection(index-1)
 		return
 	def open(self, events=None):
-		dialog = wx.FileDialog(None, _("画像ファイルを選択"), style=wx.FD_OPEN|wx.FD_MULTIPLE, wildcard=_("画像ファイル(*.jpg;*.png;*.gif;*.pdf) | *.jpg;*.png;*.gif;*.pdf | すべてのファイル(*.*) | *.*"))
+		dialog = wx.FileDialog(None, _("画像ファイルを選択"), style=wx.FD_OPEN|wx.FD_MULTIPLE, wildcard=_("画像ファイル(*.jpg;*.png;*.gif;*.pdf) | *.jpg;*.png;*.gif;*.pdf; | すべてのファイル(*.*) | *.*"))
 		if dialog.ShowModal() == wx.ID_CANCEL:
 			return
 		self.parent.app.addFileList(dialog.GetPaths())
