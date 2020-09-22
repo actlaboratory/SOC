@@ -32,12 +32,14 @@ class OcrTool():
 	def __init__(self):
 		self.available_language=("jpn", "jpn_fast", "jpn_vert", "jpn_vert_fast")#tesseract-ocrの設定の保存
 
-	def google_ocr(self, local_file_path, credential, pdf_to_png = False):
+	def google_ocr(self, local_file_path, credential, pdf_to_png = False, dialog=None):
 		if local_file_path.suffix == ".pdf" and pdf_to_png:
 			text = ""
 			file = pathlib.Path(os.environ["temp"]).joinpath("soc/tmp.png")
 			images = pdfUtil.pdf_to_image(str(local_file_path))
 			for image in images:
+				if dialog is not None and dialog.cancel:
+					return ""
 				image.save(str(file))
 				text += self.google_ocr(file, credential)
 			return text
@@ -128,7 +130,7 @@ class OcrManager():
 					return errorCodes.NOT_AUTHORIZED
 				self.Credential.Authorize()
 				try:
-					text = self.tool.google_ocr(Path, self.Credential.credential, self.pdf_to_png)
+					text = self.tool.google_ocr(Path, self.Credential.credential, self.pdf_to_png, dialog)
 				except(errors.HttpError) as error:
 					self.SavedText = ""
 					return errorCodes.GOOGLE_ERROR
