@@ -30,9 +30,7 @@ import views.convert
 import views.converted
 class MainView(BaseView):
 	def __init__(self):
-		super().__init__()
-		self.identifier="mainView"#このビューを表す文字列
-		self.log=getLogger("Soc.%s" % (self.identifier))
+		super().__init__("mainView")
 		self.log.debug("created")
 		self.app=globalVars.app
 		self.events=Events(self,self.identifier)
@@ -161,6 +159,7 @@ class Events(BaseEvents):
 			return
 		convertDialog = views.convert.ConvertDialog()
 		convertDialog.Initialize()
+		contain_text = False
 		result = []
 		for file in self.parent.OcrManager.OcrList:
 			if pdfUtil.pdfTextChecker(str(file)):

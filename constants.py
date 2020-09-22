@@ -9,13 +9,13 @@ APP_NAME="SOC"
 APP_VERSION="0.5.0"
 APP_COPYRIGHT_YEAR="2020"
 APP_DEVELOPERS="Guredora"
-SUPPORTING_LANGUAGE=("ja-JP","en-US")# 対応言語一覧
-DISPLAY_LANGUAGE = ("日本語", "english")# 言語選択表示用の文字列
+SUPPORTING_LANGUAGE={"ja-JP": "日本語","en-US": "English"}# 対応言語一覧
 AVAILABLE_FORMATS = (".jpg", ".png", ".gif", ".pdf")# 対応フォーマット一覧
 #各種ファイル名
+LOG_PREFIX="app"
+LOG_FILE_NAME="application.log"
 SETTING_FILE_NAME="settings.ini"
 KEYMAP_FILE_NAME="keymap.ini"
-
 #フォントの設定可能サイズ範囲
 FONT_MIN_SIZE=5
 FONT_MAX_SIZE=35

@@ -10,10 +10,8 @@ from views.baseDialog import *
 class ConvertDialog(BaseDialog):
 	def __init__(self):
 		self.cancel = False
-		super().__init__()
+		super().__init__("convert_dialog")
 	def Initialize(self):
-		self.identifier="converting file dialog"#このビューを表す文字列
-		self.log=getLogger("Soc%s" % (self.identifier))
 		self.log.debug("created")
 		super().Initialize(self.app.hMainView.hFrame,_("変換中"),0)
 		self.InstallControls()
