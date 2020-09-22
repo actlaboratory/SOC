@@ -36,3 +36,6 @@ GOOGLE_CLIENT_SECRET = '{"installed":{"client_id":"1048336246922-57l71avhupo8r40
 
 # update情報
 UPDATE_URL = "https://actlab.org/api/checkUpdate"
+
+#pipe関係
+PIPE_NAME = "SocPdfTextCheck"

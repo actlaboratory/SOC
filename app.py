@@ -5,8 +5,11 @@ import AppBase
 from views import main
 import CredentialManager
 import sys
+import locale
+import _locale
 import update
 import constants
+import pathlib
 import errorCodes
 from simpleDialog import *
 import pathlib
@@ -23,6 +26,8 @@ class Main(AppBase.MainBase):
 		self.update = update.update()
 		if self.config.getboolean("general", "update"):
 			self.autoUpdate()
+		self.SetDefaultEncoding()
+		print(locale.getpreferredencoding())
 		# メインビューを表示
 		self.hMainView=main.MainView()
 		self.addFileList(sys.argv[1:])
@@ -30,6 +35,11 @@ class Main(AppBase.MainBase):
 			self.hMainView.hFrame.Maximize()
 		self.hMainView.Show()
 		return True
+
+	#windows標準のコードページではなくUTF-8を強制するHack
+	def SetDefaultEncoding(self):
+		country=_locale._getdefaultlocale()[0]
+		_locale._getdefaultlocale = (lambda *args: ([country,'utf8']))
 
 	def autoUpdate(self):
 		code = self.update.check(constants.APP_NAME, constants.APP_VERSION, constants.UPDATE_URL)

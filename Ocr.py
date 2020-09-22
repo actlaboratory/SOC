@@ -4,11 +4,14 @@
 import globalVars
 from PIL import Image
 import pyocr
+import constants
 import pyocr.builders
 from pdf2image import convert_from_path
 import pathlib
+import sys
 import errorCodes
 import CredentialManager
+import simpleDialog
 from PIL import UnidentifiedImageError
 import httplib2
 from apiclient import discovery
@@ -18,42 +21,29 @@ from googleapiclient import errors
 import io
 import os
 import threading
+import time
 import wx
 import traceback
+import subprocess
+import util
+import pdfUtil
 
 class OcrTool():
 	def __init__(self):
 		self.available_language=("jpn", "jpn_fast", "jpn_vert", "jpn_vert_fast")#tesseract-ocrの設定の保存
-	#folderの内容をすべて削除
-	def tmpDelete(self, tmp):
-		for path in tmp.iterdir():
-			if path.is_dir():
-				self.tmpDelete(path)
-			if path.is_file:
-				path.unlink()
-		tmp.rmdir()
-		return
-	# pdfを画像に変換する
-	def pdf_convert(self, path, images):
-		tmp = pathlib.Path(os.environ["TEMP"]).joinpath("OcrTool")
-		if tmp.exists():
-			self.tmpDelete(tmp)
-		tmp.mkdir()
-		result = convert_from_path(path, output_folder=str(tmp), thread_count=os.cpu_count()-1, fmt="png", dpi=400)
-		images += result
-	# googleのOcr呼び出し
+
 	def google_ocr(self, local_file_path, credential):
 		service = discovery.build("drive", "v3", credentials=credential)
 		with local_file_path.open("rb") as f:
 			media_body = MediaIoBaseUpload(f, mimetype="application/vnd.google-apps.document", resumable=True)
 			file = service.files().create(
-					body = {
-						"name": local_file_path.name,
-						"mimeType":"application/vnd.google-apps.document"
-					},
-					media_body = media_body,
-					ocrLanguage = "ja",
-					fields="id"
+				body = {
+					"name": local_file_path.name,
+					"mimeType":"application/vnd.google-apps.document"
+				},
+				media_body = media_body,
+				ocrLanguage = "ja",
+				fields="id"
 			).execute()
 		ID = file.get("id")
 		request = service.files().export_media(fileId=ID, mimeType = "text/plain")
@@ -71,10 +61,7 @@ class OcrTool():
 		tools = pyocr.get_available_tools()
 		tool = tools[0]
 		if local_file_path.suffix == ".pdf":
-			images = []
-			pdfThread = threading.Thread(target = self.pdf_convert, args = (str(local_file_path), images), name = "pdfThread")
-			pdfThread.start()
-			pdfThread.join()
+			images = pdfUtil.pdf_to_image(local_file_path)
 			i = 0
 			for image in images:
 				if dialog.cancel:
@@ -101,25 +88,19 @@ class OcrManager():
 		self.mode = -1
 		self.tool = OcrTool()
 		os.environ["PATH"] += os.pathsep + os.getcwd() + "/poppler/bin"
-	# ファイル名とテキストを渡すと保存する関数
-	def TextSave(self, filePath, text):
-		if isinstance(filePath, pathlib.WindowsPath):
-			filePath.write_text(text, encoding="utf-8")
-			txt = filePath.read_text(encoding="utf-8")
-			self.saved.append(filePath)
-			self.SavedText += text
-			return
-		pathlib.Path(filePath).write_text(text, encoding="utf-8")
-		self.saved.append(filePath)
-		self.SavedText += text
-		return
 
-	def allDelete(self):#変換済みファイルを一掃する
+	def _allDelete(self):
+		"""変換済みファイルを一層する。"""
 		for path in self.saved:
 			path.unlink()
 		return
-	# Ocrの実行
+
+	def _showPdfDialog(self):
+		self.qPdfImage = simpleDialog.qDialog(_("pdfからテキストが検出されたため画像に変換して送信します。よろしいですか？"))
+		return
+
 	def ocr_exe(self, dialog):
+		"""ocrを実行する。"""
 		if self.Engine == 0:
 			try:
 				self.Credential = CredentialManager.CredentialManager(True)
@@ -140,6 +121,35 @@ class OcrManager():
 					self.SavedText = ""
 					return errorCodes.NOT_AUTHORIZED
 				self.Credential.Authorize()
+				if Path.suffix == ".pdf" and pdfUtil.pdfTextChecker(str(Path.resolve())):
+					print("きた")
+					self.qPdfImage = None
+					wx.CallAfter(self.showPdfDialog)
+					while True:
+						if self.qPdfImage is not None:
+							break
+						time.sleep(0.01)
+					if self.qPdfImage == wx.ID_YES:
+						print("pdf image convert")
+						images = []
+						pdfThread = threading.Thread(target = self.tool.pdf_convert, args = (str(Path), images), name = "pdfThread")
+						pdfThread.start()
+						pdfThread.join()
+						file = pathlib.Path(os.environ["temp"]).joinpath("soc/tmp.png")
+						text = ""
+						count = 0
+						for image in images:
+							image.save(str(file))
+							try:
+								text += self.tool.google_ocr(file, self.Credential.credential)
+								print(text)
+							except(errors.HttpError) as error:
+								self.SavedText = ""
+								return errorCodes.GOOGLE_ERROR
+							finally:
+								del images[count]
+							count += 1
+							continue
 				try:
 					text = self.tool.google_ocr(Path, self.Credential.credential)
 				except(errors.HttpError) as error:
@@ -156,7 +166,9 @@ class OcrManager():
 				self.allDelete()
 				self.SavedText = ""
 				return errorCodes.CANCELED
-			self.TextSave(Path.with_suffix(".txt"), text)#ファイルに保存
+			util.textSave(Path.with_suffix(".txt"), text)#ファイルに保存
+			self.saved.append(Path.with_suffix(".txt"))
+			self.SavedText += text
 		return errorCodes.OK
 	def lapped_ocr_exe(self, dialog, result):
 		try:
