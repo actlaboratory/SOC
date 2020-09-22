@@ -23,10 +23,10 @@ class ConvertDialog(BaseDialog):
 		"""いろんなwidgetを設置する。"""
 
 		self.creator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.sizer,wx.VERTICAL,20)
-		self.creator.staticText(_("進行状況"), _("変換中..."),layout=wx.ALIGN_CENTER,style=wx.ALIGN_CENTER)
-		self.static = self.creator.staticText(_("進行状況"), _("読み込み中..."),x=530,layout=wx.ALIGN_CENTER,style=wx.ALIGN_CENTER | wx.ST_ELLIPSIZE_MIDDLE)
+		self.creator.staticText(_("変換中..."),wx.ALIGN_CENTER,-1,wx.ALIGN_CENTER)
+		self.static = self.creator.staticText(_("読み込み中..."),wx.ALIGN_CENTER | wx.ST_ELLIPSIZE_MIDDLE,530,wx.ALIGN_CENTER)
 
-		self.bCancel=self.creator.button(_("キャンセル"), self.canceled,layout=wx.ALIGN_CENTER)
+		self.bCancel=self.creator.button(_("キャンセル"), self.canceled,sizerFlag=wx.ALIGN_CENTER)
 
 	def canceled(self, events):
 		self.cancel = True
