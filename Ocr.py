@@ -32,7 +32,15 @@ class OcrTool():
 	def __init__(self):
 		self.available_language=("jpn", "jpn_fast", "jpn_vert", "jpn_vert_fast")#tesseract-ocrの設定の保存
 
-	def google_ocr(self, local_file_path, credential):
+	def google_ocr(self, local_file_path, credential, pdf_to_png = False):
+		if local_file_path.suffix == ".pdf" and pdf_to_png:
+			text = ""
+			file = pathlib.Path(os.environ["temp"]).joinpath("soc/tmp.png")
+			images = pdfUtil.pdf_to_image(str(local_file_path))
+			for image in images:
+				image.save(str(file))
+				text += self.google_ocr(file, credential)
+			return text
 		service = discovery.build("drive", "v3", credentials=credential)
 		with local_file_path.open("rb") as f:
 			media_body = MediaIoBaseUpload(f, mimetype="application/vnd.google-apps.document", resumable=True)
@@ -54,6 +62,7 @@ class OcrTool():
 			status, done = downloader.next_chunk()
 		service.files().delete(fileId=ID).execute()
 		return fh.getvalue().decode("utf-8")
+
 	# tesseract-ocrの呼び出し
 	def tesseract_ocr(self, local_file_path, number, dialog):
 		lang = self.available_language[number]
@@ -87,16 +96,13 @@ class OcrManager():
 		self.Engine = -1
 		self.mode = -1
 		self.tool = OcrTool()
+		self.pdf_to_png = False
 		os.environ["PATH"] += os.pathsep + os.getcwd() + "/poppler/bin"
 
 	def _allDelete(self):
 		"""変換済みファイルを一層する。"""
 		for path in self.saved:
 			path.unlink()
-		return
-
-	def _showPdfDialog(self):
-		self.qPdfImage = simpleDialog.qDialog(_("pdfからテキストが検出されたため画像に変換して送信します。よろしいですか？"))
 		return
 
 	def ocr_exe(self, dialog):
@@ -121,37 +127,8 @@ class OcrManager():
 					self.SavedText = ""
 					return errorCodes.NOT_AUTHORIZED
 				self.Credential.Authorize()
-				if Path.suffix == ".pdf" and pdfUtil.pdfTextChecker(str(Path.resolve())):
-					print("きた")
-					self.qPdfImage = None
-					wx.CallAfter(self.showPdfDialog)
-					while True:
-						if self.qPdfImage is not None:
-							break
-						time.sleep(0.01)
-					if self.qPdfImage == wx.ID_YES:
-						print("pdf image convert")
-						images = []
-						pdfThread = threading.Thread(target = self.tool.pdf_convert, args = (str(Path), images), name = "pdfThread")
-						pdfThread.start()
-						pdfThread.join()
-						file = pathlib.Path(os.environ["temp"]).joinpath("soc/tmp.png")
-						text = ""
-						count = 0
-						for image in images:
-							image.save(str(file))
-							try:
-								text += self.tool.google_ocr(file, self.Credential.credential)
-								print(text)
-							except(errors.HttpError) as error:
-								self.SavedText = ""
-								return errorCodes.GOOGLE_ERROR
-							finally:
-								del images[count]
-							count += 1
-							continue
 				try:
-					text = self.tool.google_ocr(Path, self.Credential.credential)
+					text = self.tool.google_ocr(Path, self.Credential.credential, self.pdf_to_png)
 				except(errors.HttpError) as error:
 					self.SavedText = ""
 					return errorCodes.GOOGLE_ERROR

@@ -18,6 +18,7 @@ import threading
 import webbrowser
 import constants
 import errorCodes
+import pdfUtil
 import globalVars
 import menuItemsStore
 import keymap
@@ -161,6 +162,12 @@ class Events(BaseEvents):
 		convertDialog = views.convert.ConvertDialog()
 		convertDialog.Initialize()
 		result = []
+		for file in self.parent.OcrManager.OcrList:
+			if pdfUtil.pdfTextChecker(str(file)):
+				contain_text = True
+		if contain_text:
+			if qDialog("pdfからテキストが検出されました。画像に変換して送信しますか？") == wx.ID_YES:
+				self.parent.OcrManager.pdf_to_png = True
 		ocrThread = threading.Thread(target=self.parent.OcrManager.lapped_ocr_exe, args=(convertDialog, result))
 		ocrThread.start()
 		convertDialog.Show(True)

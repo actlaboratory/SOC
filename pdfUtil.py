@@ -7,6 +7,8 @@ import pathlib
 
 def pdfTextChecker(path):
 	"""pathに指定されたpdfファイルにテキストが含まれているか判定する。"""
+	if not pathlib.Path(path).suffix == ".pdf":
+		return False
 	info = {}
 	os.environ["PYTHONIOENCODING"] = "utf-8"
 	output = subprocess.check_output(("pdfinfo", path), encoding="cp932")
