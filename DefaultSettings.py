@@ -20,7 +20,7 @@ class DefaultSettings:
 		}
 		config["view"]={
 			"font": font,
-			"colorMode":"normal"
+			"colorMode":"white"
 		}
 		config["speech"]={
 			"reader" : "AUTO"
