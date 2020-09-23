@@ -62,7 +62,7 @@ venv.bak/
 /test/
 /updator.py
 errorLog.txt
-SOC.log
+*.log
 test.py
 test.txt
 /log.txt
