@@ -58,7 +58,7 @@ class MainView(BaseView):
 		self.open = vCreator.button(_("追加"), self.events.open)
 		self.delete = vCreator.button(_("削除"), self.events.delete)
 
-		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),views.ViewCreator.FlexGridSizer,10)
+		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),views.ViewCreator.FlexGridSizer,10, 2)
 		self.engine, self.engineStatic = creator.combobox(_("OCRエンジン"), (_("google (インターネット)"), _("tesseract (ローカル)")), self.events.engine)
 		self.tesseract, self.tesseractStatic = creator.combobox(_("モード"), (_("横書き通常"), _("横書き低負荷版"), _("縦書き通常"), _("縦書き低負荷版")), self.events.tesseract_mode)
 		self.tesseract.Disable()
@@ -162,7 +162,7 @@ class Events(BaseEvents):
 		contain_text = False
 		result = []
 		for file in self.parent.OcrManager.OcrList:
-			if pdfUtil.pdfTextChecker(str(file)):
+			if self.parent.OcrManager.Engine == 0 and pdfUtil.pdfTextChecker(str(file)):
 				contain_text = True
 		if contain_text:
 			if qDialog("pdfからテキストが検出されました。画像に変換して送信しますか？") == wx.ID_YES:
