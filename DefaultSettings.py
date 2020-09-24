@@ -7,10 +7,10 @@ import locale
 class DefaultSettings:
 	def get():
 		config = ConfigManager()
-		loc = locale.getdefaultlocale()[0].replace("_", "-")
-		if loc == "en-US":
+		loc = locale.getdefaultlocale()[0]
+		if loc == "en_US":
 			font = "Bold 'times new roman' 22 windows-1252"
-		if loc == "ja-JP":
+		if loc == "ja_JP":
 			font = "bold 'ＭＳ ゴシック' 22 windows-932"
 		config["general"]={
 			"language": "",
