@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SOC\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-25 00:07+0900\n"
+"POT-Creation-Date: 2020-09-24 20:10+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -90,11 +90,11 @@ msgstr ""
 msgid "この組み合わせは別の用途で予約されているため、利用できません。"
 msgstr ""
 
-#: simpleDialog.py:16 views\main.py:158 views\main.py:231
+#: simpleDialog.py:12 views\main.py:158 views\main.py:231
 msgid "確認"
 msgstr ""
 
-#: simpleDialog.py:30 views\base.py:96 views\fontManager.py:25
+#: simpleDialog.py:25 views\base.py:96 views\fontManager.py:25
 #: views\fontManager.py:50 views\main.py:272
 msgid "エラー"
 msgstr ""
@@ -231,7 +231,7 @@ msgid "送るメニューにショートカットを作成(&s)"
 msgstr ""
 
 #: views\main.py:112
-msgid "actlaboratoryホームページを開く(&p)"
+msgid "ホームページを開く(&p)"
 msgstr ""
 
 #: views\main.py:113 views\main.py:285
