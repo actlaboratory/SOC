@@ -533,7 +533,7 @@ class KeyFilter:
 		for ptn in patterns:
 			ptn=ptn.upper()
 			if not ptn in str2key:
-				raise ValueError(_("%s は存在しないキーです。" % (ptn)))
+				raise ValueError(_("%s は存在しないキーです。") % (ptn))
 		self.disablePattern.append(set(patterns))
 
 

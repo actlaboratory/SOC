@@ -49,13 +49,13 @@ class Main(AppBase.MainBase):
 			dialog(_("サーバーとの通信に失敗しました。"), _("アップデート"))
 			return
 		if code == errorCodes.UPDATER_NEED_UPDATE:
-			result = qDialog(_("バージョン%sにアップデートすることができます。%sアップデートを開始しますか？" % (self.update.version, self.update.description)), _("アップデート"))
+			result = qDialog(_("バージョン%sにアップデートすることができます。%sアップデートを開始しますか？") % (self.update.version, self.update.description), _("アップデート"))
 			if result == wx.ID_NO:
 				return
 			self.update.run("")
 		if code == errorCodes.UPDATER_VISIT_SITE:
 			URL = self.update.URL
-			if qDialog(_("緊急のお知らせがあります。\nタイトル:%s\n詳細をブラウザーで開きますか？"% (self.update.description))) == wx.ID_NO:
+			if qDialog(_("緊急のお知らせがあります。\nタイトル:%s\n詳細をブラウザーで開きますか？")% (self.update.description)) == wx.ID_NO:
 				return
 			webbrowser.open(URL)
 
