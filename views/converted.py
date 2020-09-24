@@ -24,7 +24,7 @@ class Dialog(BaseDialog):
 	def InstallControls(self):
 		"""いろんなwidgetを設置する。"""
 		self.creator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.sizer,wx.VERTICAL,20)
-		self.resultView,static = self.creator.inputbox("認識結果", None, self.result, wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_DONTWRAP, 800)
+		self.resultView,static = self.creator.inputbox(_("認識結果"), None, self.result, wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_DONTWRAP, 800)
 		self.repButton = self.creator.button(_("スペースを置換"), self.onRep)
 		if self.tesseract_flag == False:
 			self.repButton.Disable()
