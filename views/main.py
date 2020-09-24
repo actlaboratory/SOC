@@ -109,7 +109,7 @@ class Menu(BaseMenu):
 		self.google=self.RegisterMenuCommand(self.hToolMenu,"GOOGLE",_("Googleと連携する(&g)"))#グーグルの認証開始
 		self.sendRegist = self.RegisterMenuCommand(self.hToolMenu,"SENDREGIST",_("送るメニューにショートカットを作成(&s)"))
 		#ヘルプメニューの中身
-		self.Page = self.RegisterMenuCommand(self.hHelpMenu, "webpage", _("ホームページを開く(&p)"))
+		self.Page = self.RegisterMenuCommand(self.hHelpMenu, "webpage", _("actlaboratoryホームページを開く(&p)"))
 		self.About = self.RegisterMenuCommand(self.hHelpMenu, "ABOUT", _("このソフトについて"))
 		self.Update = self.RegisterMenuCommand(self.hHelpMenu, "UPDATE", _("最新バージョンを確認"))
 		#メニューバーの生成
@@ -272,7 +272,7 @@ class Events(BaseEvents):
 				dialog(_("不明なエラーが発生しました。"),_("エラー"))
 			return
 		if selected == menuItemsStore.getRef("webpage"):
-			webbrowser.open("https://guredora.com")
+			webbrowser.open("https://actlab.org")
 			return
 		if selected == menuItemsStore.getRef("SENDREGIST"):
 			shortCut = os.environ["APPDATA"]+"\\Microsoft\\Windows\\SendTo\\"+_("SOCで文字認識を開始.lnk")
