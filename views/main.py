@@ -12,6 +12,7 @@ import re
 import ctypes
 import pywintypes
 import pathlib
+import time
 import win32com.client
 import clipboard
 import threading
@@ -28,6 +29,7 @@ from simpleDialog import *
 import Ocr
 import views.convert
 import views.converted
+from views import authorizing
 class MainView(BaseView):
 	def __init__(self):
 		super().__init__("mainView")
@@ -235,8 +237,10 @@ class Events(BaseEvents):
 			#認証プロセスの開始、認証用URL取得
 			url=self.parent.app.credentialManager.MakeFlow()
 
+			authorizeDialog = authorizing.authorizeDialog()
+			authorizeDialog.Initialize()
+			authorizeDialog.Show(False)
 			#ブラウザの表示
-			self.parent.hFrame.Disable()
 			self.parent.app.say(_("ブラウザを開いています..."))
 
 			#webView=views.web.Dialog(url,"http://localhost")
@@ -252,16 +256,22 @@ class Events(BaseEvents):
 			while(status==errorCodes.WAITING_USER):
 				if not wx.Process.Exists(pid):
 					status=errorCodes.CANCELED
+				if authorizeDialog.cancel:
+					status = errorCodes.CANCELED_BY_USER
 				if status==errorCodes.WAITING_USER:
 					status=self.parent.app.credentialManager.getCredential()
-				globalVars.app.Yield()		#無限ループ中に固まるので対策
+				wx.YieldIfNeeded()
 				evt.wait(0.3)
-			self.parent.hFrame.Enable()
+			authorizeDialog.Destroy()
 			if status==errorCodes.OK:
 				if web.Exists(pid):
 					wx.Process.Kill(pid,wx.SIGTERM)		#修了要請
 				dialog(_("認証が完了しました"),_("認証結果"))
 				self.parent.menu.hMenuBar.Enable(menuItemsStore.getRef("GOOGLE"), False)
+			if status == errorCodes.CANCELED_BY_USER:
+				if web.Exists(pid):
+					wx.Process.Kill(pid,wx.SIGTERM)		#修了要請
+				dialog(_("キャンセルしました。"))
 			elif status==errorCodes.IO_ERROR:
 				dialog(_("認証に成功しましたが、ファイルの保存に失敗しました。ディレクトリのアクセス権限などを確認してください。"),_("認証結果"))
 			elif status==errorCodes.CANCELED:
