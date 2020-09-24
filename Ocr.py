@@ -35,7 +35,7 @@ class OcrTool():
 	def google_ocr(self, local_file_path, credential, pdf_to_png = False, dialog=None):
 		if local_file_path.suffix == ".pdf" and pdf_to_png:
 			text = ""
-			file = pathlib.Path(os.environ["temp"]).joinpath("soc/tmp.png")
+			file = pathlib.Path(globalVars.app.tmpdir).joinpath("tmp.png")
 			images = pdfUtil.pdf_to_image(str(local_file_path))
 			for image in images:
 				if dialog is not None and dialog.cancel:

@@ -4,6 +4,7 @@ import subprocess
 import os
 import util
 import pathlib
+import globalVars
 
 def pdfTextChecker(path):
 	"""pathに指定されたpdfファイルにテキストが含まれているか判定する。"""
@@ -25,7 +26,7 @@ def pdfTextChecker(path):
 	return False
 
 def _pdf_convert(path, images):
-	tmp = pathlib.Path(os.environ["TEMP"]).joinpath("soc")
+	tmp = pathlib.Path(globalVars.app.tmpdir)
 	if tmp.exists():
 		util.allDelete(tmp)
 	tmp.mkdir()
