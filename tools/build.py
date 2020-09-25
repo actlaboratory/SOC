@@ -61,6 +61,6 @@ if build_filename=="snapshot":
 	print("Skipping batch archiving because this is a snapshot release.")
 else:
 	print("Making patch...")
-	archiver=diff_archiver.DiffArchiver(BASE_PACKAGE_URL,"SOC-%s.zip" % (build_filename),"SOC-%spatch" % (build_filename))
+	archiver=diff_archiver.DiffArchiver(BASE_PACKAGE_URL,"SOC-%s.zip" % (build_filename),"SOC-%spatch" % (build_filename),clean_base_package=True)
 	archiver.work()
 print("Build finished!")
