@@ -36,8 +36,16 @@ class ViewCreator():
 		self.font=fontManager.FontManager()
 
 		#親ウィンドウ
-		self.parent=parent
-		self._setFace(parent)
+		if type(parent) in (wx.Panel,):
+			self.parent=parent
+			self._setFace(parent)
+		elif type(parent) in (wx.Notebook,wx.Choicebook,wx.Listbook):
+			self._setFace(parent)
+			self.parent=makePanel(parent)
+			self._setFace(self.parent)
+			parent.InsertPage(parent.GetPageCount(),self.parent,label)
+		else:
+			raise ValueError("ViewCreatorの親はパネルまたはブックコントロールである必要があります。")
 
 		#サイザー作成
 		if orient==FlexGridSizer:
