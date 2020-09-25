@@ -95,8 +95,8 @@ class OcrManager():
 		self.saved = []
 		self.SavedText = ""
 		self.OcrList = []
-		self.Engine = -1
-		self.mode = -1
+		self.Engine = 0
+		self.mode = 0
 		self.tool = OcrTool()
 		self.pdf_to_png = False
 		os.environ["PATH"] += os.pathsep + os.getcwd() + "/poppler/bin"

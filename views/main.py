@@ -63,8 +63,8 @@ class MainView(BaseView):
 		self.delete = vCreator.button(_("削除"), self.events.delete)
 
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),views.ViewCreator.FlexGridSizer,10, 2)
-		self.engine, self.engineStatic = creator.combobox(_("OCRエンジン"), (_("google (インターネット)"), _("tesseract (ローカル)")), self.events.engine)
-		self.tesseract, self.tesseractStatic = creator.combobox(_("モード"), (_("横書き通常"), _("横書き低負荷版"), _("縦書き通常"), _("縦書き低負荷版")), self.events.tesseract_mode)
+		self.engine, self.engineStatic = creator.combobox(_("OCRエンジン"), (_("google (インターネット)"), _("tesseract (ローカル)")), self.events.engine, state = 0)
+		self.tesseract, self.tesseractStatic = creator.combobox(_("モード"), (_("横書き通常"), _("横書き低負荷版"), _("縦書き通常"), _("縦書き低負荷版")), self.events.tesseract_mode, state = 0)
 		self.tesseract.Disable()
 
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),wx.HORIZONTAL,20,style=wx.ALIGN_RIGHT)
@@ -115,7 +115,7 @@ class Menu(BaseMenu):
 		self.setting = self.RegisterMenuCommand(self.hToolMenu,"SETTINGS",_("設定画面を開く(&w)"))
 	
 		#ヘルプメニューの中身
-		self.Page = self.RegisterMenuCommand(self.hHelpMenu, "webpage", _("actlaboratoryホームページを開く(&p)"))
+		self.Page = self.RegisterMenuCommand(self.hHelpMenu, "webpage", _("ACT Laboratoryホームページを開く(&p)"))
 		self.About = self.RegisterMenuCommand(self.hHelpMenu, "ABOUT", _("このソフトについて"))
 		self.Update = self.RegisterMenuCommand(self.hHelpMenu, "UPDATE", _("最新バージョンを確認"))
 		#メニューバーの生成
@@ -272,7 +272,7 @@ class Events(BaseEvents):
 					wx.Process.Kill(pid,wx.SIGTERM)		#修了要請
 				dialog(_("認証が完了しました"),_("認証結果"))
 				self.parent.menu.hMenuBar.Enable(menuItemsStore.getRef("GOOGLE"), False)
-			if status == errorCodes.CANCELED_BY_USER:
+			elif status == errorCodes.CANCELED_BY_USER:
 				if web.Exists(pid):
 					wx.Process.Kill(pid,wx.SIGTERM)		#修了要請
 				dialog(_("キャンセルしました。"))
@@ -303,7 +303,7 @@ class Events(BaseEvents):
 			scut.Save()
 			dialog(_("送るメニューの登録が完了しました。送るメニューから「SOCで文字認識を開始」で実行できます。"), _("完了"))
 		if selected == menuItemsStore.getRef("ABOUT"):
-			dialog(_("SimpleOcrController（%s） version %s.\nCopyright (C) %s %s.\nこのソフトは公開されているOCRエンジンを使いやすくした物です。") % (constants.APP_NAME, constants.APP_VERSION, constants.APP_COPYRIGHT_YEAR, constants.APP_DEVELOPERS), _("このソフトについて"))
+			dialog(_("SimpleOcrController（%s） version %s.\nCopyright (C) %s %s.\nこのソフトは公開されているOCRエンジンを使いやすくしたものです。") % (constants.APP_NAME, constants.APP_VERSION, constants.APP_COPYRIGHT_YEAR, constants.APP_DEVELOPERS), _("このソフトについて"))
 		if selected == menuItemsStore.getRef("UPDATE"):
 			code = self.parent.app.update.check(constants.APP_NAME, constants.APP_VERSION, constants.UPDATE_URL)
 			if code == errorCodes.NET_ERROR:

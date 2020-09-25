@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #app build tool
 #Copyright (C) 2019 Yukio Nozawa <personal@nyanchangames.com>
+import glob
 import os
 import sys
 import subprocess
@@ -8,6 +9,7 @@ import shutil
 import distutils.dir_util
 import PyInstaller
 import diff_archiver
+
 def runcmd(cmd):
 	proc=subprocess.Popen(cmd.split(), shell=True, stdout=1, stderr=2)
 	proc.communicate()
@@ -36,12 +38,22 @@ if os.path.isdir("dist\\soc"):
 
 print("Building...")
 shutil.copy("tools/hook-googleapiclient.py", hooks_path)
-runcmd("pyinstaller soc.py --windowed --log-level=ERROR")
 runcmd("%s --windowed --log-level=ERROR soc.py" % pyinstaller_path)
 
 shutil.copytree("tesseract-ocr\\", "dist\\SOC\\tesseract-ocr")
 shutil.copytree("poppler\\", "dist\\SOC\\poppler")
 shutil.copytree("locale\\","dist\\SOC\\locale", ignore=shutil.ignore_patterns("*.po", "*.pot", "*.po~"))
+for elem in glob.glob("public\\*"):
+	if os.path.isfile(elem):
+		shutil.copyfile(elem,"dist\\SOC\\%s" % os.path.basename(elem))
+	else:
+		shutil.copytree(elem,"dist\\SOC\\%s" % os.path.basename(elem))
+#end copypublic
+
+if os.path.exists("release"):
+	print("packaging release file...")
+	for file in os.listdir("release"):
+		shutil.copy(os.path.join("release", file), "dist/soc")
 print("Compressing into package...")
 shutil.make_archive("SOC-%s" % (build_filename),'zip','dist')
 
@@ -49,6 +61,6 @@ if build_filename=="snapshot":
 	print("Skipping batch archiving because this is a snapshot release.")
 else:
 	print("Making patch...")
-	archiver=diff_archiver.DiffArchiver(BASE_PACKAGE_URL,"SOC-%s.zip" % (build_filename),"SOC-%spatch" % (build_filename))
+	archiver=diff_archiver.DiffArchiver(BASE_PACKAGE_URL,"SOC-%s.zip" % (build_filename),"SOC-%spatch" % (build_filename),clean_base_package=True)
 	archiver.work()
 print("Build finished!")

@@ -8,14 +8,18 @@ import ConfigManager
 import os
 import pathlib
 import sys
+import globalVars
 
 class update():
 	def check(self, app_name, current_version, check_url):
 		url = "%s?name=%s&updater_version=1.0.0&version=%s" % (check_url, app_name, current_version)# 引数からURLを生成
+		time = globalVars.app.config.getint("general", "timeout", 3)
 		try:
-			response = requests.get(url)# サーバーに最新バージョンを問い合わせる
+			response = requests.get(url, timeout=time)# サーバーに最新バージョンを問い合わせる
 		except requests.exceptions.ConnectionError as c:
 			return errorCodes.NET_ERROR
+		except requests.exceptions.timeout:
+			return errorCodes.CONNECT_TIMEOUT
 		if not response.status_code == 200:
 			print(response.status_code)
 			return errorCodes.NET_ERROR

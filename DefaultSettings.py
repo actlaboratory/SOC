@@ -17,7 +17,9 @@ class DefaultSettings:
 			"fileVersion": "100",
 			"locale": loc,
 			"update": True,
+			"timeout": 3
 		}
+
 		config["view"]={
 			"font": font,
 			"colorMode":"white"

@@ -162,7 +162,6 @@ class Credentials(credentials.ReadOnlyScoped, credentials.Credentials):
 
     @_helpers.copy_docstring(credentials.Credentials)
     def refresh(self, request):
-        print("refresh")
         if (
             self._refresh_token is None
             or self._token_uri is None
