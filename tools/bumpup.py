@@ -47,20 +47,17 @@ if os.path.exists(VERSION_FILE_NAME):
 
 #step 2: input
 print("Current version is %s." % v["version"])
+next=v["version"].split(".")
 if bump["major"]:
-	next=v["version"].split(".")
 	next[0]=str(int(next[0])+1)
 	inp=".".join(next)
 elif bump["minor"]:
-	next=v["version"].split(".")
 	next[1]=str(int(next[1])+1)
 	inp=".".join(next)
 elif bump["patch"]:
-	next=v["version"].split(".")
 	next[2]=str(int(next[2])+1)
 	inp=".".join(next)
 else:
-	next=v["version"].split(".")
 	next[2]=str(int(next[2])+1)
 	next=".".join(next)
 	inp=input("Type next version (leave blank to use %s): " % next)
