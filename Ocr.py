@@ -113,6 +113,8 @@ class OcrManager():
 			try:
 				self.Credential = CredentialManager.CredentialManager(True)
 			except:
+				traceback.print_exc()
+				pathlib.Path("errorlog.txt").write_text(traceback.format_exc())
 				return errorCodes.NET_ERROR#ネットワーク関係のエラー
 		for Path in self.OcrList:
 			if dialog.cancel:#キャンセル処理
@@ -132,12 +134,16 @@ class OcrManager():
 				try:
 					text = self.tool.google_ocr(Path, self.Credential.credential, self.pdf_to_png, dialog)
 				except(errors.HttpError) as error:
+					traceback.print_exc()
+					Path("errorlog.txt").write_text(traceback.format_exc())
 					self.SavedText = ""
 					return errorCodes.GOOGLE_ERROR
 			if self.Engine == 1:#tesseractの呼び出し
 				try:
 					text = self.tool.tesseract_ocr(Path, self.mode, dialog)
 				except(UnidentifiedImageError):
+					traceback.print_exc()
+					pathlib.Path("errorlog.txt").write_text(traceback.format_exc())
 					self.allDelete()
 					self.SavedText = ""
 					return errorCodes.FILE_NOT_SUPPORTED
