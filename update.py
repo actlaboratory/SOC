@@ -18,6 +18,8 @@ class update():
 			response = requests.get(url, timeout=time)# サーバーに最新バージョンを問い合わせる
 		except requests.exceptions.ConnectionError as c:
 			return errorCodes.NET_ERROR
+		except requests.exceptions.timeout:
+			return errorCodes.CONNECT_TIMEOUT
 		if not response.status_code == 200:
 			print(response.status_code)
 			return errorCodes.NET_ERROR
