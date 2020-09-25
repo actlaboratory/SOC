@@ -7,6 +7,7 @@ import views.ViewCreator
 from logging import getLogger
 from views.baseDialog import *
 import globalVars
+import simpleDialog
 
 class settingsDialog(BaseDialog):
 	def __init__(self):
@@ -54,7 +55,24 @@ class settingsDialog(BaseDialog):
 
 
 	def onOkBtn(self, event):
-		print("ok")
+		reader = list(self.readerSelection.keys())[self.reader.GetSelection()]
+		colormode = list(self.colorSelection.keys())[self.color.GetSelection()]
+		update = self.autoUpdate.GetValue()
+		try:
+			timeout = int(self.timeout.GetValue())
+		except ValueError:
+			simpleDialog.errorDialog(_("タイムアウト秒数の設定値が不正です。"))
+		tmpdir = self.tmpEdit.GetValue()
+		saveSourceDir = self.saveSelect.GetValue()
+		savedir = self.saveDir.GetValue()
+		globalVars.app.config["speech"]["reader"] = reader
+		globalVars.app.config["view"]["colormode"] = colormode
+		globalVars.app.config["general"]["update"] = update
+		globalVars.app.config["general"]["timeout"] = timeout
+		globalVars.app.config["ocr"]["tmpdir"] = tmpdir
+		globalVars.app.config["ocr"]["savesourcedir"] = saveSourceDir
+		globalVars.app.config["ocr"]["savedir"] = savedir
+		simpleDialog.dialog(_("設定を保存しました。一部の設定は再起動後から有効になります。"))
 		self.Destroy()
 
 	def onCancelBtn(self, event):
