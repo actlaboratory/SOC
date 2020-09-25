@@ -19,6 +19,7 @@ class DefaultSettings:
 			"update": True,
 			"timeout": 3
 		}
+
 		config["view"]={
 			"font": font,
 			"colorMode":"white"
@@ -28,6 +29,11 @@ class DefaultSettings:
 		}
 		config["mainView"]={
 
+		}
+		config["ocr"] = {
+			"tmpdir": os.path.join(os.environ["TEMP"], "soc"),
+			"saveSourceDir": True,
+			"savedir": "c:\\aac"
 		}
 		return config
 

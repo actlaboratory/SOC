@@ -145,8 +145,16 @@ class OcrManager():
 				self.allDelete()
 				self.SavedText = ""
 				return errorCodes.CANCELED
-			util.textSave(Path.with_suffix(".txt"), text)#ファイルに保存
-			self.saved.append(Path.with_suffix(".txt"))
+			if globalVars.app.config.getboolean("ocr", "saveSourceDir"):
+				saveFile = Path.with_suffix(".txt")
+			else:
+				self.dirname = globalVars.app.config.getstring("ocr", "savedir", "", None)
+				if os.path.exists(self.dirname):
+					os.makedirs(self.dirname)
+				saveFile = pathlib.Path(self.dirname, Path.with_suffix(".txt").name)
+			print(saveFile)
+			util.textSave(saveFile, text)#ファイルに保存
+			self.saved.append(saveFile)
 			self.SavedText += text
 		return errorCodes.OK
 	def lapped_ocr_exe(self, dialog, result):
