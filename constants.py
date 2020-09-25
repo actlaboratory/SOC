@@ -6,8 +6,9 @@ import wx
 import os
 #アプリケーション基本情報
 APP_NAME="SOC"
-APP_VERSION="0.5.0"
-APP_COPYRIGHT_YEAR="2020"
+APP_VERSION="1.0.0"
+APP_LAST_RELEASE_DATE="2020-09-25"
+APP_COPYRIGHT_YEAR=APP_LAST_RELEASE_DATE.split("-")[0]
 APP_DEVELOPERS="Guredora"
 SUPPORTING_LANGUAGE={"ja-JP": "日本語","en-US": "English"}# 対応言語一覧
 AVAILABLE_FORMATS = (".jpg", ".png", ".gif", ".pdf")# 対応フォーマット一覧
