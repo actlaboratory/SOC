@@ -8,6 +8,7 @@ import shutil
 import distutils.dir_util
 import PyInstaller
 import diff_archiver
+
 def runcmd(cmd):
 	proc=subprocess.Popen(cmd.split(), shell=True, stdout=1, stderr=2)
 	proc.communicate()
@@ -42,6 +43,10 @@ runcmd("%s --windowed --log-level=ERROR soc.py" % pyinstaller_path)
 shutil.copytree("tesseract-ocr\\", "dist\\SOC\\tesseract-ocr")
 shutil.copytree("poppler\\", "dist\\SOC\\poppler")
 shutil.copytree("locale\\","dist\\SOC\\locale", ignore=shutil.ignore_patterns("*.po", "*.pot", "*.po~"))
+if os.path.exists("release"):
+	print("packaging release file...")
+	for file in os.listdir("release"):
+		shutil.copy(os.path.join("release", file), "dist/soc")
 print("Compressing into package...")
 shutil.make_archive("SOC-%s" % (build_filename),'zip','dist')
 
