@@ -29,7 +29,8 @@ class settingsDialog(BaseDialog):
 			(_("自動選択"), _("sapi5"), _("pc-talker"), _("NVDA"), _("JAWS")))
 		self.collar, dummy = creator.combobox(_("配色"), 
 			(_("white"), _("dark")))
-
+		self.autoUpdate = creator.checkbox(_("起動時にアップデートを確認"), style = wx.CHK_2STATE)
+		self.timeout, dummy = creator.inputbox(_("アップデート確認時のタイムアウト（秒数）"))
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,space=20,label=_("アップデートと通信"))
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,space=20,label=_("消滅"))
 		lastHope,dummy=creator.inputbox(_("最後の願い事"),None,_("なにもない"),x=300)
