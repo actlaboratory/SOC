@@ -1,6 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 # Soc Main
 
+import proxyUtil
 import AppBase
 from views import main
 import CredentialManager
@@ -22,6 +23,12 @@ class Main(AppBase.MainBase):
 
 	def initialize(self):
 		"""アプリを初期化する。"""
+		# プロキシの設定を適用
+		if self.config.getboolean("network", "auto_proxy"):
+			self.proxyEnviron = proxyUtil.virtualProxyEnviron()
+			self.proxyEnviron.set_environ()
+		else:
+			self.proxyEnviron = None
 		# googleのCredentialを準備
 		self.credentialManager=CredentialManager.CredentialManager()
 		# update関係を準備
@@ -88,5 +95,8 @@ class Main(AppBase.MainBase):
 		if os.path.exists(self.tmpdir):
 			util.allDelete(self.tmpdir)
 
+		# プロキシの設定を元に戻す
+		if self.proxyEnviron != None: self.proxyEnviron.unset_environ()
+		
 		#戻り値は無視される
 		return 0

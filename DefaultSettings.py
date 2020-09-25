@@ -29,6 +29,9 @@ class DefaultSettings:
 		config["mainView"]={
 
 		}
+		config["network"]={
+			"auto_proxy": True
+		}
 		return config
 
 initialValues={}
