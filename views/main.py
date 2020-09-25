@@ -291,7 +291,6 @@ class Events(BaseEvents):
 			settingDialog.Initialize()
 			settingDialog.Show(True)
 			settingDialog.Destroy()
-			print("きた")
 
 		if selected == menuItemsStore.getRef("webpage"):
 			webbrowser.open("https://actlab.org")
