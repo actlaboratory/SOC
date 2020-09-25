@@ -85,7 +85,6 @@ class Main(AppBase.MainBase):
 	def OnExit(self):
 		#設定の保存やリソースの開放など、終了前に行いたい処理があれば記述できる
 		#ビューへのアクセスや終了の抑制はできないので注意。
-		print(self.tmpdir)
 		if os.path.exists(self.tmpdir):
 			util.allDelete(self.tmpdir)
 

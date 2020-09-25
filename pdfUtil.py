@@ -5,9 +5,14 @@ import os
 import util
 import pathlib
 import globalVars
+import namedPipe
+import constants
+import simpleDialog
+import re
 
-def pdfTextChecker(path):
-	"""pathに指定されたpdfファイルにテキストが含まれているか判定する。"""
+pattern = re.compile(r'[^\f\n\r]')
+
+def getPdfInfo(path):
 	if not pathlib.Path(path).suffix == ".pdf":
 		return False
 	info = {}
@@ -21,7 +26,18 @@ def pdfTextChecker(path):
 		else:
 			data.append("")
 		info[data[0]] = data[1]
-	if info["File size"] != "0 bytes":
+	return info
+
+def pdfTextChecker(path):
+	if not pathlib.Path(path).suffix == ".pdf":
+		return False
+	pipeServer = namedPipe.Server(constants.PIPE_NAME)
+	pipeServer.start()
+	subprocess.run(("pdftotext", path, pipeServer.getFullName()))
+	list = pipeServer.getNewMessageList()
+	pipeServer.exit()
+	text = list[0]
+	if pattern.search(text) is not None:
 		return True
 	return False
 
