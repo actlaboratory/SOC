@@ -17,7 +17,7 @@ class DefaultSettings:
 			"fileVersion": "100",
 			"locale": loc,
 			"update": True,
-			"tmpdir": os.path.join(os.environ["TEMP"], "soc")
+			"timeout": 3
 		}
 		config["view"]={
 			"font": font,
