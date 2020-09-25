@@ -268,7 +268,7 @@ class Events(BaseEvents):
 					wx.Process.Kill(pid,wx.SIGTERM)		#修了要請
 				dialog(_("認証が完了しました"),_("認証結果"))
 				self.parent.menu.hMenuBar.Enable(menuItemsStore.getRef("GOOGLE"), False)
-			if status == errorCodes.CANCELED_BY_USER:
+			elif status == errorCodes.CANCELED_BY_USER:
 				if web.Exists(pid):
 					wx.Process.Kill(pid,wx.SIGTERM)		#修了要請
 				dialog(_("キャンセルしました。"))
