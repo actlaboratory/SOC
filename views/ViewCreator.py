@@ -161,7 +161,7 @@ class ViewCreator():
 
 	def checkbox(self,text, event=None, state=False, style=0, x=-1, sizerFlag=0, proportion=0,margin=5):
 		hPanel=wx.Panel(self.parent,wx.ID_ANY)
-		self._setFace(hPanel)
+		self._setFace(hPanel,mode=SKIP_COLOUR)
 		hSizer=self.BoxSizer(hPanel,self.sizer.GetOrientation())
 
 		if (isinstance(text,str)):	#単純に一つを作成
@@ -171,7 +171,8 @@ class ViewCreator():
 			self._setFace(hCheckBox,mode=SKIP_COLOUR)
 			hSizer.Add(hCheckBox)
 			Add(self.sizer,hPanel,proportion,sizerFlag,margin)
-			viewHelper.ScCheckbox(hPanel.GetHandle())
+			if self.mode==MODE_DARK:
+				viewHelper.ScCheckbox(hPanel.GetHandle())
 			self.AddSpace()
 			return hCheckBox
 		elif (isinstance(text,list)):	#複数同時作成
@@ -184,7 +185,8 @@ class ViewCreator():
 				hSizer.Add(hCheckBox)
 				hCheckBoxes.append(hCheckBox)
 			Add(self.sizer,hPanel,proportion,sizerFlag,margin)
-			viewHelper.ScCheckbox(hPanel.GetHandle())
+			if self.mode==MODE_DARK:
+				viewHelper.ScCheckbox(hPanel.GetHandle())
 			self.AddSpace()
 			return hCheckBoxes
 		else:
@@ -193,7 +195,7 @@ class ViewCreator():
 	# 3stateチェックボックス
 	def checkbox3(self,text, event=None, state=None, style=0, x=-1, sizerFlag=0, proportion=0,margin=0):
 		hPanel=wx.Panel(self.parent,wx.ID_ANY)
-		self._setFace(hPanel)
+		self._setFace(hPanel,mode=SKIP_COLOUR)
 		hSizer=self.BoxSizer(hPanel,self.sizer.GetOrientation())
 
 		if (isinstance(text,str)):	#単純に一つを作成
@@ -208,7 +210,8 @@ class ViewCreator():
 			hSizer.Add(hCheckBox)
 			self.AddSpace()
 			Add(self.sizer,hPanel,proportion,sizerFlag,margin)
-			viewHelper.ScCheckbox(hPanel.GetHandle())
+			if self.mode==MODE_DARK:
+				viewHelper.ScCheckbox(hPanel.GetHandle())
 			self.AddSpace()
 			return hCheckBox
 		elif (isinstance(text,list)):	#複数同時作成
@@ -227,7 +230,8 @@ class ViewCreator():
 				hSizer.Add(hCheckBox)
 				hCheckBoxes.append(hCheckBox)
 			Add(self.sizer,hPanel,proportion,sizerFlag,margin)
-			viewHelper.ScCheckbox(hPanel.GetHandle())
+			if self.mode==MODE_DARK:
+				viewHelper.ScCheckbox(hPanel.GetHandle())
 			self.AddSpace()
 			return hCheckBoxes
 		else:
