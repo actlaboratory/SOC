@@ -30,6 +30,8 @@ import Ocr
 import views.convert
 import views.converted
 from views import authorizing
+from views import settings
+
 class MainView(BaseView):
 	def __init__(self):
 		super().__init__("mainView")
@@ -110,6 +112,8 @@ class Menu(BaseMenu):
 		#ツールメニューの中身
 		self.google=self.RegisterMenuCommand(self.hToolMenu,"GOOGLE",_("Googleと連携する(&g)"))#グーグルの認証開始
 		self.sendRegist = self.RegisterMenuCommand(self.hToolMenu,"SENDREGIST",_("送るメニューにショートカットを作成(&s)"))
+		self.setting = self.RegisterMenuCommand(self.hToolMenu,"SETTINGS",_("設定画面を開く(&w)"))
+	
 		#ヘルプメニューの中身
 		self.Page = self.RegisterMenuCommand(self.hHelpMenu, "webpage", _("actlaboratoryホームページを開く(&p)"))
 		self.About = self.RegisterMenuCommand(self.hHelpMenu, "ABOUT", _("このソフトについて"))
@@ -281,6 +285,14 @@ class Events(BaseEvents):
 			else:
 				dialog(_("不明なエラーが発生しました。"),_("エラー"))
 			return
+
+		if selected == menuItemsStore.getRef("SETTINGS"):
+			settingDialog = settings.settingsDialog()
+			settingDialog.Initialize()
+			settingDialog.Show(True)
+			settingDialog.Destroy()
+			print("きた")
+
 		if selected == menuItemsStore.getRef("webpage"):
 			webbrowser.open("https://actlab.org")
 			return
