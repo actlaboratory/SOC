@@ -11,7 +11,7 @@ def patch(filename, version_regexp, release_date_regexp, version_object):
 	try:
 		with open(filename, "r", encoding="UTF-8") as f:
 			c=f.read()
-		#end read		with open(filename, "r", encoding="UTF-8") as f:
+		#end read
 		p=re.sub(r"("+version_regexp+r")\d+\.\d+\.\d+",r"\g<1>"+version_object["version"],c)
 		p=re.sub(r"("+release_date_regexp+r")\d+\-\d+\-\d+",r"\g<1>"+version_object["release_date"],p)
 		with open(filename, "w", encoding="UTF-8") as f:
