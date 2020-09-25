@@ -6,13 +6,14 @@ msgstr ""
 "Project-Id-Version: SOC\n"
 "Report-Msgid-Bugs-To: support@actlab.org\n"
 "POT-Creation-Date: 2020-09-24 23:37+0900\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: English\n"
+"PO-Revision-Date: 2020-09-25 20:28+0900\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"X-Generator: Poedit 2.4.1\n"
 
 #: app.py:49
 msgid "サーバーとの通信に失敗しました。"
@@ -34,7 +35,7 @@ msgid ""
 "タイトル:%s\n"
 "詳細をブラウザーで開きますか？"
 msgstr ""
-"There is a important news.\n"
+"There is a important anouncement.\n"
 "Title:%s\n"
 "Do you open details in your browser?"
 
@@ -47,8 +48,7 @@ msgid "このフォーマットのファイルには対応していないため�
 msgstr "This file type is not supported."
 
 #: CredentialManager.py:45
-msgid ""
-"googleでの認証手続きが完了しました。このブラウザを閉じ、処理結果を確認してください。<script>window.close();</script>"
+msgid "googleでの認証手続きが完了しました。このブラウザを閉じ、処理結果を確認してください。<script>window.close();</script>"
 msgstr "Google authentication has successfully finished. Close the browser window, and see the result.<script>window.close();</script>"
 
 #: keymap.py:536
@@ -63,15 +63,15 @@ msgstr "%s is unusable key."
 
 #: keymap.py:579
 msgid "修飾キーのみのパターンは設定できません。"
-msgstr "Keystroke which consists of only modifire keys cannot be added."
+msgstr "Keystroke which consists of only modifier keys cannot be added."
 
 #: keymap.py:581
 msgid "このキーは修飾キーと合わせて指定する必要があります。"
-msgstr "This key must be added with some modifire keys."
+msgstr "This key must be added with some modifier keys."
 
 #: keymap.py:586
 msgid "修飾キーでないキーを複数指定することはできません。"
-msgstr "This keycombination is not supported."
+msgstr "This key combination is not supported."
 
 #: keymap.py:589 keymap.py:597
 msgid "このキーは、SHIFTキー以外の修飾キーと合わせて指定する必要があります。"
@@ -79,7 +79,7 @@ msgstr "This key cannot be added with Shift key."
 
 #: keymap.py:592
 msgid "修飾キーのみの組み合わせは指定できません。"
-msgstr "Keystroke which consists of only modifire keys cannot be added."
+msgstr "Keystroke which consists of only modifier keys cannot be added."
 
 #: keymap.py:601
 msgid "この組み合わせは別の用途で予約されているため、利用できません。"
@@ -99,8 +99,10 @@ msgid "現在メニューは操作できません"
 msgstr "You cannot use the menu at the moment."
 
 #: views\base.py:93
-msgid "で設定されたショートカットキーが正しくありません。キーの重複、存在しないキー名の指定、使用できないキーパターンの指定などが考えられます。以下のキーの設定内容をご確認ください。\n\n"
-msgstr ""
+msgid ""
+"で設定されたショートカットキーが正しくありません。キーの重複、存在しないキー名の指定、使用できないキーパターンの指定などが考えられます。以下のキーの設定内容をご確認ください。\n"
+"\n"
+msgstr "keyboard shortcut is invalid. Please check for conflicting / unusable key combinations and key names.\n"
 
 #: views\convert.py:16
 msgid "変換中"
@@ -228,7 +230,7 @@ msgstr "About SOC"
 
 #: views\main.py:114
 msgid "最新バージョンを確認"
-msgstr "Check for update"
+msgstr "Check for updates"
 
 #: views\main.py:116
 msgid "ファイル(&f)"
@@ -252,7 +254,7 @@ msgstr "Image files(*.jpg;*.png;*.gif;*.pdf) | *.jpg;*.png;*.gif;*.pdf; | all fi
 
 #: views\main.py:150
 msgid "変換をおこなうには最低ひとつの画像ファイルが追加されている必用があります。"
-msgstr "To start conversion, at least one files must be added ."
+msgstr "To start conversion, at least one file must be added ."
 
 #: views\main.py:153
 msgid "OCRエンジンを選択してください。"
@@ -296,7 +298,7 @@ msgstr "Error. Please make sure that the selected items are valid image files."
 
 #: views\main.py:192
 msgid "何らかの理由により変換に失敗しました。errorlog.txtをご確認ください。"
-msgstr "Conversion failed. Check the errorlog.txt."
+msgstr "Conversion failed. Check the errorlog.txt for details."
 
 #: views\main.py:194
 msgid "このエンジンではこのファイル形式は対応していません。"
@@ -324,7 +326,7 @@ msgstr "Authentication has finished, but data couldn't be saved in the file."
 
 #: views\main.py:268
 msgid "ブラウザが閉じられたため、認証をキャンセルしました。"
-msgstr "Authentication has been canceled."
+msgstr "Authentication has been canceled since the browser was closed."
 
 #: views\main.py:270
 msgid "認証が拒否されました。"
@@ -348,8 +350,14 @@ msgstr "Done"
 
 #: views\main.py:285
 #, python-format
-msgid "SimpleOcrController（%s） version %s.\nCopyright (C) %s %s.\nこのソフトは公開されているOCRエンジンを使いやすくした物です。"
-msgstr "SimpleOcrController（%s） version %s.\nCopyright (C) %s %s.\nThis software will make OCR engines easy to use."
+msgid ""
+"SimpleOcrController（%s） version %s.\n"
+"Copyright (C) %s %s.\n"
+"このソフトは公開されているOCRエンジンを使いやすくしたものです。"
+msgstr ""
+"SimpleOcrController（%s） version %s.\n"
+"Copyright (C) %s %s.\n"
+"This software will make OCR engines easy to use."
 
 #: views\main.py:289
 msgid "サーバーとの通信中にエラーが発生しました。"
@@ -361,7 +369,7 @@ msgstr "No updates are available."
 
 #: views\main.py:305
 msgid "リクエストパラメーターが不正です。開発者にお問い合わせください。"
-msgstr "Request parameter is invalid. Contact the software developer."
+msgstr "Request parameter is invalid. Please kontact the software developer."
 
 #~ msgid "進行状況"
 #~ msgstr "Progress"

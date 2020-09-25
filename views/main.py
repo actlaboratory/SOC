@@ -292,7 +292,7 @@ class Events(BaseEvents):
 			scut.Save()
 			dialog(_("送るメニューの登録が完了しました。送るメニューから「SOCで文字認識を開始」で実行できます。"), _("完了"))
 		if selected == menuItemsStore.getRef("ABOUT"):
-			dialog(_("SimpleOcrController（%s） version %s.\nCopyright (C) %s %s.\nこのソフトは公開されているOCRエンジンを使いやすくした物です。") % (constants.APP_NAME, constants.APP_VERSION, constants.APP_COPYRIGHT_YEAR, constants.APP_DEVELOPERS), _("このソフトについて"))
+			dialog(_("SimpleOcrController（%s） version %s.\nCopyright (C) %s %s.\nこのソフトは公開されているOCRエンジンを使いやすくしたものです。") % (constants.APP_NAME, constants.APP_VERSION, constants.APP_COPYRIGHT_YEAR, constants.APP_DEVELOPERS), _("このソフトについて"))
 		if selected == menuItemsStore.getRef("UPDATE"):
 			code = self.parent.app.update.check(constants.APP_NAME, constants.APP_VERSION, constants.UPDATE_URL)
 			if code == errorCodes.NET_ERROR:
