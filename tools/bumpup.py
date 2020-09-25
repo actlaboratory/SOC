@@ -87,5 +87,5 @@ with open(VERSION_FILE_NAME, "w") as f:
 	json.dump(v,f)
 
 print("Saved %s." % VERSION_FILE_NAME)
-patch("public/readme.txt",r'Version: ', r'Last updated: ', v)
+patch("public/readme.txt",r'バージョン:　　ver\.', r'リリース:　　　', v)
 patch("constants.py",r'APP_VERSION="', r'APP_LAST_RELEASE_DATE="', v)
