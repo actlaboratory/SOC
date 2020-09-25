@@ -145,7 +145,12 @@ class OcrManager():
 				self.allDelete()
 				self.SavedText = ""
 				return errorCodes.CANCELED
-			util.textSave(Path.with_suffix(".txt"), text)#ファイルに保存
+			if globalVars.app.config.getboolean("ocr", "saveSourceDir"):
+				saveFile = Path.with_suffix(".txt")
+			else:
+				saveFile = pathlib.Path(globalVars.app.config.getstring("ocr", "savedir", "", None), Path.with_suffix(".txt").name)
+			print(saveFile)
+			util.textSave(saveFile, text)#ファイルに保存
 			self.saved.append(Path.with_suffix(".txt"))
 			self.SavedText += text
 		return errorCodes.OK

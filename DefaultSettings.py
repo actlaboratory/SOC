@@ -17,7 +17,6 @@ class DefaultSettings:
 			"fileVersion": "100",
 			"locale": loc,
 			"update": True,
-			"tmpdir": os.path.join(os.environ["TEMP"], "soc")
 		}
 		config["view"]={
 			"font": font,
@@ -28,6 +27,11 @@ class DefaultSettings:
 		}
 		config["mainView"]={
 
+		}
+		config["ocr"] = {
+			"tmpdir": os.path.join(os.environ["TEMP"], "soc"),
+			"saveSourceDir": True,
+			"savedir": "c:\\aac"
 		}
 		return config
 
