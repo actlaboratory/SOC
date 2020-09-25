@@ -4,31 +4,32 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: SOC\n"
-"Report-Msgid-Bugs-To: support@actlab.org\n"
-"POT-Creation-Date: 2020-09-24 23:37+0900\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-09-25 21:03+0900\n"
 "PO-Revision-Date: 2020-09-25 20:28+0900\n"
+"Last-Translator: \n"
+"Language-Team: \n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Last-Translator: \n"
-"Language-Team: \n"
 "X-Generator: Poedit 2.4.1\n"
 
 #: app.py:49
 msgid "サーバーとの通信に失敗しました。"
 msgstr "Connection failed."
 
-#: app.py:49 app.py:52 views\main.py:292 views\main.py:295 views\main.py:305
+#: app.py:49 app.py:52 views\main.py:302 views\main.py:305 views\main.py:315
 msgid "アップデート"
 msgstr "Update"
 
-#: app.py:52 views\main.py:295
+#: app.py:52 views\main.py:305
 #, python-format
-msgid "バージョン%sにアップデートすることができます。%sアップデートを開始しますか？"
+msgid ""
+"バージョン%sにアップデートすることができます。%sアップデートを開始しますか？"
 msgstr "Version %s is now available. %s Update now?"
 
-#: app.py:58 views\main.py:301
+#: app.py:58 views\main.py:311
 #, python-format
 msgid ""
 "緊急のお知らせがあります。\n"
@@ -40,16 +41,23 @@ msgstr ""
 "Do you open details in your browser?"
 
 #: app.py:81
-msgid "対応していないフォーマットのファイルは除外され、一部のファイルのみ追加されました。"
+msgid ""
+"対応していないフォーマットのファイルは除外され、一部のファイルのみ追加されま"
+"した。"
 msgstr "Unsupported files are skipped."
 
 #: app.py:83
-msgid "このフォーマットのファイルには対応していないため、追加できませんでした。"
+msgid ""
+"このフォーマットのファイルには対応していないため、追加できませんでした。"
 msgstr "This file type is not supported."
 
 #: CredentialManager.py:45
-msgid "googleでの認証手続きが完了しました。このブラウザを閉じ、処理結果を確認してください。<script>window.close();</script>"
-msgstr "Google authentication has successfully finished. Close the browser window, and see the result.<script>window.close();</script>"
+msgid ""
+"googleでの認証手続きが完了しました。このブラウザを閉じ、処理結果を確認してく"
+"ださい。<script>window.close();</script>"
+msgstr ""
+"Google authentication has successfully finished. Close the browser window, "
+"and see the result.<script>window.close();</script>"
 
 #: keymap.py:536
 #, python-format
@@ -85,14 +93,26 @@ msgstr "Keystroke which consists of only modifier keys cannot be added."
 msgid "この組み合わせは別の用途で予約されているため、利用できません。"
 msgstr "This keystroke is already reserved."
 
-#: simpleDialog.py:16 views\main.py:158 views\main.py:231
+#: simpleDialog.py:16 views\main.py:160 views\main.py:233
 msgid "確認"
 msgstr "Confirmation"
 
 #: simpleDialog.py:30 views\base.py:96 views\fontManager.py:25
-#: views\fontManager.py:50 views\main.py:272
+#: views\fontManager.py:50 views\main.py:282
 msgid "エラー"
 msgstr "Error"
+
+#: views\authorizing.py:17 views\authorizing.py:25
+msgid "大気中..."
+msgstr "Waiting..."
+
+#: views\authorizing.py:26
+msgid "認証大気中..."
+msgstr "Waiting for the authentication..."
+
+#: views\authorizing.py:27 views\convert.py:27
+msgid "キャンセル"
+msgstr "Cancel"
 
 #: views\base.py:62
 msgid "現在メニューは操作できません"
@@ -100,9 +120,13 @@ msgstr "You cannot use the menu at the moment."
 
 #: views\base.py:93
 msgid ""
-"で設定されたショートカットキーが正しくありません。キーの重複、存在しないキー名の指定、使用できないキーパターンの指定などが考えられます。以下のキーの設定内容をご確認ください。\n"
+"で設定されたショートカットキーが正しくありません。キーの重複、存在しないキー"
+"名の指定、使用できないキーパターンの指定などが考えられます。以下のキーの設定"
+"内容をご確認ください。\n"
 "\n"
-msgstr "keyboard shortcut is invalid. Please check for conflicting / unusable key combinations and key names.\n"
+msgstr ""
+"keyboard shortcut is invalid. Please check for conflicting / unusable key "
+"combinations and key names.\n"
 
 #: views\convert.py:16
 msgid "変換中"
@@ -115,10 +139,6 @@ msgstr "Converting..."
 #: views\convert.py:25
 msgid "読み込み中..."
 msgstr "Loading..."
-
-#: views\convert.py:27
-msgid "キャンセル"
-msgstr "Cancel"
 
 #: views\converted.py:20 views\converted.py:27
 msgid "認識結果"
@@ -133,8 +153,11 @@ msgid "OK"
 msgstr "OK"
 
 #: views\converted.py:34
-msgid "余計なスペースをすべて置換します。文章が崩れる可能性があります。よろしいですか？"
-msgstr "Spaces will be replaced and Document layout will be lost. Are you sure?"
+msgid ""
+"余計なスペースをすべて置換します。文章が崩れる可能性があります。よろしいです"
+"か？"
+msgstr ""
+"Spaces will be replaced and Document layout will be lost. Are you sure?"
 
 #: views\converted.py:41
 msgid "置換が完了しました。"
@@ -145,210 +168,232 @@ msgid "置換"
 msgstr "Replace"
 
 #: views\fontManager.py:25
-msgid "設定されているフォント情報が不正です。デフォルトのフォントを適用します。"
+msgid ""
+"設定されているフォント情報が不正です。デフォルトのフォントを適用します。"
 msgstr "Font configuration is invalid. Default settings will be applied."
 
 #: views\fontManager.py:50
 msgid "原因不明のエラーにより、フォントの変更に失敗しました。"
 msgstr "Font configuration has failed."
 
-#: views\main.py:51
+#: views\main.py:53
 msgid "ファイル一覧"
 msgstr "Files list"
 
-#: views\main.py:58
+#: views\main.py:60
 msgid "追加"
 msgstr "Add"
 
-#: views\main.py:59
+#: views\main.py:61
 msgid "削除"
 msgstr "Remove"
 
-#: views\main.py:62
+#: views\main.py:64
 msgid "OCRエンジン"
 msgstr "OCR engine"
 
-#: views\main.py:62
+#: views\main.py:64
 msgid "google (インターネット)"
 msgstr "google (Internet)"
 
-#: views\main.py:62
+#: views\main.py:64
 msgid "tesseract (ローカル)"
 msgstr "tesseract (local)"
 
-#: views\main.py:63
+#: views\main.py:65
 msgid "モード"
 msgstr "Mode"
 
-#: views\main.py:63
+#: views\main.py:65
 msgid "横書き通常"
 msgstr "Horizontal"
 
-#: views\main.py:63
+#: views\main.py:65
 msgid "横書き低負荷版"
 msgstr "Horizontal(light)"
 
-#: views\main.py:63
+#: views\main.py:65
 msgid "縦書き通常"
 msgstr "Vertical"
 
-#: views\main.py:63
+#: views\main.py:65
 msgid "縦書き低負荷版"
 msgstr "Vertical(light)"
 
-#: views\main.py:67
+#: views\main.py:69
 msgid "変換"
 msgstr "Convert"
 
-#: views\main.py:68
+#: views\main.py:70
 msgid "終了"
 msgstr "Exit"
 
-#: views\main.py:106
+#: views\main.py:108
 msgid "変換ファイルの追加(&o)"
 msgstr "Add files(&o)"
 
-#: views\main.py:107
+#: views\main.py:109
 msgid "終了(&x)"
 msgstr "Exit(&x)"
 
-#: views\main.py:109
+#: views\main.py:111
 msgid "Googleと連携する(&g)"
 msgstr "Link a Google account"
 
-#: views\main.py:110
+#: views\main.py:112
 msgid "送るメニューにショートカットを作成(&s)"
 msgstr "Add to SendTo"
 
-#: views\main.py:112
-msgid "actlaboratoryホームページを開く(&p)"
-msgstr "Open Act Laboratory's home page(&p)"
+#: views\main.py:114
+msgid "ACT Laboratoryホームページを開く(&p)"
+msgstr "Open ACT Laboratory's home page(&p)"
 
-#: views\main.py:113 views\main.py:285
+#: views\main.py:115 views\main.py:295
 msgid "このソフトについて"
 msgstr "About SOC"
 
-#: views\main.py:114
+#: views\main.py:116
 msgid "最新バージョンを確認"
 msgstr "Check for updates"
 
-#: views\main.py:116
+#: views\main.py:118
 msgid "ファイル(&f)"
 msgstr "File(&f)"
 
-#: views\main.py:117
+#: views\main.py:119
 msgid "ツール(&t)"
 msgstr "Tools(&t)"
 
-#: views\main.py:118
+#: views\main.py:120
 msgid "ヘルプ(&h)"
 msgstr "Help(&h)"
 
-#: views\main.py:133
+#: views\main.py:135
 msgid "画像ファイルを選択"
 msgstr "Select image files"
 
-#: views\main.py:133
-msgid "画像ファイル(*.jpg;*.png;*.gif;*.pdf) | *.jpg;*.png;*.gif;*.pdf; | すべてのファイル(*.*) | *.*"
-msgstr "Image files(*.jpg;*.png;*.gif;*.pdf) | *.jpg;*.png;*.gif;*.pdf; | all files(*.*) | *.*"
+#: views\main.py:135
+msgid ""
+"画像ファイル(*.jpg;*.png;*.gif;*.pdf) | *.jpg;*.png;*.gif;*.pdf; | すべての"
+"ファイル(*.*) | *.*"
+msgstr ""
+"Image files(*.jpg;*.png;*.gif;*.pdf) | *.jpg;*.png;*.gif;*.pdf; | all "
+"files(*.*) | *.*"
 
-#: views\main.py:150
-msgid "変換をおこなうには最低ひとつの画像ファイルが追加されている必用があります。"
+#: views\main.py:152
+msgid ""
+"変換をおこなうには最低ひとつの画像ファイルが追加されている必用があります。"
 msgstr "To start conversion, at least one file must be added ."
 
-#: views\main.py:153
+#: views\main.py:155
 msgid "OCRエンジンを選択してください。"
 msgstr "Select OCR engine."
 
-#: views\main.py:156
+#: views\main.py:158
 msgid "tesseract-ocrのモードが指定されていません。"
 msgstr "Tesseract-ocr mode is not configured."
 
-#: views\main.py:158
+#: views\main.py:160
 msgid "変換を開始します。よろしいですか？"
 msgstr "Conversion will be started. Are you sure?"
 
-#: views\main.py:174
+#: views\main.py:176
 msgid "キャンセルされました。"
 msgstr "Canceled."
 
-#: views\main.py:174
+#: views\main.py:176
 msgid "結果"
 msgstr "Result"
 
-#: views\main.py:177
+#: views\main.py:179
 msgid "画像ファイルが存在しなかったためキャンセルされました。"
 msgstr "Since image files didn't exist, Conversion has been canceled."
 
-#: views\main.py:180
+#: views\main.py:182
 msgid "この機能は対応していません"
 msgstr "This function is not supported."
 
-#: views\main.py:183
-msgid "この機能を使用するには事前にグーグルと連携しておく必用があります。ツールメニューより連携を行ってください。"
-msgstr "To use this function, you need to link your Google account from tools menu."
+#: views\main.py:185
+msgid ""
+"この機能を使用するには事前にグーグルと連携しておく必用があります。ツールメ"
+"ニューより連携を行ってください。"
+msgstr ""
+"To use this function, you need to link your Google account from tools menu."
 
-#: views\main.py:186
-msgid "通信中にエラーが発生しました。ネット接続を確認するか時間をおいてから再度お試しください。"
-msgstr "Connection failed. Please check your Internet connection and try again."
+#: views\main.py:188
+msgid ""
+"通信中にエラーが発生しました。ネット接続を確認するか時間をおいてから再度お試"
+"しください。"
+msgstr ""
+"Connection failed. Please check your Internet connection and try again."
 
-#: views\main.py:189
-msgid "エラーが発生しました。ファイルが画像ファイルか、ファイルが破損していないかなどを確認してください。"
+#: views\main.py:191
+msgid ""
+"エラーが発生しました。ファイルが画像ファイルか、ファイルが破損していないかな"
+"どを確認してください。"
 msgstr "Error. Please make sure that the selected items are valid image files."
 
-#: views\main.py:192
+#: views\main.py:194
 msgid "何らかの理由により変換に失敗しました。errorlog.txtをご確認ください。"
 msgstr "Conversion failed. Check the errorlog.txt for details."
 
-#: views\main.py:194
+#: views\main.py:196
 msgid "このエンジンではこのファイル形式は対応していません。"
 msgstr "This file type is not supported in this engine."
 
-#: views\main.py:231
+#: views\main.py:233
 msgid "ブラウザを開き、認証を開始します。よろしいですか？"
 msgstr "Browser will open, and authentication will be started. Are you sure?"
 
-#: views\main.py:240
+#: views\main.py:244
 msgid "ブラウザを開いています..."
 msgstr "Opening browser..."
 
-#: views\main.py:263
+#: views\main.py:269
 msgid "認証が完了しました"
 msgstr "Authentication has successfully finished."
 
-#: views\main.py:263 views\main.py:266 views\main.py:268 views\main.py:270
+#: views\main.py:269 views\main.py:276 views\main.py:278 views\main.py:280
 msgid "認証結果"
 msgstr "Authentication result"
 
-#: views\main.py:266
-msgid "認証に成功しましたが、ファイルの保存に失敗しました。ディレクトリのアクセス権限などを確認してください。"
+#: views\main.py:274
+msgid "キャンセルしました。"
+msgstr "Canceled."
+
+#: views\main.py:276
+msgid ""
+"認証に成功しましたが、ファイルの保存に失敗しました。ディレクトリのアクセス権"
+"限などを確認してください。"
 msgstr "Authentication has finished, but data couldn't be saved in the file."
 
-#: views\main.py:268
+#: views\main.py:278
 msgid "ブラウザが閉じられたため、認証をキャンセルしました。"
 msgstr "Authentication has been canceled since the browser was closed."
 
-#: views\main.py:270
+#: views\main.py:280
 msgid "認証が拒否されました。"
 msgstr "Authentication has been denied"
 
-#: views\main.py:272
+#: views\main.py:282
 msgid "不明なエラーが発生しました。"
 msgstr "Unknown error has occured."
 
-#: views\main.py:278
+#: views\main.py:288
 msgid "SOCで文字認識を開始.lnk"
 msgstr "Start OCR by SOC.lnk"
 
-#: views\main.py:283
-msgid "送るメニューの登録が完了しました。送るメニューから「SOCで文字認識を開始」で実行できます。"
+#: views\main.py:293
+msgid ""
+"送るメニューの登録が完了しました。送るメニューから「SOCで文字認識を開始」で実"
+"行できます。"
 msgstr "SOC's shortcut has been created in your SendTo folder."
 
-#: views\main.py:283
+#: views\main.py:293
 msgid "完了"
 msgstr "Done"
 
-#: views\main.py:285
+#: views\main.py:295
 #, python-format
 msgid ""
 "SimpleOcrController（%s） version %s.\n"
@@ -359,17 +404,17 @@ msgstr ""
 "Copyright (C) %s %s.\n"
 "This software will make OCR engines easy to use."
 
-#: views\main.py:289
+#: views\main.py:299
 msgid "サーバーとの通信中にエラーが発生しました。"
 msgstr "Unknown errors has occured."
 
-#: views\main.py:292
+#: views\main.py:302
 msgid "現在お使いのバージョンは最新です。アップデートの必要はありません。"
 msgstr "No updates are available."
 
-#: views\main.py:305
+#: views\main.py:315
 msgid "リクエストパラメーターが不正です。開発者にお問い合わせください。"
-msgstr "Request parameter is invalid. Please kontact the software developer."
+msgstr "Request parameter is invalid. Please contact the software developer."
 
 #~ msgid "進行状況"
 #~ msgstr "Progress"
