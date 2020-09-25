@@ -31,10 +31,11 @@ class settingsDialog(BaseDialog):
 			(_("white"), _("dark")))
 		self.autoUpdate = creator.checkbox(_("起動時にアップデートを確認"), style = wx.CHK_2STATE)
 		self.timeout, dummy = creator.inputbox(_("アップデート確認時のタイムアウト（秒数）"))
-		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,space=20,label=_("アップデートと通信"))
-		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,space=20,label=_("消滅"))
-		lastHope,dummy=creator.inputbox(_("最後の願い事"),None,_("なにもない"),x=300)
-		next,dummy=creator.inputbox(_("来世の希望"),None,_("なにもない"),x=300)
+		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,space=20,label=_("OCR"))
+		self.tmpEdit, dummy = creator.inputbox(_("一時ファイルの場所"))
+		self.saveSelect = creator.checkbox(_("認識結果をもとの画像ファイルと同じディレクトリに保存する"), self.switch)
+		self.saveDir, dummy = creator.inputbox(_("認識結果の保存先"), style = wx.TE_READONLY)
+		self.changeBtn = creator.button(_("参照"), self.browse)
 
 
 		self.okbtn = self.creator.okbutton(_("OK"), self.onOkBtn)
@@ -48,6 +49,21 @@ class settingsDialog(BaseDialog):
 	def onCancelBtn(self, event):
 		print("cancel")
 		self.Destroy()
+
+	def switch(self, event = None):
+		if self.saveSelect.IsChecked():
+			self.saveDir.Disable()
+			self.changeBtn.Disable()
+		else:
+			self.saveDir.Enable()
+			self.changeBtn.Enable()
+
+	def browse(self, event):
+		dialog = wx.DirDialog(None, _("保存先を選択"))
+		if dialog.ShowModal() == wx.ID_OK:
+			dir = dialog.GetPath()
+			self.saveDir.SetValue(dir)
+		return
 
 	def Destroy(self, events = None):
 		self.log.debug("destroy")
