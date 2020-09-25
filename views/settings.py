@@ -11,12 +11,25 @@ import globalVars
 class settingsDialog(BaseDialog):
 	def __init__(self):
 		super().__init__("settingDialog")
-		self.config = globalVars.app.config
+		self.readerSelection = {
+			"AUTO": _("自動選択"),
+			"SAPI5": "SAPI5",
+			"PCTK": "pc-talker",
+			"NVDA": "NVDA",
+			"JAWS": "JAWS",
+			"CLIPBOARD": _("クリップボード出力")
+		}
+		self.colorSelection = {
+			"white": "white",
+			"dark": "dark"
+		}
 
 	def Initialize(self):
 		self.log.debug("created")
 		super().Initialize(self.app.hMainView.hFrame,_("設定画面"))
 		self.InstallControls()
+		self.loadSettings()
+		self.switch()
 		return True
 
 	def InstallControls(self):
@@ -25,10 +38,8 @@ class settingsDialog(BaseDialog):
 		self.creator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.sizer,wx.VERTICAL,20)
 		self.tab = self.creator.tabCtrl(_("カテゴリ選択"))
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,space=20,label=_("一般"))
-		self.reader, dummy = creator.combobox(_("スクリーンリーダー"), 
-			(_("自動選択"), _("sapi5"), _("pc-talker"), _("NVDA"), _("JAWS")))
-		self.collar, dummy = creator.combobox(_("配色"), 
-			(_("white"), _("dark")))
+		self.reader, dummy = creator.combobox(_("スクリーンリーダー"), list(self.readerSelection.values()))
+		self.color, dummy = creator.combobox(_("配色"), list(self.colorSelection.values()))
 		self.autoUpdate = creator.checkbox(_("起動時にアップデートを確認"), style = wx.CHK_2STATE)
 		self.timeout, dummy = creator.inputbox(_("アップデート確認時のタイムアウト（秒数）"))
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,space=20,label=_("OCR"))
@@ -63,6 +74,32 @@ class settingsDialog(BaseDialog):
 		if dialog.ShowModal() == wx.ID_OK:
 			dir = dialog.GetPath()
 			self.saveDir.SetValue(dir)
+		return
+
+	def loadSettings(self):
+		reader = globalVars.app.config["speech"]["reader"]
+		selectionStr = self.readerSelection[reader]
+		self.reader.SetStringSelection(selectionStr)
+		color = globalVars.app.config.getstring("view", "colormode")
+		selectionStr = self.colorSelection[color]
+		self.color.SetStringSelection(selectionStr)
+		update = globalVars.app.config.getboolean("general", "update")
+		if update:
+			self.autoUpdate.SetValue(True)
+		else:
+			self.autoUpdate.SetValue(False)
+		timeout = globalVars.app.config.getint("general", "timeout", 3)
+		self.timeout.SetValue(str(timeout))
+		tmpdir = globalVars.app.tmpdir
+		self.tmpEdit.SetValue(tmpdir)
+		savesourcedir = globalVars.app.config.getboolean("ocr", "saveSourceDir")
+		print(savesourcedir)
+		if savesourcedir:
+			self.saveSelect.SetValue(True)
+		else:
+			self.saveSelect.SetValue(False)
+		savedir = globalVars.app.config.getstring("ocr", "savedir", "")
+		self.saveDir.SetValue(savedir)
 		return
 
 	def Destroy(self, events = None):

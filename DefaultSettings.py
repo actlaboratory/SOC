@@ -3,6 +3,7 @@
 
 from ConfigManager import *
 import locale
+import os
 
 class DefaultSettings:
 	def get():
@@ -33,7 +34,7 @@ class DefaultSettings:
 		config["ocr"] = {
 			"tmpdir": os.path.join(os.environ["TEMP"], "soc"),
 			"saveSourceDir": True,
-			"savedir": "c:\\aac"
+			"savedir": os.path.join(os.environ["userprofile"], "Documents")
 		}
 		return config
 
