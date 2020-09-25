@@ -79,7 +79,7 @@ try:
 except:
 	print("Invalid date format.")
 	print("Aborting.")
-	sys.exit()
+	sys.exit(1)
 #end abort
 
 v["release_date"]=inp
