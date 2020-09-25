@@ -376,7 +376,7 @@ msgstr ""
 msgid ""
 "SimpleOcrController（%s） version %s.\n"
 "Copyright (C) %s %s.\n"
-"このソフトは公開されているOCRエンジンを使いやすくした物です。"
+"このソフトは公開されているOCRエンジンを使いやすくしたものです。"
 msgstr ""
 
 #: views\main.py:289
