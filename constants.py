@@ -14,7 +14,7 @@ SUPPORTING_LANGUAGE={"ja-JP": "日本語","en-US": "English"}# 対応言語一�
 AVAILABLE_FORMATS = (".jpg", ".png", ".gif", ".pdf")# 対応フォーマット一覧
 #各種ファイル名
 LOG_PREFIX="app"
-LOG_FILE_NAME="application.log"
+LOG_FILE_NAME="SOC.log"
 SETTING_FILE_NAME="settings.ini"
 KEYMAP_FILE_NAME="keymap.ini"
 #フォントの設定可能サイズ範囲
