@@ -13,7 +13,7 @@ APP_DEVELOPERS="Guredora"
 SUPPORTING_LANGUAGE={"ja-JP": "日本語","en-US": "English"}# 対応言語一覧
 AVAILABLE_FORMATS = (".jpg", ".png", ".gif", ".pdf")# 対応フォーマット一覧
 #各種ファイル名
-LOG_PREFIX="app"
+LOG_PREFIX="SOC"
 LOG_FILE_NAME="SOC.log"
 SETTING_FILE_NAME="settings.ini"
 KEYMAP_FILE_NAME="keymap.ini"
@@ -32,7 +32,6 @@ GOOGLE_FILE_NAME = "credential.json"
 GOOGLE_CLIENT_ID = "700286679735-4bssuo7bsen9o7sua8joacl18bhms6nd.apps.googleusercontent.com"
 GOOGLE_NEED_SCOPES = ["https://www.googleapis.com/auth/drive.file"]
 GOOGLE_CALLBACK_URL = "http://localhost:8080"
-
 GOOGLE_CLIENT_SECRET = '{"installed":{"client_id":"700286679735-4bssuo7bsen9o7sua8joacl18bhms6nd.apps.googleusercontent.com","project_id":"simple-ocr-controller","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"607kPxH25Wba68T3mJmoxrKD","redirect_uris":["urn:ietf:wg:oauth:2.0:oob","http://localhost"]}}'
 
 # update情報
