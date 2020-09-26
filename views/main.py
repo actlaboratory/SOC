@@ -233,48 +233,13 @@ class Events(BaseEvents):
 			self.parent.app.addFileList(pathList)
 			return
 		if selected==menuItemsStore.getRef("GOOGLE"):
-			#確認ダイアログ表示
-			result = qDialog(_("ブラウザを開き、認証を開始します。よろしいですか？"),_("確認"))
-			if result == wx.ID_NO:
-				return
-
-			#認証プロセスの開始、認証用URL取得
-			url=self.parent.app.credentialManager.MakeFlow()
-
 			authorizeDialog = authorizing.authorizeDialog()
 			authorizeDialog.Initialize()
-			authorizeDialog.Show(False)
-			#ブラウザの表示
-			self.parent.app.say(_("ブラウザを開いています..."))
+			status = authorizeDialog.Show()
 
-			#webView=views.web.Dialog(url,"http://localhost")
-			#webView.Initialize()
-			#webView.Show()
-			web=wx.Process.Open("\"C:\\Program Files\\Internet Explorer\\iexplore.exe\" "+url)
-
-			pid=web.GetPid()
-
-			#ユーザの認証待ち
-			status=errorCodes.WAITING_USER
-			evt=threading.Event()
-			while(status==errorCodes.WAITING_USER):
-				if not wx.Process.Exists(pid):
-					status=errorCodes.CANCELED
-				if authorizeDialog.cancel:
-					status = errorCodes.CANCELED_BY_USER
-				if status==errorCodes.WAITING_USER:
-					status=self.parent.app.credentialManager.getCredential()
-				wx.YieldIfNeeded()
-				evt.wait(0.3)
-			authorizeDialog.Destroy()
 			if status==errorCodes.OK:
-				if web.Exists(pid):
-					wx.Process.Kill(pid,wx.SIGTERM)		#修了要請
-				dialog(_("認証が完了しました"),_("認証結果"))
 				self.parent.menu.hMenuBar.Enable(menuItemsStore.getRef("GOOGLE"), False)
 			elif status == errorCodes.CANCELED_BY_USER:
-				if web.Exists(pid):
-					wx.Process.Kill(pid,wx.SIGTERM)		#修了要請
 				dialog(_("キャンセルしました。"))
 			elif status==errorCodes.IO_ERROR:
 				dialog(_("認証に成功しましたが、ファイルの保存に失敗しました。ディレクトリのアクセス権限などを確認してください。"),_("認証結果"))
