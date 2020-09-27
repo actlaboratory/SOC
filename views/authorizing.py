@@ -12,7 +12,6 @@ from views.baseDialog import *
 
 class authorizeDialog(BaseDialog):
 	def __init__(self):
-		self.cancel = False
 		super().__init__("authorizingDialog")
 		self.web, self.pid = None, None
 		self.authThread = None
@@ -64,6 +63,7 @@ class authorizeDialog(BaseDialog):
 		status=errorCodes.WAITING_USER
 		evt=threading.Event()
 		while(status==errorCodes.WAITING_USER):
+			if self.__isArrive: return
 			if not wx.Process.Exists(self.pid):
 				wx.CallAfter(self.end, errorCodes.CANCELED)
 				return
@@ -96,10 +96,3 @@ class authorizeDialog(BaseDialog):
 
 	def finish(self):
 		self.wnd.EndModal(errorCodes.OK)
-	
-	def Destroy(self, events = None):
-		self.log.debug("destroy")
-		self.wnd.Destroy()
-
-	#def GetData(self):
-		return None
