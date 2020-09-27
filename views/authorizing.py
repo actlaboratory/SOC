@@ -63,7 +63,7 @@ class authorizeDialog(BaseDialog):
 		status=errorCodes.WAITING_USER
 		evt=threading.Event()
 		while(status==errorCodes.WAITING_USER):
-			if self.__isArrive: return
+			if not self.__isArrive: return
 			if not wx.Process.Exists(self.pid):
 				wx.CallAfter(self.end, errorCodes.CANCELED)
 				return
