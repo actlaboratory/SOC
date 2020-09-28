@@ -18,7 +18,8 @@ class settingsDialog(BaseDialog):
 			"PCTK": "pc-talker",
 			"NVDA": "NVDA",
 			"JAWS": "JAWS",
-			"CLIPBOARD": _("クリップボード出力")
+			"CLIPBOARD": _("クリップボード出力"),
+			"NOSPEECH": _("読み上げなし")
 		}
 		self.colorSelection = {
 			"white": "white",
