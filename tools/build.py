@@ -55,12 +55,12 @@ if os.path.exists("release"):
 	for file in os.listdir("release"):
 		shutil.copy(os.path.join("release", file), "dist/soc")
 print("Compressing into package...")
-shutil.make_archive("SOC-%s" % (build_filename),'zip','dist')
+shutil.make_archive("SOC-%s" % (build_filename),'zip','dist\\soc')
 
 if build_filename=="snapshot":
 	print("Skipping batch archiving because this is a snapshot release.")
 else:
 	print("Making patch...")
-	archiver=diff_archiver.DiffArchiver(BASE_PACKAGE_URL,"SOC-%s.zip" % (build_filename),"SOC-%spatch" % (build_filename),clean_base_package=True)
+	archiver=diff_archiver.DiffArchiver(BASE_PACKAGE_URL,"SOC-%s.zip" % (build_filename),"SOC-%spatch" % (build_filename),clean_base_package=True, skip_root = True)
 	archiver.work()
 print("Build finished!")
