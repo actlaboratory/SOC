@@ -44,6 +44,7 @@ class ViewCreator():
 			self.parent=makePanel(parent)
 			self._setFace(self.parent)
 			parent.InsertPage(parent.GetPageCount(),self.parent,label)
+			label=""
 		else:
 			raise ValueError("ViewCreatorの親はパネルまたはブックコントロールである必要があります。")
 
@@ -108,7 +109,7 @@ class ViewCreator():
 		self.AddSpace()
 		return hButton
 
-	def okbutton(self,text, event=None, sizerFlag=wx.ALIGN_BOTTOM | wx.ALIGN_RIGHT | wx.ALL,proportion=0,margin=5):
+	def okbutton(self,text, event=None, sizerFlag=wx.ALIGN_BOTTOM | wx.ALIGN_RIGHT | wx.ALL,proportion=1,margin=5):
 		hButton=wx.Button(self.parent, wx.ID_OK,label=text, name=text,style=wx.BORDER_RAISED)
 		hButton.Bind(wx.EVT_BUTTON,event)
 		self._setFace(hButton,mode=BUTTON_COLOUR)
@@ -117,7 +118,7 @@ class ViewCreator():
 		self.AddSpace()
 		return hButton
 
-	def cancelbutton(self,text, event=None, sizerFlag=wx.ALIGN_BOTTOM | wx.ALIGN_RIGHT | wx.ALL,proportion=0,margin=5):
+	def cancelbutton(self,text, event=None, sizerFlag=wx.ALIGN_BOTTOM | wx.ALIGN_RIGHT | wx.ALL,proportion=1,margin=5):
 		hButton=wx.Button(self.parent, wx.ID_CANCEL,label=text, name=text,style=wx.BORDER_RAISED)
 		hButton.Bind(wx.EVT_BUTTON,event)
 		self._setFace(hButton,mode=BUTTON_COLOUR)
@@ -162,7 +163,7 @@ class ViewCreator():
 	def checkbox(self,text, event=None, state=False, style=0, x=-1, sizerFlag=0, proportion=0,margin=5):
 		hPanel=wx.Panel(self.parent,wx.ID_ANY)
 		self._setFace(hPanel,mode=SKIP_COLOUR)
-		hSizer=self.BoxSizer(hPanel,self.sizer.GetOrientation())
+		hSizer=self.BoxSizer(hPanel,self.getParentOrientation())
 
 		if (isinstance(text,str)):	#単純に一つを作成
 			hCheckBox=wx.CheckBox(hPanel,wx.ID_ANY, label=text, name=text,size=(x,-1),style=style)
@@ -196,7 +197,7 @@ class ViewCreator():
 	def checkbox3(self,text, event=None, state=None, style=0, x=-1, sizerFlag=0, proportion=0,margin=0):
 		hPanel=wx.Panel(self.parent,wx.ID_ANY)
 		self._setFace(hPanel,mode=SKIP_COLOUR)
-		hSizer=self.BoxSizer(hPanel,self.sizer.GetOrientation())
+		hSizer=self.BoxSizer(hPanel,self.getParentOrientation())
 
 		if (isinstance(text,str)):	#単純に一つを作成
 			if (state==None):
@@ -260,7 +261,7 @@ class ViewCreator():
 	def radio(self,text,event=None,state=False,style=0, x=-1, sizerFlag=0, proportion=0,margin=5):
 		hPanel=wx.Panel(self.parent,wx.ID_ANY)
 		self._setFace(hPanel,mode=SKIP_COLOUR)
-		hSizer=self.BoxSizer(hPanel,self.sizer.GetOrientation())
+		hSizer=self.BoxSizer(hPanel,self.getParentOrientation())
 
 		if type(text)==str:
 			hRadio=wx.RadioButton(hPanel,id=wx.ID_ANY,label=text,style=style,name=text)
@@ -458,6 +459,12 @@ class ViewCreator():
 		target.SetThemeEnabled(False)
 		_winxptheme.SetWindowTheme(target.GetHandle(),"","")
 		target.SetFont(self.font.GetFont())
+
+	def getParentOrientation(self,default=wx.VERTICAL):
+		if type(self.sizer) in (wx.BoxSizer,wx.StaticBoxSizer):
+			return self.sizer.GetOrientation()
+		else:
+			return default
 
 
 #parentで指定したsizerの下に、新たなBoxSizerを設置
