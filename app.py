@@ -36,7 +36,7 @@ class Main(AppBase.MainBase):
 		if self.config.getboolean("general", "update"):
 			self.autoUpdate()
 		self.SetDefaultEncoding()
-		self.tmpdir = self.config.getstring("general", "tmpdir", os.path.join(os.environ["TEMP"], "soc"), None)
+		self.tmpdir = self.config.getstring("ocr", "tmpdir", os.path.join(os.environ["TEMP"], "soc"), None)
 		# メインビューを表示
 		self.hMainView=main.MainView()
 		self.addFileList(sys.argv[1:])

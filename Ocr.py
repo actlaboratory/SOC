@@ -95,8 +95,8 @@ class OcrManager():
 		self.saved = []
 		self.SavedText = ""
 		self.OcrList = []
-		self.Engine = -1
-		self.mode = -1
+		self.Engine = 0
+		self.mode = 0
 		self.tool = OcrTool()
 		self.pdf_to_png = False
 		os.environ["PATH"] += os.pathsep + os.getcwd() + "/poppler/bin"
@@ -113,6 +113,8 @@ class OcrManager():
 			try:
 				self.Credential = CredentialManager.CredentialManager(True)
 			except:
+				traceback.print_exc()
+				pathlib.Path("errorlog.txt").write_text(traceback.format_exc())
 				return errorCodes.NET_ERROR#ネットワーク関係のエラー
 		for Path in self.OcrList:
 			if dialog.cancel:#キャンセル処理
@@ -132,12 +134,16 @@ class OcrManager():
 				try:
 					text = self.tool.google_ocr(Path, self.Credential.credential, self.pdf_to_png, dialog)
 				except(errors.HttpError) as error:
+					traceback.print_exc()
+					pathlib.Path("errorlog.txt").write_text(traceback.format_exc())
 					self.SavedText = ""
 					return errorCodes.GOOGLE_ERROR
 			if self.Engine == 1:#tesseractの呼び出し
 				try:
 					text = self.tool.tesseract_ocr(Path, self.mode, dialog)
 				except(UnidentifiedImageError):
+					traceback.print_exc()
+					pathlib.Path("errorlog.txt").write_text(traceback.format_exc())
 					self.allDelete()
 					self.SavedText = ""
 					return errorCodes.FILE_NOT_SUPPORTED
@@ -145,8 +151,16 @@ class OcrManager():
 				self.allDelete()
 				self.SavedText = ""
 				return errorCodes.CANCELED
-			util.textSave(Path.with_suffix(".txt"), text)#ファイルに保存
-			self.saved.append(Path.with_suffix(".txt"))
+			if globalVars.app.config.getboolean("ocr", "saveSourceDir"):
+				saveFile = Path.with_suffix(".txt")
+			else:
+				self.dirname = globalVars.app.config.getstring("ocr", "savedir", "", None)
+				if os.path.exists(self.dirname):
+					os.makedirs(self.dirname)
+				saveFile = pathlib.Path(self.dirname, Path.with_suffix(".txt").name)
+			print(saveFile)
+			util.textSave(saveFile, text)#ファイルに保存
+			self.saved.append(saveFile)
 			self.SavedText += text
 		return errorCodes.OK
 	def lapped_ocr_exe(self, dialog, result):

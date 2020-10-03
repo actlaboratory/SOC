@@ -3,6 +3,7 @@
 
 from ConfigManager import *
 import locale
+import os
 
 class DefaultSettings:
 	def get():
@@ -17,8 +18,9 @@ class DefaultSettings:
 			"fileVersion": "100",
 			"locale": loc,
 			"update": True,
-			"tmpdir": os.path.join(os.environ["TEMP"], "soc")
+			"timeout": 3
 		}
+
 		config["view"]={
 			"font": font,
 			"colorMode":"white"
@@ -26,11 +28,19 @@ class DefaultSettings:
 		config["speech"]={
 			"reader" : "AUTO"
 		}
+
 		config["mainView"]={
 
 		}
+
 		config["network"]={
 			"auto_proxy": True
+		}
+
+		config["ocr"] = {
+			"tmpdir": os.path.join(os.environ["TEMP"], "soc"),
+			"saveSourceDir": True,
+			"savedir": os.path.join(os.environ["userprofile"], "Documents")
 		}
 		return config
 
