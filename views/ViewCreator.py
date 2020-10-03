@@ -257,6 +257,47 @@ class ViewCreator():
 		self.AddSpace()
 		return hRadioBox
 
+	def radio(self,text,event=None,state=False,style=0, x=-1, sizerFlag=0, proportion=0,margin=5):
+		hPanel=wx.Panel(self.parent,wx.ID_ANY)
+		self._setFace(hPanel,mode=SKIP_COLOUR)
+		hSizer=self.BoxSizer(hPanel,self.sizer.GetOrientation())
+
+		if type(text)==str:
+			hRadio=wx.RadioButton(hPanel,id=wx.ID_ANY,label=text,style=style,name=text)
+			hRadio.SetValue(state)
+			hRadio.Bind(wx.EVT_RADIOBUTTON,event)
+			self._setFace(hRadio,mode=SKIP_COLOUR)
+			Add(self.sizer,hRadio)
+			Add(self.sizer,hPanel,proportion,sizerFlag,margin)
+			self.AddSpace()
+
+			if self.mode==MODE_DARK:
+				viewHelper.ScRadioButton(hPanel.GetHandle())
+
+			return hRadio
+		elif type(text) in (list,tuple):
+			radios=[]
+			for s in text:
+				if len(radios)==0:	#最初の１つのみ追加のスタイルが必要
+					hRadio=wx.RadioButton(hPanel,id=wx.ID_ANY,label=s,style=wx.RB_GROUP | style,name=s)
+				else :
+					hRadio=wx.RadioButton(hPanel,id=wx.ID_ANY,label=s,style=style,name=s)
+				hRadio.Bind(wx.EVT_RADIOBUTTON,event)
+				self._setFace(hRadio,mode=SKIP_COLOUR)
+				Add(hSizer,hRadio)
+				radios.append(hRadio)
+			if type(state)==int:
+				radios[state].SetValue(True)
+			Add(self.sizer,hPanel,proportion,sizerFlag,margin)
+			self.AddSpace()
+
+			if self.mode==MODE_DARK:
+				viewHelper.ScRadioButton(hPanel.GetHandle())
+
+			return radios
+		else:
+			raise ValueError("ViewCreatorはRadioの作成に際し不正な型ののtextパラメータを受け取りました。")
+
 	def listbox(self,text, choices=[], event=None, state=-1, style=0, size=(-1,-1), sizerFlag=wx.ALL, proportion=0,margin=5,textLayout=wx.DEFAULT):
 		hStaticText,sizer,parent=self._addDescriptionText(text,textLayout,sizerFlag, proportion,margin)
 
@@ -288,7 +329,7 @@ class ViewCreator():
 		self.sizer.Layout()
 		return htab
 
-	def inputbox(self,text, event=None, defaultValue="", style=0, x=0, sizerFlag=wx.ALL, proportion=0,margin=5,textLayout=wx.DEFAULT):
+	def inputbox(self,text, event=None, defaultValue="", style=0, x=-1, sizerFlag=wx.ALL, proportion=0,margin=5,textLayout=wx.DEFAULT):
 		hStaticText,sizer,parent=self._addDescriptionText(text,textLayout,sizerFlag, proportion,margin)
 
 		hTextCtrl=TextCtrl(parent, wx.ID_ANY,size=(x,-1),name=text,value=defaultValue,style=style | wx.BORDER_RAISED)

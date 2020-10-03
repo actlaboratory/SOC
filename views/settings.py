@@ -39,21 +39,24 @@ class settingsDialog(BaseDialog):
 
 		self.creator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.sizer,wx.VERTICAL,20)
 		self.tab = self.creator.tabCtrl(_("カテゴリ選択"))
+
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,space=20,label=_("一般"))
-		self.reader, dummy = creator.combobox(_("スクリーンリーダー"), list(self.readerSelection.values()))
-		self.color, dummy = creator.combobox(_("配色"), list(self.colorSelection.values()))
+		self.reader, dummy = creator.combobox(_("スクリーンリーダー"), list(self.readerSelection.values()),textLayout=wx.HORIZONTAL)
+		self.color, dummy = creator.combobox(_("配色"), list(self.colorSelection.values()),textLayout=wx.HORIZONTAL)
 		self.autoUpdate = creator.checkbox(_("起動時にアップデートを確認"), style = wx.CHK_2STATE)
-		self.timeout, dummy = creator.inputbox(_("アップデート確認時のタイムアウト（秒数）"))
+		self.timeout, dummy = creator.inputbox(_("アップデート確認時のタイムアウト（秒数）"),x=50,textLayout=wx.HORIZONTAL)
+
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,space=20,label=_("OCR"))
-		self.tmpEdit, dummy = creator.inputbox(_("一時ファイルの場所"))
-		self.saveSelect = creator.checkbox(_("認識結果をもとの画像ファイルと同じディレクトリに保存する"), self.switch)
-		self.saveDir, dummy = creator.inputbox(_("認識結果の保存先"), style = wx.TE_READONLY)
+		self.tmpEdit, dummy = creator.inputbox(_("一時ファイルの場所"),None,x=-1)
+		creator=views.ViewCreator.ViewCreator(self.viewMode,creator.GetPanel(),creator.GetSizer(),wx.VERTICAL,space=0,label=_("認識結果の保存先"))
+		self.saveSelect = creator.radio((_("読み込んだファイルと同じ場所"),_("指定の場所")), self.switch)
+		creator=views.ViewCreator.ViewCreator(self.viewMode,creator.GetPanel(),creator.GetSizer(),wx.HORIZONTAL,space=5)
+		self.saveDir, dummy = creator.inputbox(_("認識結果の保存先"), style = wx.TE_READONLY,textLayout=None)
 		self.changeBtn = creator.button(_("参照"), self.browse)
 
-
+		creator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.sizer,wx.HORIZONTAL)
 		self.okbtn = self.creator.okbutton(_("OK"), self.onOkBtn)
 		self.cancelBtn = self.creator.cancelbutton(_("キャンセル"), self.onCancelBtn)
-
 
 	def onOkBtn(self, event):
 		reader = list(self.readerSelection.keys())[self.reader.GetSelection()]
@@ -64,7 +67,7 @@ class settingsDialog(BaseDialog):
 		except ValueError:
 			simpleDialog.errorDialog(_("タイムアウト秒数の設定値が不正です。"))
 		tmpdir = self.tmpEdit.GetValue()
-		saveSourceDir = self.saveSelect.GetValue()
+		saveSourceDir = self.saveSelect[0].GetValue()
 		savedir = self.saveDir.GetValue()
 		globalVars.app.config["speech"]["reader"] = reader
 		globalVars.app.config["view"]["colormode"] = colormode
@@ -81,7 +84,7 @@ class settingsDialog(BaseDialog):
 		self.Destroy()
 
 	def switch(self, event = None):
-		if self.saveSelect.IsChecked():
+		if self.saveSelect[0].GetValue():
 			self.saveDir.Disable()
 			self.changeBtn.Disable()
 		else:
@@ -111,12 +114,8 @@ class settingsDialog(BaseDialog):
 		self.timeout.SetValue(str(timeout))
 		tmpdir = globalVars.app.tmpdir
 		self.tmpEdit.SetValue(tmpdir)
-		savesourcedir = globalVars.app.config.getboolean("ocr", "saveSourceDir")
-		print(savesourcedir)
-		if savesourcedir:
-			self.saveSelect.SetValue(True)
-		else:
-			self.saveSelect.SetValue(False)
+		saveDirType = globalVars.app.config.getint("ocr", "saveDirtype",0,0,1)
+		self.saveSelect[saveDirType].SetValue(True)
 		savedir = globalVars.app.config.getstring("ocr", "savedir", "")
 		self.saveDir.SetValue(savedir)
 		return
