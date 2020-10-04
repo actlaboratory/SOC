@@ -270,26 +270,7 @@ class Events(BaseEvents):
 		if selected == menuItemsStore.getRef("ABOUT"):
 			dialog(_("SimpleOcrController（%s） version %s.\nCopyright (C) %s %s.\nこのソフトは公開されているOCRエンジンを使いやすくしたものです。") % (constants.APP_NAME, constants.APP_VERSION, constants.APP_COPYRIGHT_YEAR, constants.APP_DEVELOPERS), _("このソフトについて"))
 		if selected == menuItemsStore.getRef("UPDATE"):
-			code = self.parent.app.update.check(constants.APP_NAME, constants.APP_VERSION, constants.UPDATE_URL)
-			if code == errorCodes.NET_ERROR:
-				errorDialog(_("サーバーとの通信中にエラーが発生しました。"))
-				return
-			if code == errorCodes.UPDATER_LATEST:
-				dialog(_("現在お使いのバージョンは最新です。アップデートの必要はありません。"), _("アップデート"))
-				return
-			if code == errorCodes.UPDATER_NEED_UPDATE:
-				result = qDialog(_("バージョン%sにアップデートすることができます。%sアップデートを開始しますか？" % (self.parent.app.update.version, self.parent.app.update.description)), _("アップデート"))
-				if result == wx.ID_NO:
-					return
-				self.parent.app.update.run("")
-			if code == errorCodes.UPDATER_VISIT_SITE:
-				URL = self.parent.app.update.URL
-				if qDialog(_("緊急のお知らせがあります。\nタイトル:%s\n詳細をブラウザーで開きますか？"% (self.parent.app.update.description))) == wx.ID_NO:
-					return
-				webbrowser.open(URL)
-			if code == errorCodes.UPDATER_FAILED_PARAM:
-				dialog(_("リクエストパラメーターが不正です。開発者にお問い合わせください。"), _("アップデート"))
-				return
+			globalVars.update.update()
 
 
 

@@ -6,7 +6,7 @@ import wx
 import os
 #アプリケーション基本情報
 APP_NAME="SOC"
-APP_VERSION="1.0.0"
+APP_VERSION="0.0.16"
 APP_LAST_RELEASE_DATE="2020-09-25"
 APP_COPYRIGHT_YEAR=APP_LAST_RELEASE_DATE.split("-")[0]
 APP_DEVELOPERS="Guredora"
@@ -36,6 +36,7 @@ GOOGLE_CLIENT_SECRET = '{"installed":{"client_id":"700286679735-4bssuo7bsen9o7su
 
 # update情報
 UPDATE_URL = "https://actlab.org/api/checkUpdate"
-
+UPDATER_VERSION = "1.0.0"
+UPDATER_WAKE_WORD = "hello"
 #pipe関係
 PIPE_NAME = "SocPdfTextCheck"
