@@ -72,6 +72,5 @@ class update():
 				wx.CallAfter(self.dialog.gauge.SetValue, (now_size))
 				wx.YieldIfNeeded()
 		print("downloaded!")
-		sys.exit()
 		subprocess.Popen(("updater.exe", sys.argv[0], constants.UPDATER_WAKE_WORD, file_name))
-		sys.exit()
+		wx.CallAfter(sys.exit)
