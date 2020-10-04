@@ -1,44 +1,69 @@
-# アップデート関連プログラム
-#Copyright (C) 2020 guredora <contact@guredora.com>
-
 import requests
-import subprocess
+import constants
 import errorCodes
-import ConfigManager
-import os
-import pathlib
-import sys
 import globalVars
+import simpleDialog
+import webbrowser
+import os
+import subprocess
+import sys
 
 class update():
-	def check(self, app_name, current_version, check_url):
-		url = "%s?name=%s&updater_version=1.0.0&version=%s" % (check_url, app_name, current_version)# 引数からURLを生成
-		time = globalVars.app.config.getint("general", "timeout", 3)
+	def update(self, auto=False):
+		params = {
+			"name": constants.APP_NAME,
+			"updater_version": constants.UPDATER_VERSION,
+			"version": constants.APP_VERSION
+		}
+		timeout = globalVars.app.config.getint("general", "timeout", 3)
 		try:
-			response = requests.get(url, timeout=time)# サーバーに最新バージョンを問い合わせる
-		except requests.exceptions.ConnectionError as c:
-			return errorCodes.NET_ERROR
-		except requests.exceptions.timeout:
-			return errorCodes.CONNECT_TIMEOUT
+			response = requests.get(constants.UPDATE_URL, params, timeout = timeout)
+		except requests.exceptions.ConnectTimeout:
+			if not auto:
+				simpleDialog.dialog(_("サーバーへの通信がタイムアウトしました。"), _("アップデート"))
+			return
+		except requests.exceptions.ConnectionError:
+			if not auto:
+				simpleDialog.dialog(_("サーバーへの接続に失敗しました。インターネット接続などをご確認ください"), _("アップデート"))
+			return
 		if not response.status_code == 200:
-			print(response.status_code)
-			return errorCodes.NET_ERROR
-		json = response.json()
-		code = json["code"]
-		print(code)
-		if code == errorCodes.UPDATER_NEED_UPDATE:
-			self.download = json["updater_url"]
-			self.version = json["update_version"]
-			self.description = json["update_description"]
-		if code == errorCodes.UPDATER_VISIT_SITE:
-			self.URL = json["URL"]
-			self.description = json["info_description"]
-		return code
-	def run(self, wakeWord):
-		path = os.path.abspath(sys.argv[0])
-		response = requests.get(self.download)
-		up_name = os.path.basename(self.download)
-		pathlib.Path(up_name).write_bytes(response.content)
-		subprocess.Popen(("up.exe", path, up_name, wakeWord))
-		sys.exit()
+			if not auto:
+				simpleDialog.dialog(_("サーバーとの通信に失敗しました。"), _("アップデート"))
+			return
+		self.info = response.json()
+		code = info["code"]
+		if code == errorCodes.UPDATER_LATEST:
+			if not auto:
+				simpleDialog.dialog(_("現在のバージョンが最新です。アップデートの必要はありません。"), _("アップデート"))
+			return
+		elif code == errorCodes.UPDATER_BAD_PARAM:
+			if not auto:
+				simpleDialog.dialog(_("リクエストパラメーターが不正です。開発者まで連絡してください"), _("アップデート"))
+			return
+		elif errorCodes.UPDATER_NOT_FOUND:
+			if not auto:
+				simpleDialog.dialog(_("アップデーターが登録されていません。開発者に連絡してください。"), _("アップデート"))
+			return
+		elif code == errorCodes.UPDATER_NEED_UPDATE or errorCodes.UPDATER_VISIT_SITE:
+			print("updating...")
+		return
 
+	def open_site(self):
+		webbrowser.open(self.info["URL"])
+		return
+
+	def run(self):
+		url = self.info["updater_url"]
+		file_name = "update_file.zip"
+		header = requests.head(url).headers
+		total_size = int(header["Content-Length"])
+		self.dialog.gauge.SetRange(total_size)
+		response = requests.get(url, stream = True)
+		now_size = 0
+		with open(file_name, mode="wb") as f:
+			for chunk in response.iter_content(chunk_size = 1024):
+				f.write(chunk)
+				now_size += len(chunk)
+				self.dialog.gauge.SetValue(now_size)
+		subprocess.Popen(("updater.exe", sys.argv[0], constants.UPDATER_WAKE_WORD, file_name))
+		sys.exit()
