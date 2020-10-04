@@ -34,7 +34,6 @@ class update():
 				simpleDialog.dialog(_("サーバーとの通信に失敗しました。"), _("アップデート"))
 			return
 		self.info = response.json()
-		print(self.info)
 		code = self.info["code"]
 		if code == errorCodes.UPDATER_LATEST:
 			if not auto:
@@ -62,10 +61,9 @@ class update():
 	def run(self):
 		url = self.info["updater_url"]
 		file_name = "update_file.zip"
-		header = requests.head(url).headers
-		total_size = int(header["Content-Length"])
-		wx.CallAfter(self.dialog.gauge.SetRange, (total_size))
 		response = requests.get(url, stream = True)
+		total_size = int(response.headers["Content-Length"])
+		wx.CallAfter(self.dialog.gauge.SetRange, (total_size))
 		now_size = 0
 		with open(file_name, mode="wb") as f:
 			for chunk in response.iter_content(chunk_size = 64*1024):
@@ -73,6 +71,7 @@ class update():
 				now_size += len(chunk)
 				wx.CallAfter(self.dialog.gauge.SetValue, (now_size))
 				wx.YieldIfNeeded()
+		print("downloaded!")
 		sys.exit()
 		subprocess.Popen(("updater.exe", sys.argv[0], constants.UPDATER_WAKE_WORD, file_name))
 		sys.exit()
