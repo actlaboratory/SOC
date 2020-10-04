@@ -1,4 +1,5 @@
 import requests
+import wx
 import constants
 import errorCodes
 import globalVars
@@ -8,6 +9,7 @@ import os
 import subprocess
 import sys
 from views import updateDialog
+import time
 
 class update():
 	def update(self, auto=False):
@@ -66,10 +68,11 @@ class update():
 		response = requests.get(url, stream = True)
 		now_size = 0
 		with open(file_name, mode="wb") as f:
-			for chunk in response.iter_content(chunk_size = 1024):
+			for chunk in response.iter_content(chunk_size = 64*1024):
 				f.write(chunk)
 				now_size += len(chunk)
 				self.dialog.gauge.SetValue(now_size)
+				wx.YieldIfNeeded()
 		sys.exit()
 		subprocess.Popen(("updater.exe", sys.argv[0], constants.UPDATER_WAKE_WORD, file_name))
 		sys.exit()
