@@ -28,9 +28,15 @@ class DefaultSettings:
 		config["speech"]={
 			"reader" : "AUTO"
 		}
+
 		config["mainView"]={
 
 		}
+
+		config["network"]={
+			"auto_proxy": True
+		}
+
 		config["ocr"] = {
 			"tmpdir": os.path.join(os.environ["TEMP"], "soc"),
 			"saveSourceDir": True,
