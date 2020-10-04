@@ -7,6 +7,7 @@ import webbrowser
 import os
 import subprocess
 import sys
+from views import updateDialog
 
 class update():
 	def update(self, auto=False):
@@ -31,6 +32,7 @@ class update():
 				simpleDialog.dialog(_("サーバーとの通信に失敗しました。"), _("アップデート"))
 			return
 		self.info = response.json()
+		print(self.info)
 		code = self.info["code"]
 		if code == errorCodes.UPDATER_LATEST:
 			if not auto:
@@ -46,6 +48,9 @@ class update():
 			return
 		elif code == errorCodes.UPDATER_NEED_UPDATE or errorCodes.UPDATER_VISIT_SITE:
 			print("updating...")
+			self.dialog = updateDialog.updateDialog()
+			self.dialog.Initialize()
+			self.dialog.Show()
 		return
 
 	def open_site(self):
@@ -65,5 +70,6 @@ class update():
 				f.write(chunk)
 				now_size += len(chunk)
 				self.dialog.gauge.SetValue(now_size)
+		sys.exit()
 		subprocess.Popen(("updater.exe", sys.argv[0], constants.UPDATER_WAKE_WORD, file_name))
 		sys.exit()
