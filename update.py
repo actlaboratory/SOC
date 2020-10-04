@@ -31,7 +31,7 @@ class update():
 				simpleDialog.dialog(_("サーバーとの通信に失敗しました。"), _("アップデート"))
 			return
 		self.info = response.json()
-		code = info["code"]
+		code = self.info["code"]
 		if code == errorCodes.UPDATER_LATEST:
 			if not auto:
 				simpleDialog.dialog(_("現在のバージョンが最新です。アップデートの必要はありません。"), _("アップデート"))
@@ -40,7 +40,7 @@ class update():
 			if not auto:
 				simpleDialog.dialog(_("リクエストパラメーターが不正です。開発者まで連絡してください"), _("アップデート"))
 			return
-		elif errorCodes.UPDATER_NOT_FOUND:
+		elif code == errorCodes.UPDATER_NOT_FOUND:
 			if not auto:
 				simpleDialog.dialog(_("アップデーターが登録されていません。開発者に連絡してください。"), _("アップデート"))
 			return
