@@ -64,14 +64,14 @@ class update():
 		file_name = "update_file.zip"
 		header = requests.head(url).headers
 		total_size = int(header["Content-Length"])
-		self.dialog.gauge.SetRange(total_size)
+		wx.CallAfter(self.dialog.gauge.SetRange, (total_size))
 		response = requests.get(url, stream = True)
 		now_size = 0
 		with open(file_name, mode="wb") as f:
 			for chunk in response.iter_content(chunk_size = 64*1024):
 				f.write(chunk)
 				now_size += len(chunk)
-				self.dialog.gauge.SetValue(now_size)
+				wx.CallAfter(self.dialog.gauge.SetValue, (now_size))
 				wx.YieldIfNeeded()
 		sys.exit()
 		subprocess.Popen(("updater.exe", sys.argv[0], constants.UPDATER_WAKE_WORD, file_name))

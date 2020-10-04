@@ -6,6 +6,7 @@ import globalVars
 import views.ViewCreator
 from logging import getLogger
 from views.baseDialog import *
+import threading
 
 class updateDialog(BaseDialog):
 	def __init__(self):
@@ -53,7 +54,8 @@ class updateDialog(BaseDialog):
 		self.startBtn.Hide()
 		self.gaugeStatic.Show()
 		self.gauge.Show()
-		globalVars.update.run()
+		thread = threading.Thread(target = globalVars.update.run)
+		thread.start()
 	def end(self):
 		self.wnd.EndModal(wx.ID_OK)
 
