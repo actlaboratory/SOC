@@ -343,13 +343,13 @@ class ViewCreator():
 		self.AddSpace()
 		return hTextCtrl,hStaticText
 
-	def gauge(self,text,max=0,defaultValue=0,style=wx.GA_HORIZONTAL | wx.GA_SMOOTH,x=-1,sizerFlag=wx.ALL,proportion=0,margin=5,textLayout=wx.DEFAULT):
+	def gauge(self,text,max=0,defaultValue=0,style=wx.GA_HORIZONTAL | wx.GA_SMOOTH | wx.BORDER_RAISED,x=-1,sizerFlag=wx.ALL,proportion=0,margin=5,textLayout=wx.DEFAULT):
 		hStaticText,sizer,parent=self._addDescriptionText(text,textLayout,sizerFlag, proportion,margin)
 
 		hGauge=wx.Gauge(parent, wx.ID_ANY, size=(x,-1), style=style,name=text,)
 		self._setFace(hGauge)
 		if x==-1:
-			Add(sizer,hGauge,proportion,sizerFlag,expandFlag=wx.HORIZONTAL)
+			Add(sizer,hGauge,proportion,sizerFlag,margin,expandFlag=wx.HORIZONTAL)
 		else:
 			Add(sizer,hGauge,proportion,sizerFlag,margin)
 		self.AddSpace()
