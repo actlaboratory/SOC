@@ -9,6 +9,8 @@ import shutil
 import distutils.dir_util
 import PyInstaller
 import diff_archiver
+import hashlib
+import json
 
 def runcmd(cmd):
 	proc=subprocess.Popen(cmd.split(), shell=True, stdout=1, stderr=2)
@@ -63,4 +65,17 @@ else:
 	print("Making patch...")
 	archiver=diff_archiver.DiffArchiver(BASE_PACKAGE_URL,"SOC-%s.zip" % (build_filename),"SOC-%spatch" % (build_filename),clean_base_package=True, skip_root = True)
 	archiver.work()
+	print("creating version info file...")
+	with open("SOC-%s.zip" % (build_filename), mode = "rb") as f:
+		content = f.read()
+		package_hash = hashlib.sha1(content).hexdigest()
+	with open("SOC-%spatch.zip" % (build_filename), mode = "rb") as f:
+		content = f.read()
+		patch_hash = hashlib.sha1(content).hexdigest()
+	with open("soc-%s_info.json" % (build_filename), mode = "w") as f:
+		info = {
+			"package_hash": package_hash,
+			"patch_hash": patch_hash
+		}
+		json.dump(info, f)
 print("Build finished!")
