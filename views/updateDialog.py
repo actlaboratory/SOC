@@ -57,6 +57,7 @@ class updateDialog(BaseDialog):
 		self.startBtn.Hide()
 		self.gaugeStatic.Show()
 		self.gauge.Show()
+		self.cancelBtn.SetFocus()
 		self.panel.Layout()
 		globalVars.update.start()
 
