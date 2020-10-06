@@ -115,7 +115,7 @@ class Menu(BaseMenu):
 		self.setting = self.RegisterMenuCommand(self.hToolMenu,"SETTINGS",_("設定画面を開く(&w)"))
 	
 		#ヘルプメニューの中身
-		self.Page = self.RegisterMenuCommand(self.hHelpMenu, "webpage", _("ACT Laboratoryホームページを開く(&p)"))
+		self.Page = self.RegisterMenuCommand(self.hHelpMenu, "webpage", _("ACT Laboratoryのホームページを開く(&p)"))
 		self.About = self.RegisterMenuCommand(self.hHelpMenu, "ABOUT", _("このソフトについて"))
 		self.Update = self.RegisterMenuCommand(self.hHelpMenu, "UPDATE", _("最新バージョンを確認"))
 		#メニューバーの生成
@@ -233,48 +233,13 @@ class Events(BaseEvents):
 			self.parent.app.addFileList(pathList)
 			return
 		if selected==menuItemsStore.getRef("GOOGLE"):
-			#確認ダイアログ表示
-			result = qDialog(_("ブラウザを開き、認証を開始します。よろしいですか？"),_("確認"))
-			if result == wx.ID_NO:
-				return
-
-			#認証プロセスの開始、認証用URL取得
-			url=self.parent.app.credentialManager.MakeFlow()
-
 			authorizeDialog = authorizing.authorizeDialog()
 			authorizeDialog.Initialize()
-			authorizeDialog.Show(False)
-			#ブラウザの表示
-			self.parent.app.say(_("ブラウザを開いています..."))
+			status = authorizeDialog.Show()
 
-			#webView=views.web.Dialog(url,"http://localhost")
-			#webView.Initialize()
-			#webView.Show()
-			web=wx.Process.Open("\"C:\\Program Files\\Internet Explorer\\iexplore.exe\" "+url)
-
-			pid=web.GetPid()
-
-			#ユーザの認証待ち
-			status=errorCodes.WAITING_USER
-			evt=threading.Event()
-			while(status==errorCodes.WAITING_USER):
-				if not wx.Process.Exists(pid):
-					status=errorCodes.CANCELED
-				if authorizeDialog.cancel:
-					status = errorCodes.CANCELED_BY_USER
-				if status==errorCodes.WAITING_USER:
-					status=self.parent.app.credentialManager.getCredential()
-				wx.YieldIfNeeded()
-				evt.wait(0.3)
-			authorizeDialog.Destroy()
 			if status==errorCodes.OK:
-				if web.Exists(pid):
-					wx.Process.Kill(pid,wx.SIGTERM)		#修了要請
-				dialog(_("認証が完了しました"),_("認証結果"))
 				self.parent.menu.hMenuBar.Enable(menuItemsStore.getRef("GOOGLE"), False)
 			elif status == errorCodes.CANCELED_BY_USER:
-				if web.Exists(pid):
-					wx.Process.Kill(pid,wx.SIGTERM)		#修了要請
 				dialog(_("キャンセルしました。"))
 			elif status==errorCodes.IO_ERROR:
 				dialog(_("認証に成功しましたが、ファイルの保存に失敗しました。ディレクトリのアクセス権限などを確認してください。"),_("認証結果"))
@@ -305,26 +270,7 @@ class Events(BaseEvents):
 		if selected == menuItemsStore.getRef("ABOUT"):
 			dialog(_("SimpleOcrController（%s） version %s.\nCopyright (C) %s %s.\nこのソフトは公開されているOCRエンジンを使いやすくしたものです。") % (constants.APP_NAME, constants.APP_VERSION, constants.APP_COPYRIGHT_YEAR, constants.APP_DEVELOPERS), _("このソフトについて"))
 		if selected == menuItemsStore.getRef("UPDATE"):
-			code = self.parent.app.update.check(constants.APP_NAME, constants.APP_VERSION, constants.UPDATE_URL)
-			if code == errorCodes.NET_ERROR:
-				errorDialog(_("サーバーとの通信中にエラーが発生しました。"))
-				return
-			if code == errorCodes.UPDATER_LATEST:
-				dialog(_("現在お使いのバージョンは最新です。アップデートの必要はありません。"), _("アップデート"))
-				return
-			if code == errorCodes.UPDATER_NEED_UPDATE:
-				result = qDialog(_("バージョン%sにアップデートすることができます。%sアップデートを開始しますか？" % (self.parent.app.update.version, self.parent.app.update.description)), _("アップデート"))
-				if result == wx.ID_NO:
-					return
-				self.parent.app.update.run("")
-			if code == errorCodes.UPDATER_VISIT_SITE:
-				URL = self.parent.app.update.URL
-				if qDialog(_("緊急のお知らせがあります。\nタイトル:%s\n詳細をブラウザーで開きますか？"% (self.parent.app.update.description))) == wx.ID_NO:
-					return
-				webbrowser.open(URL)
-			if code == errorCodes.UPDATER_FAILED_PARAM:
-				dialog(_("リクエストパラメーターが不正です。開発者にお問い合わせください。"), _("アップデート"))
-				return
+			globalVars.update.update()
 
 
 

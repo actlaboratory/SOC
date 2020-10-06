@@ -135,7 +135,7 @@ class OcrManager():
 					text = self.tool.google_ocr(Path, self.Credential.credential, self.pdf_to_png, dialog)
 				except(errors.HttpError) as error:
 					traceback.print_exc()
-					Path("errorlog.txt").write_text(traceback.format_exc())
+					pathlib.Path("errorlog.txt").write_text(traceback.format_exc())
 					self.SavedText = ""
 					return errorCodes.GOOGLE_ERROR
 			if self.Engine == 1:#tesseractの呼び出し

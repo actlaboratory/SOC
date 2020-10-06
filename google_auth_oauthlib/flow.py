@@ -458,7 +458,6 @@ class InstalledAppFlow(Flow):
 		return auth_url
 
 	def localServerThread(self,server):
-		print("serv")
 		server.handle_request()
 
 	def run_local_server(self):

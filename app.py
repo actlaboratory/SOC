@@ -1,6 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 # Soc Main
 
+import proxyUtil
 import AppBase
 from views import main
 import CredentialManager
@@ -12,9 +13,9 @@ import constants
 import pathlib
 import errorCodes
 from simpleDialog import *
-import pathlib
 import util
 import os
+import globalVars
 
 class Main(AppBase.MainBase):
 	def __init__(self):
@@ -22,12 +23,18 @@ class Main(AppBase.MainBase):
 
 	def initialize(self):
 		"""アプリを初期化する。"""
+		# プロキシの設定を適用
+		if self.config.getboolean("network", "auto_proxy"):
+			self.proxyEnviron = proxyUtil.virtualProxyEnviron()
+			self.proxyEnviron.set_environ()
+		else:
+			self.proxyEnviron = None
 		# googleのCredentialを準備
 		self.credentialManager=CredentialManager.CredentialManager()
+		self.setGlobalVars()
 		# update関係を準備
-		self.update = update.update()
 		if self.config.getboolean("general", "update"):
-			self.autoUpdate()
+			globalVars.update.update(True)
 		self.SetDefaultEncoding()
 		self.tmpdir = self.config.getstring("ocr", "tmpdir", os.path.join(os.environ["TEMP"], "soc"), None)
 		# メインビューを表示
@@ -43,21 +50,9 @@ class Main(AppBase.MainBase):
 		country=_locale._getdefaultlocale()[0]
 		_locale._getdefaultlocale = (lambda *args: ([country,'utf8']))
 
-	def autoUpdate(self):
-		code = self.update.check(constants.APP_NAME, constants.APP_VERSION, constants.UPDATE_URL)
-		if code == errorCodes.NET_ERROR:
-			dialog(_("サーバーとの通信に失敗しました。"), _("アップデート"))
-			return
-		if code == errorCodes.UPDATER_NEED_UPDATE:
-			result = qDialog(_("バージョン%sにアップデートすることができます。%sアップデートを開始しますか？") % (self.update.version, self.update.description), _("アップデート"))
-			if result == wx.ID_NO:
-				return
-			self.update.run("")
-		if code == errorCodes.UPDATER_VISIT_SITE:
-			URL = self.update.URL
-			if qDialog(_("緊急のお知らせがあります。\nタイトル:%s\n詳細をブラウザーで開きますか？")% (self.update.description)) == wx.ID_NO:
-				return
-			webbrowser.open(URL)
+	def setGlobalVars(self):
+		globalVars.update = update.update()
+		return
 
 	def addFileList(self, files):
 		error = False
@@ -88,5 +83,8 @@ class Main(AppBase.MainBase):
 		if os.path.exists(self.tmpdir):
 			util.allDelete(self.tmpdir)
 
+		# プロキシの設定を元に戻す
+		if self.proxyEnviron != None: self.proxyEnviron.unset_environ()
+		
 		#戻り値は無視される
 		return 0
