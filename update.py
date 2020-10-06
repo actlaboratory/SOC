@@ -10,8 +10,13 @@ import subprocess
 import sys
 from views import updateDialog
 import time
+import threading
 
-class update():
+class update(threading.Thread):
+	def __init__(self):
+		super().__init__()
+		self.needStop = False
+
 	def update(self, auto=False):
 		params = {
 			"name": constants.APP_NAME,
@@ -67,10 +72,22 @@ class update():
 		now_size = 0
 		with open(file_name, mode="wb") as f:
 			for chunk in response.iter_content(chunk_size = 64*1024):
+				if self.needStop:
+					broken = True
+					break
 				f.write(chunk)
 				now_size += len(chunk)
 				wx.CallAfter(self.dialog.gauge.SetValue, (now_size))
 				wx.YieldIfNeeded()
+		if broken:
+			print("canceled!")
+			os.remove(file_name)
+			wx.CallAfter(self.dialog.end)
+			return
 		print("downloaded!")
 		subprocess.Popen(("updater.exe", sys.argv[0], constants.UPDATER_WAKE_WORD, file_name))
 		wx.CallAfter(sys.exit)
+
+	def exit(self):
+		self.needStop = True
+		return

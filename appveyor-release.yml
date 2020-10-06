@@ -39,13 +39,14 @@ after_test:
 
 artifacts:
   - path: SOC-*.zip
+  - path: SOC-*.json
 
 deploy:
   - provider: GitHub
     description: "SOC official release"
     auth_token:
       secure: UcoHc3nVwi+4feNv3QuMZy2qgZmTVElAD9iMr9UxcEUTA0PP2beWDMuiNhBoNYeA
-    artifact: /SOC-.*\.zip/
+    artifact: /(SOC-.*\.zip) | (SOC-.*\.json)/
     draft: true
     prerelease: false
     on:
