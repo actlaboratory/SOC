@@ -4,6 +4,8 @@ from libloader.com import load_com
 from .base import Output, OutputError
 import pywintypes
 import logging
+import os
+import shutil
 log = logging.getLogger(__name__)
 
 SVSFDefault = 0
@@ -34,6 +36,11 @@ class SAPI5(Output):
 			self._voices = self._available_voices()
 		except pywintypes.com_error:
 			raise OutputError
+		except AttributeError:
+			print("deleting cash...")
+			genpy_path=os.path.join(os.environ["temp"], "gen_py")
+			shutil.rmtree(genpy_path)
+
 		self._pitch = 0
 
 	def _available_voices(self):
