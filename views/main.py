@@ -115,7 +115,7 @@ class Menu(BaseMenu):
 		self.setting = self.RegisterMenuCommand(self.hToolMenu,"SETTINGS",_("設定画面を開く(&w)"))
 	
 		#ヘルプメニューの中身
-		self.Page = self.RegisterMenuCommand(self.hHelpMenu, "webpage", _("ACT Laboratoryホームページを開く(&p)"))
+		self.Page = self.RegisterMenuCommand(self.hHelpMenu, "webpage", _("ACT Laboratoryのホームページを開く(&p)"))
 		self.About = self.RegisterMenuCommand(self.hHelpMenu, "ABOUT", _("このソフトについて"))
 		self.Update = self.RegisterMenuCommand(self.hHelpMenu, "UPDATE", _("最新バージョンを確認"))
 		#メニューバーの生成
