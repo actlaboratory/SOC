@@ -6,6 +6,7 @@ import globalVars
 import views.ViewCreator
 from logging import getLogger
 from views.baseDialog import *
+import simpleDialog
 
 class updateDialog(BaseDialog):
 	def __init__(self):
@@ -60,6 +61,10 @@ class updateDialog(BaseDialog):
 		self.cancelBtn.SetFocus()
 		self.panel.Layout()
 		globalVars.update.start()
+
+	def updater_notFound(self):
+		simpleDialog.errorDialog(_("updater.exeが見つかりませんでした。誤って削除したかなどをご確認ください。"))
+		self.end()
 
 	def end(self):
 		self.wnd.EndModal(wx.ID_OK)

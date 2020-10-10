@@ -70,10 +70,12 @@ class update(threading.Thread):
 		total_size = int(response.headers["Content-Length"])
 		wx.CallAfter(self.dialog.gauge.SetRange, (total_size))
 		now_size = 0
+		broken = False
 		with open(file_name, mode="wb") as f:
-			for chunk in response.iter_content(chunk_size = 64*1024):
+			for chunk in response.iter_content(chunk_size = 1024):
 				if self.needStop:
 					broken = True
+					print("broken!")
 					break
 				f.write(chunk)
 				now_size += len(chunk)
@@ -85,8 +87,13 @@ class update(threading.Thread):
 			wx.CallAfter(self.dialog.end)
 			return
 		print("downloaded!")
-		subprocess.Popen(("updater.exe", sys.argv[0], constants.UPDATER_WAKE_WORD, file_name))
-		wx.CallAfter(sys.exit)
+		if os.path.exists("updater.exe"):
+			subprocess.Popen(("updater.exe", sys.argv[0], constants.UPDATER_WAKE_WORD, file_name))
+			wx.CallAfter(sys.exit)
+		else:
+			os.remove(file_name)			
+			wx.CallAfter(self.dialog.updater_notFound)
+			return
 
 	def exit(self):
 		self.needStop = True
