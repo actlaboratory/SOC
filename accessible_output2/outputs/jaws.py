@@ -2,7 +2,8 @@ from __future__ import absolute_import
 import win32gui
 from libloader.com import load_com
 import pywintypes
-
+import os
+import shutil
 from .base import Output, OutputError
 
 class Jaws (Output):
@@ -16,6 +17,10 @@ class Jaws (Output):
 			self.object = load_com("FreedomSci.JawsApi", "jfwapi")
 		except pywintypes.com_error:
 			raise OutputError
+		except AttributeError:
+			print("deleting cash...")
+			genpy_path=os.path.join(os.environ["temp"], "gen_py")
+			shutil.rmtree(genpy_path)
 
 	def braille(self, text, **options):
 		# HACK: replace " with ', Jaws doesn't seem to understand escaping them with \

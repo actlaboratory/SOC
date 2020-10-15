@@ -46,7 +46,7 @@ deploy:
     description: "SOC official release"
     auth_token:
       secure: UcoHc3nVwi+4feNv3QuMZy2qgZmTVElAD9iMr9UxcEUTA0PP2beWDMuiNhBoNYeA
-    artifact: /(SOC-.*\.zip) | (SOC-.*\.json)/
+    artifact: /(SOC-.*\.zip)|(SOC-.*\.json)/
     draft: true
     prerelease: false
     on:
