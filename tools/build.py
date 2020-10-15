@@ -72,7 +72,7 @@ else:
 	with open("SOC-%spatch.zip" % (build_filename), mode = "rb") as f:
 		content = f.read()
 		patch_hash = hashlib.sha1(content).hexdigest()
-	with open("soc-%s_info.json" % (build_filename), mode = "w") as f:
+	with open("SOC-%s_info.json" % (build_filename), mode = "w") as f:
 		info = {
 			"package_hash": package_hash,
 			"patch_hash": patch_hash
