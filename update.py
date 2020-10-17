@@ -53,7 +53,6 @@ class update(threading.Thread):
 				simpleDialog.dialog(_("アップデーターが登録されていません。開発者に連絡してください。"), _("アップデート"))
 			return
 		elif code == errorCodes.UPDATER_NEED_UPDATE or errorCodes.UPDATER_VISIT_SITE:
-			print("updating...")
 			self.dialog = updateDialog.updateDialog()
 			self.dialog.Initialize()
 			self.dialog.Show()
