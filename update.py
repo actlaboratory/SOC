@@ -31,6 +31,7 @@ class update(threading.Thread):
 				simpleDialog.dialog(_("サーバーへの通信がタイムアウトしました。"), _("アップデート"))
 			return
 		except requests.exceptions.ConnectionError:
+			print(e)
 			if not auto:
 				simpleDialog.dialog(_("サーバーへの接続に失敗しました。インターネット接続などをご確認ください"), _("アップデート"))
 			return
@@ -53,7 +54,6 @@ class update(threading.Thread):
 				simpleDialog.dialog(_("アップデーターが登録されていません。開発者に連絡してください。"), _("アップデート"))
 			return
 		elif code == errorCodes.UPDATER_NEED_UPDATE or errorCodes.UPDATER_VISIT_SITE:
-			print("updating...")
 			self.dialog = updateDialog.updateDialog()
 			self.dialog.Initialize()
 			self.dialog.Show()
@@ -88,7 +88,7 @@ class update(threading.Thread):
 			return
 		print("downloaded!")
 		if os.path.exists("updater.exe"):
-			subprocess.Popen(("updater.exe", sys.argv[0], constants.UPDATER_WAKE_WORD, file_name))
+			subprocess.Popen(("updater.exe", sys.argv[0], constants.UPDATER_WAKE_WORD, file_name, self.info["updater_hash"]))
 			wx.CallAfter(sys.exit)
 		else:
 			os.remove(file_name)			
