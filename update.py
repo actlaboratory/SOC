@@ -88,7 +88,8 @@ class update(threading.Thread):
 			return
 		print("downloaded!")
 		if os.path.exists("updater.exe"):
-			subprocess.Popen(("updater.exe", sys.argv[0], constants.UPDATER_WAKE_WORD, file_name, self.info["updater_hash"]))
+			pid = os.getpid()
+			subprocess.Popen(("updater.exe", sys.argv[0], constants.UPDATER_WAKE_WORD, file_name, self.info["updater_hash"], str(pid)))
 			wx.CallAfter(sys.exit)
 		else:
 			os.remove(file_name)			
