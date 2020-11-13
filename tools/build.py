@@ -45,7 +45,6 @@ if os.path.isdir(package_path):
 print("Building...")
 for hook in constants.NEED_HOOKS:
 	shutil.copy(hook, hooks_path)
-print("hokk")
 runcmd("%s --windowed --log-level=ERROR %s" % (pyinstaller_path, constants.STARTUP_FILE))
 
 shutil.copytree("locale\\","dist\\SOC\\locale", ignore=shutil.ignore_patterns("*.po", "*.pot", "*.po~"))
