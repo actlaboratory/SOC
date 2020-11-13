@@ -66,23 +66,24 @@ shutil.make_archive("%s-%s" % (constants.APP_NAME, build_filename),'zip','dist')
 if build_filename=="snapshot":
 	print("Skipping batch archiving because this is a snapshot release.")
 else:
-	print("Making patch...")
-	archive_name = "%s-%s.zip" % (constants.APP_NAME, build_filename)
-	patch_name = "%s-%spatch" % (constants.APP_NAME, build_filename)
-	archiver=diff_archiver.DiffArchiver(constants.BASE_PACKAGE_URL, archive_name, patch_name,clean_base_package=True, skip_root = True)
-	archiver.work()
-	print("computing hash...")
-	with open(archive_name, mode = "rb") as f:
-		content = f.read()
-		package_hash = hashlib.sha1(content).hexdigest()
-	with open(patch_name+".zip", mode = "rb") as f:
-		content = f.read()
-		patch_hash = hashlib.sha1(content).hexdigest()
-	print("creating package info...")
-	with open("%s-%s_info.json" % (constants.APP_NAME, build_filename), mode = "w") as f:
-		info = {
-			"package_hash": package_hash,
-			"patch_hash": patch_hash
-		}
-		json.dump(info, f)
+	if constants.BASE_PACKAGE_URL is not None:
+		print("Making patch...")
+		archive_name = "%s-%s.zip" % (constants.APP_NAME, build_filename)
+		patch_name = "%s-%spatch" % (constants.APP_NAME, build_filename)
+		archiver=diff_archiver.DiffArchiver(constants.BASE_PACKAGE_URL, archive_name, patch_name,clean_base_package=True, skip_root = True)
+		archiver.work()
+		print("computing hash...")
+		with open(archive_name, mode = "rb") as f:
+			content = f.read()
+			package_hash = hashlib.sha1(content).hexdigest()
+		with open(patch_name+".zip", mode = "rb") as f:
+			content = f.read()
+			patch_hash = hashlib.sha1(content).hexdigest()
+		print("creating package info...")
+		with open("%s-%s_info.json" % (constants.APP_NAME, build_filename), mode = "w") as f:
+			info = {
+				"package_hash": package_hash,
+				"patch_hash": patch_hash
+			}
+			json.dump(info, f)
 print("Build finished!")
