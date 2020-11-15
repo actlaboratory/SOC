@@ -10,7 +10,7 @@ environment:
   gitHubPassword:
     secure: s4pKVblYXP+c03qM8gH8tQ==
   SCRIPT_PASSWORD:
-    secure: H6BmtMG5rLPg9t3FLegVvVVRKRsCp28Hiqc+uCTkBS4=
+    secure: 9RvVUKVQ8MsoG5LOZ86VyFQF19JXXS33tDzomLH/jZM=
   matrix:
 
     # For Python versions available on Appveyor, see
