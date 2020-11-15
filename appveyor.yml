@@ -39,7 +39,7 @@ test_script:
   # the interpreter you're using - Appveyor does not do anything special
   # to put the Python evrsion you want to use on PATH.
   - "echo Skipped Tests"
-  - "echo %APPVEYOR_REPO_NAME%"
+  - cmd: echo "https://actlab.org/git-release.php?repo_name=%APPVEYOR_REPO_NAME%&tag_name=SOC-latestcommit"
 
 after_test:
   # This step builds your wheels.
