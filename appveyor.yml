@@ -22,10 +22,6 @@ environment:
 
 install:
   # We need wheel installed to build wheels
-  - cmd: git tag -d SOC-latestcommit
-  - cmd: git push -d https://actlab-auto:%gitHubPassword%@github.com/actlaboratory/SOC.git SOC-latestcommit
-  - cmd: git tag SOC-latestcommit
-  - cmd: git push https://actlab-auto:%gitHubPassword%@github.com/actlaboratory/SOC.git SOC-latestcommit
   - "%PYTHON%\\python.exe -m pip install -r requirements.txt"
 
 build: off
@@ -39,7 +35,6 @@ test_script:
   # the interpreter you're using - Appveyor does not do anything special
   # to put the Python evrsion you want to use on PATH.
   - "echo Skipped Tests"
-  - cmd: echo "https://actlab.org/git-release.php?repo_name=%APPVEYOR_REPO_NAME%&tag_name=SOC-latestcommit"
 
 after_test:
   # This step builds your wheels.
@@ -48,6 +43,10 @@ after_test:
   # interpreter
   - "%PYTHON%\\python.exe tools\\build.py --appveyor"
   - cmd: curl "https://actlab.org/git-release.php?repo_name=%APPVEYOR_REPO_NAME%&tag_name=SOC-latestcommit&password=%SCRIPT_PASSWORD%"
+  - cmd: git tag -d SOC-latestcommit
+  - cmd: git push -d https://actlab-auto:%gitHubPassword%@github.com/actlaboratory/SOC.git SOC-latestcommit
+  - cmd: git tag SOC-latestcommit
+  - cmd: git push https://actlab-auto:%gitHubPassword%@github.com/actlaboratory/SOC.git SOC-latestcommit
 
 artifacts:
   - path: SOC-*.zip
