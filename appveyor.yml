@@ -43,6 +43,7 @@ after_test:
   # 64-bit Python 3.3/3.4. And you need to use %PYTHON% to get the correct
   # interpreter
   - "%PYTHON%\\python.exe tools\\build.py --appveyor"
+  - cmd: exit 0
   - cmd: curl "https://actlab.org/git-release.php?repo_name=%APPVEYOR_REPO_NAME%&tag_name=SOC-latestcommit&password=%SCRIPT_PASSWORD%"
   - cmd: git tag -d SOC-latestcommit
   - cmd: git push -d https://actlab-auto:%gitHubPassword%@github.com/actlaboratory/SOC.git SOC-latestcommit
