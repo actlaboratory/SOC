@@ -5,7 +5,8 @@
 import wx
 import os
 #アプリケーション基本情報
-APP_NAME="SOC"
+APP_NAME="SOC"#アプリケーションの名前
+APP_FULL_NAME = "Simple Ocr Controller"#アプリケーションの完全な名前
 APP_VERSION="0.0.33"
 APP_LAST_RELEASE_DATE="2020-11-20"
 APP_COPYRIGHT_YEAR=APP_LAST_RELEASE_DATE.split("-")[0]
