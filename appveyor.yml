@@ -35,7 +35,7 @@ test_script:
   # the interpreter you're using - Appveyor does not do anything special
   # to put the Python evrsion you want to use on PATH.
   - "echo Skipped Tests"
-  - cmd: echo !APPVYOR_REPO_NAME!
+  - cmd: echo %APPVEYOR_REPO_NAME%
 
 after_test:
   # This step builds your wheels.
