@@ -7,10 +7,15 @@ import os
 #アプリケーション基本情報
 APP_NAME="SOC"#アプリケーションの名前
 APP_FULL_NAME = "Simple Ocr Controller"#アプリケーションの完全な名前
+APP_ICON = None
 APP_VERSION="0.0.33"
 APP_LAST_RELEASE_DATE="2020-11-20"
-APP_COPYRIGHT_YEAR=APP_LAST_RELEASE_DATE.split("-")[0]
-APP_DEVELOPERS="Guredora"
+APP_COPYRIGHT_YEAR="2020"
+APP_LICENSE="Apache License 2.0"
+APP_DEVELOPERS="ACT Laboratory"
+APP_DEVELOPERS_URL="https://actlab.org/"
+APP_DETAILS_URL="https://actlab.org/software/SOC"
+APP_COPYRIGHT_MESSAGE = "Copyright (c) %s %s All lights reserved." % (APP_COPYRIGHT_YEAR, APP_DEVELOPERS)
 
 SUPPORTING_LANGUAGE={"ja-JP": "日本語","en-US": "English"}# 対応言語一覧
 AVAILABLE_FORMATS = (".jpg", ".png", ".gif", ".pdf")# 対応フォーマット一覧
