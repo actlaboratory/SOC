@@ -11,6 +11,19 @@ import sys
 from views import updateDialog
 import time
 import threading
+import win32api
+
+def getUpdaterVersion():
+	""" return (pyVersion, exeVersion) """
+	return ["1.0.0", _getFileVersion("./updater.exe")]
+
+def _getFileVersion(filePath):
+	info = win32api.GetFileVersionInfo(filePath, os.sep)
+	ms = info['FileVersionMS']
+	ls = info['FileVersionLS']
+	version = '%d.%d.%d' % (win32api.HIWORD(ms), win32api.LOWORD(ms), win32api.HIWORD(ls))
+	return version
+
 
 class update(threading.Thread):
 	def __init__(self):
@@ -18,6 +31,15 @@ class update(threading.Thread):
 		self.needStop = False
 
 	def update(self, auto=False):
+		# アップデータチェック
+		updaterCheck = False
+		try:
+			if getUpdaterVersion()[0] == getUpdaterVersion()[1]: updaterCheck = True
+		except: pass
+		if not updaterCheck:
+			simpleDialog.winDialog(_("アップデート"), _("アップデータが利用できません。お手数ですが、再度ソフトウェアをダウンロードしてください。"))
+			return
+		
 		params = {
 			"name": constants.APP_NAME,
 			"updater_version": constants.UPDATER_VERSION,
@@ -28,30 +50,30 @@ class update(threading.Thread):
 			response = requests.get(constants.UPDATE_URL, params, timeout = timeout)
 		except requests.exceptions.ConnectTimeout:
 			if not auto:
-				simpleDialog.dialog(_("サーバーへの通信がタイムアウトしました。"), _("アップデート"))
+				simpleDialog.winDialog(_("アップデート"), _("サーバーへの通信がタイムアウトしました。"))
 			return
 		except requests.exceptions.ConnectionError as e:
 			print(e)
 			if not auto:
-				simpleDialog.dialog(_("サーバーへの接続に失敗しました。インターネット接続などをご確認ください"), _("アップデート"))
+				simpleDialog.winDialog(_("アップデート"), _("サーバーへの接続に失敗しました。インターネット接続などをご確認ください"))
 			return
 		if not response.status_code == 200:
 			if not auto:
-				simpleDialog.dialog(_("サーバーとの通信に失敗しました。"), _("アップデート"))
+				simpleDialog.winDialog(_("アップデート"), _("サーバーとの通信に失敗しました。"))
 			return
 		self.info = response.json()
 		code = self.info["code"]
 		if code == errorCodes.UPDATER_LATEST:
 			if not auto:
-				simpleDialog.dialog(_("現在のバージョンが最新です。アップデートの必要はありません。"), _("アップデート"))
+				simpleDialog.winDialog(_("アップデート"), _("現在のバージョンが最新です。アップデートの必要はありません。"))
 			return
 		elif code == errorCodes.UPDATER_BAD_PARAM:
 			if not auto:
-				simpleDialog.dialog(_("リクエストパラメーターが不正です。開発者まで連絡してください"), _("アップデート"))
+				simpleDialog.winDialog(_("アップデート"), _("リクエストパラメーターが不正です。開発者まで連絡してください"))
 			return
 		elif code == errorCodes.UPDATER_NOT_FOUND:
 			if not auto:
-				simpleDialog.dialog(_("アップデーターが登録されていません。開発者に連絡してください。"), _("アップデート"))
+				simpleDialog.winDialog(_("アップデート"), _("アップデーターが登録されていません。開発者に連絡してください。"))
 			return
 		elif code == errorCodes.UPDATER_NEED_UPDATE or errorCodes.UPDATER_VISIT_SITE:
 			self.dialog = updateDialog.updateDialog()
