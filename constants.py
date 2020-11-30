@@ -5,11 +5,13 @@
 import wx
 import os
 #アプリケーション基本情報
-APP_NAME="SOC"
-APP_VERSION="0.0.16"
-APP_LAST_RELEASE_DATE="2020-09-25"
+APP_NAME="SOC"#アプリケーションの名前
+APP_FULL_NAME = "Simple Ocr Controller"#アプリケーションの完全な名前
+APP_VERSION="0.0.33"
+APP_LAST_RELEASE_DATE="2020-11-20"
 APP_COPYRIGHT_YEAR=APP_LAST_RELEASE_DATE.split("-")[0]
 APP_DEVELOPERS="Guredora"
+
 SUPPORTING_LANGUAGE={"ja-JP": "日本語","en-US": "English"}# 対応言語一覧
 AVAILABLE_FORMATS = (".jpg", ".png", ".gif", ".pdf")# 対応フォーマット一覧
 #各種ファイル名
@@ -34,6 +36,11 @@ GOOGLE_NEED_SCOPES = ["https://www.googleapis.com/auth/drive.file"]
 GOOGLE_CALLBACK_URL = "http://localhost:8080"
 GOOGLE_CLIENT_SECRET = '{"installed":{"client_id":"700286679735-4bssuo7bsen9o7sua8joacl18bhms6nd.apps.googleusercontent.com","project_id":"simple-ocr-controller","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"607kPxH25Wba68T3mJmoxrKD","redirect_uris":["urn:ietf:wg:oauth:2.0:oob","http://localhost"]}}'
 
+#build関連定数
+BASE_PACKAGE_URL = "https://github.com/actlaboratory/SOC/releases/download/0.0.5/SOC-0.0.5.zip"
+PACKAGE_CONTAIN_ITEMS = ("tesseract-ocr", "poppler")
+NEED_HOOKS = ("tools/hook-googleapiclient.py",)
+STARTUP_FILE = "SOC.py"
 # update情報
 UPDATE_URL = "https://actlab.org/api/checkUpdate"
 UPDATER_VERSION = "1.0.0"

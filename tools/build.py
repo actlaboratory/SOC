@@ -49,6 +49,7 @@ if constants.APP_ICON == None:
 	runcmd("%s --windowed --log-level=ERROR %s" % (pyinstaller_path, constants.STARTUP_FILE))
 else:
 	runcmd("%s --windowed --log-level=ERROR --icon=%s %s" % (pyinstaller_path, constants.APP_ICON, constants.STARTUP_FILE))
+
 shutil.copytree("locale\\",os.path.join(package_path, "locale"), ignore=shutil.ignore_patterns("*.po", "*.pot", "*.po~"))
 for item in constants.PACKAGE_CONTAIN_ITEMS:
 	if os.path.isdir(item):
