@@ -31,6 +31,7 @@ import views.convert
 import views.converted
 from views import authorizing
 from views import settings
+from views import versionDialog
 
 class MainView(BaseView):
 	def __init__(self):
@@ -258,7 +259,7 @@ class Events(BaseEvents):
 			settingDialog.Destroy()
 
 		if selected == menuItemsStore.getRef("webpage"):
-			webbrowser.open("https://actlab.org")
+			webbrowser.open(constants.APP_DEVELOPERS_URL)
 			return
 		if selected == menuItemsStore.getRef("SENDREGIST"):
 			shortCut = os.environ["APPDATA"]+"\\Microsoft\\Windows\\SendTo\\"+_("SOCで文字認識を開始.lnk")
@@ -268,7 +269,8 @@ class Events(BaseEvents):
 			scut.Save()
 			dialog(_("送るメニューの登録が完了しました。送るメニューから「SOCで文字認識を開始」で実行できます。"), _("完了"))
 		if selected == menuItemsStore.getRef("ABOUT"):
-			dialog(_("SimpleOcrController（%s） version %s.\nCopyright (C) %s %s.\nこのソフトは公開されているOCRエンジンを使いやすくしたものです。") % (constants.APP_NAME, constants.APP_VERSION, constants.APP_COPYRIGHT_YEAR, constants.APP_DEVELOPERS), _("このソフトについて"))
+			versionDialog.versionDialog()
+
 		if selected == menuItemsStore.getRef("UPDATE"):
 			globalVars.update.update()
 
