@@ -49,7 +49,7 @@ class googleEngine(engineBase):
 		while done is False:
 			status, done = downloader.next_chunk()
 		service.files().delete(fileId=ID).execute()
-		
-		return fh.getvalue().decode("utf-8")
+		statusContainer.success(stream.getValue().decode("utf-8")
+
 
 
