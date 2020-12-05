@@ -44,33 +44,42 @@ class MainView(BaseView):
 		super().Initialize(
 			title,
 			640,
-			500,
+			560,
 			self.app.config.getint(self.identifier,"positionX"),
 			self.app.config.getint(self.identifier,"positionY"),
 			style=wx.SYSTEM_MENU | wx.CAPTION | wx.CLOSE_BOX | wx.CLIP_CHILDREN | wx.BORDER_STATIC
 		)
 
 		self.InstallMenuEvent(Menu(self.identifier),self.events.OnMenuSelect)
-		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),wx.HORIZONTAL)
-		vCreator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,creator.GetSizer(),wx.VERTICAL)
+
+		#タブコントロールの作成
+		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),wx.VERTICAL)
+		self.tab = creator.tabCtrl("ソース選択", event=None, style=wx.NB_NOPAGETHEME | wx.NB_MULTILINE, sizerFlag=0, proportion=0, margin=5)
+
+		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,label=_("画像ファイルから読込"))
+		hCreator=views.ViewCreator.ViewCreator(self.viewMode,creator.GetPanel(),creator.GetSizer(),wx.HORIZONTAL)
+		vCreator=views.ViewCreator.ViewCreator(self.viewMode,hCreator.GetPanel(),hCreator.GetSizer(),wx.VERTICAL)
 		self.filebox, self.list = vCreator.listbox(_("ファイル一覧"), (), None,-1,0,(450,200))
 		fileListKeymap = keymap.KeymapHandler(defaultKeymap.defaultKeymap)
 		acceleratorTable = fileListKeymap.GetTable("fileList")
 		self.filebox.SetAcceleratorTable(acceleratorTable)
 		self.filebox.SetDropTarget(DropTarget(self))	#D&Dの受け入れ
 
-		vCreator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,creator.GetSizer(),wx.VERTICAL,20)
+		vCreator=views.ViewCreator.ViewCreator(self.viewMode,hCreator.GetPanel(),hCreator.GetSizer(),wx.VERTICAL,20)
 		self.open = vCreator.button(_("追加"), self.events.open)
 		self.delete = vCreator.button(_("削除"), self.events.delete)
 
-		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),views.ViewCreator.FlexGridSizer,10, 2)
-		self.engine, self.engineStatic = creator.combobox(_("OCRエンジン"), (_("google (インターネット)"), _("tesseract (ローカル)")), self.events.engine, state = 0)
-		self.tesseract, self.tesseractStatic = creator.combobox(_("モード"), (_("横書き通常"), _("横書き低負荷版"), _("縦書き通常"), _("縦書き低負荷版")), self.events.tesseract_mode, state = 0)
+		settingAreaCreator=views.ViewCreator.ViewCreator(self.viewMode,creator.GetPanel(),creator.GetSizer(),views.ViewCreator.FlexGridSizer,10, 2)
+		self.engine, self.engineStatic = settingAreaCreator.combobox(_("OCRエンジン"), (_("google (インターネット)"), _("tesseract (ローカル)")), self.events.engine, state = 0)
+		self.tesseract, self.tesseractStatic = settingAreaCreator.combobox(_("モード"), (_("横書き通常"), _("横書き低負荷版"), _("縦書き通常"), _("縦書き低負荷版")), self.events.tesseract_mode, state = 0)
 		self.tesseract.Disable()
 
-		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),wx.HORIZONTAL,20,style=wx.ALIGN_RIGHT)
-		self.convert = creator.button(_("変換"), self.events.convert)
-		self.exit = creator.button(_("終了"), self.events.Exit)
+		buttonAreaCreator=views.ViewCreator.ViewCreator(self.viewMode,creator.GetPanel(),creator.GetSizer(),wx.HORIZONTAL,20,style=wx.ALIGN_RIGHT)
+		self.convert = buttonAreaCreator.button(_("変換"), self.events.convert)
+		self.exit = buttonAreaCreator.button(_("終了"), self.events.Exit)
+
+		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,label=_("スキャナから読込"))
+
 
 # D&D受入関連
 class DropTarget(wx.DropTarget):
