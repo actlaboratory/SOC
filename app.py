@@ -37,6 +37,8 @@ class Main(AppBase.MainBase):
 			globalVars.update.update(True)
 		self.SetDefaultEncoding()
 		self.tmpdir = self.config.getstring("ocr", "tmpdir", os.path.join(os.environ["TEMP"], "soc"), None)
+		#popplerにパスを通す
+		os.environ["PATH"] += os.pathsep + os.getcwd() + "/poppler/bin"
 		# メインビューを表示
 		self.hMainView=main.MainView()
 		self.addFileList(sys.argv[1:])

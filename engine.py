@@ -26,9 +26,12 @@ class googleEngine(engineBase):
 		self.credential = None
 
 	def getSupportedType(self):
-		return (".jpg", ".png", ".git")
+		return (errorCodes.TYPE_JPG, errorCodes.TYPE_PNG, errorCodes.TYPE_GIF, errorCodes.TYPE_PDF_IMAGE_ONLY)
 
 	def recognition(self, filePath, statusContainer):
+		if self.cancel:
+			statusContainer.cancel()
+			return
 		service = discovery.build("drive", "v3", credentials=credential)
 		with open(filePath, mode = "rb") as f:
 			media_body = MediaIoBaseUpload(f, mimetype="application/vnd.google-apps.document", chunksize = 64*1024, resumable=True)
@@ -51,5 +54,23 @@ class googleEngine(engineBase):
 		service.files().delete(fileId=ID).execute()
 		statusContainer.success(stream.getValue().decode("utf-8")
 
+class tesseractEngine(engineBase):
+	def __init__(self, mode):
+		super().__init__()
+		self.mode = mode
 
+	def getSupportedType(self):
+		return (errorCodes.TYPE_JPG, errorCodes.TYPE_PNG, errorCodes.TYPE_GIF, errorCodes.TYPE_BMP)
 
+	def recognition(self, filePath, statusContainer):
+		if self.cancel:
+			statusContainer.cancel()
+			return
+		tools = pyocr.get_available_tools()
+		tool = tools[0]
+		text = tool.image_to_string(
+			Image.open(filePath),
+			lang = self.mode,
+			builder = pyocr.builders.TextBuilder()
+		)
+		statusContainer.success(text)

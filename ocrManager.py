@@ -1,5 +1,18 @@
 import errorCodes
 
+def type_to_constant(type):
+	elif type.lower() == ".jpg":
+		return errorCodes.TYPE_JPG
+	elif type.lower() == ".png":
+		return errorCodes.TYPE_PNG
+	elif type.lower() == ".gif":
+		return errorCodes.TYPE_GIF
+	elif type.lower() == ".pdf":
+		return errorCodes.TYPE_PDF_ALL
+	elif type.lower() == ".bmp":
+		return errorCodes.TYPE_BMP
+	else:
+		return errorCodes.TYPE_UNKNOWN
 
 class statusContainer:
 	def __init__(self):
