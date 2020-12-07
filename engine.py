@@ -25,6 +25,9 @@ class googleEngine(engineBase):
 		super().__init__()
 		self.credential = None
 
+	def setCredential(self, credential):
+		self.credential = credential
+
 	def getSupportedType(self):
 		return (errorCodes.TYPE_JPG, errorCodes.TYPE_PNG, errorCodes.TYPE_GIF, errorCodes.TYPE_PDF_IMAGE_ONLY)
 

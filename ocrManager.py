@@ -53,3 +53,5 @@ class statusContainer:
 		self.errorCode = code
 		self.done = True
 
+class manager:
+	def __init__(self, 
