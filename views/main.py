@@ -31,6 +31,7 @@ from views import processingDialog
 from views import authorizing
 from views import settings
 from views import versionDialog
+from views import resultDialog
 import engine
 import imageSource
 
@@ -195,8 +196,15 @@ class Events(BaseEvents):
 		dialog.Initialize()
 		manager.start()
 		dialog.Show()
-		
+		text = manager.getText()
+		if text == "":
+			dialog(_("テキストが認識されませんでした。"))
+			return
+		resDialog = resultDialog.Dialog(text)
+		resDialog.Initialize()
+		resDialog.Show()
 		return
+
 	def OnMenuSelect(self,event):
 		"""メニュー項目が選択されたときのイベントハンドら。"""
 		#ショートカットキーが無効状態のときは何もしない

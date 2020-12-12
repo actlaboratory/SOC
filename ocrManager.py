@@ -36,5 +36,12 @@ class manager(threading.Thread):
 	def getStatusString(self):
 		return "test"
 
+	def getText(self):
+		text = ""
+		for container in self.processedContainers:
+			if container.getStatus() == errorCodes.STATUS_SUCCESS:
+				text = container.getText()
+		return text
+
 	def isDone(self):
 		return self.done

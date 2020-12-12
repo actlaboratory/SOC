@@ -14,7 +14,7 @@ class Dialog(BaseDialog):
 
 	def Initialize(self):
 		self.log.debug("created")
-		super().Initialize(self.app.hMainView.hFrame,_("配信者の情報"))
+		super().Initialize(self.app.hMainView.hFrame,_("認識中"))
 		self.InstallControls()
 		return True
 
