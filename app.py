@@ -41,6 +41,7 @@ class Main(AppBase.MainBase):
 		os.environ["PATH"] += os.pathsep + os.getcwd() + "/poppler/bin"
 		# メインビューを表示
 		self.hMainView=main.MainView()
+		self.fileList = []
 		self.addFileList(sys.argv[1:])
 		if self.config.getboolean(self.hMainView.identifier,"maximized",False):
 			self.hMainView.hFrame.Maximize()
@@ -60,16 +61,15 @@ class Main(AppBase.MainBase):
 		error = False
 		add = False
 		for file in files:
-			path = pathlib.Path(file)
-			suffix = path.suffix.lower()
-			if path.is_dir():
+			suffix = os.path.splitext(file)[1].lower()
+			if os.path.isdir(file):
 				error=True
 				continue
 			if suffix in constants.AVAILABLE_FORMATS:
-				if path in self.hMainView.OcrManager.OcrList:
+				if file in self.fileList:
 					continue
-				self.hMainView.OcrManager.OcrList.append(path)
-				self.hMainView.filebox.Append(path.name)
+				self.fileList.append(file)
+				self.hMainView.filebox.Append(os.path.basename(file))
 				add = True
 			else:
 				error = True

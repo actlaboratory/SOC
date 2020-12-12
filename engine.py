@@ -1,17 +1,20 @@
 import os
+import CredentialManager
 from apiclient import discovery
 import errorCodes
 from googleapiclient.http import MediaIoBaseUpload
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient import errors
 import io
-
+import pyocr
+from PIL import Image
 class engineBase(object):
 	"""すべてのエンジンクラスが継承する基本クラス。"""
 	def __init__(self):
 		self.cancel = False
+		self.processingContainer = []
 
-	def recognition(self, filePath, statusContainer):
+	def recognition(self, container):
 		raise NotImplementedError()
 
 	def getSupportedType(self):
@@ -21,24 +24,25 @@ class engineBase(object):
 		self.cancel = True
 
 class googleEngine(engineBase):
-	def __init__(self):
+	def __init__(self, credential):
 		super().__init__()
-		self.credential = None
-
-	def setCredential(self, credential):
-		self.credential = credential
+		self.credential = CredentialManager.CredentialManager(True)
+		if not self.credential.isOK():
+			return errorCodes.NOT_AUTHORIZED
+		self.credential.authorize()
 
 	def getSupportedType(self):
 		return (errorCodes.TYPE_JPG, errorCodes.TYPE_PNG, errorCodes.TYPE_GIF, errorCodes.TYPE_PDF_IMAGE_ONLY)
 
-	def recognition(self, filePath, statusContainer):
+	def recognition(self, container):
 		if self.cancel:
-			statusContainer.cancel()
+			container.cancel()
 			return
-		service = discovery.build("drive", "v3", credentials=credential)
-		with open(filePath, mode = "rb") as f:
+		self.processingContainer.append(container)
+		service = discovery.build("drive", "v3", credentials=self.credential.credential)
+		with open(container.fileName, mode = "rb") as f:
 			media_body = MediaIoBaseUpload(f, mimetype="application/vnd.google-apps.document", chunksize = 64*1024, resumable=True)
-				file = service.files().create(
+			file = service.files().create(
 				body = {
 					"name": os.path.basename(filePath),
 					"mimeType":"application/vnd.google-apps.document"
@@ -55,25 +59,28 @@ class googleEngine(engineBase):
 		while done is False:
 			status, done = downloader.next_chunk()
 		service.files().delete(fileId=ID).execute()
-		statusContainer.success(stream.getValue().decode("utf-8")
+		container.success(stream.getValue().decode("utf-8"))
+		self.processingContainer.remove(container)
 
 class tesseractEngine(engineBase):
 	def __init__(self, mode):
 		super().__init__()
 		self.mode = mode
+		tools = pyocr.get_available_tools()
+		self.tesseract = tools[0]
 
 	def getSupportedType(self):
 		return (errorCodes.TYPE_JPG, errorCodes.TYPE_PNG, errorCodes.TYPE_GIF, errorCodes.TYPE_BMP)
 
-	def recognition(self, filePath, statusContainer):
+	def recognition(self, container):
 		if self.cancel:
-			statusContainer.cancel()
+			container.cancel()
 			return
-		tools = pyocr.get_available_tools()
-		tool = tools[0]
-		text = tool.image_to_string(
-			Image.open(filePath),
+		self.processingContainer.append(container)
+		text = self.tesseract.image_to_string(
+			Image.open(container.fileName),
 			lang = self.mode,
 			builder = pyocr.builders.TextBuilder()
 		)
-		statusContainer.success(text)
+		container.success(text)
+		self.processingContainer.remove(container)
