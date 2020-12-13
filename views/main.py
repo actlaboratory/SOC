@@ -124,15 +124,15 @@ class Menu(BaseMenu):
 		"""指定されたウィンドウに、メニューを適用する。"""
 		#メニューの大項目を作る
 		self.hFileMenu = wx.Menu()
-		self.hToolMenu=wx.Menu()
+		self.hSettingMenu=wx.Menu()
 		self.hHelpMenu = wx.Menu()
 		#ファイルメニューの中身
 		self.open = self.RegisterMenuCommand(self.hFileMenu, "OPEN", _("変換ファイルの追加(&o)"))#ファイルリストの追加
 		self.exit = self.RegisterMenuCommand(self.hFileMenu, "EXIT", _("終了(&x)"))#プログラムの終了
-		#ツールメニューの中身
-		self.google=self.RegisterMenuCommand(self.hToolMenu,"GOOGLE",_("Googleと連携する(&g)"))#グーグルの認証開始
-		self.sendRegist = self.RegisterMenuCommand(self.hToolMenu,"SENDREGIST",_("送るメニューにショートカットを作成(&s)"))
-		self.setting = self.RegisterMenuCommand(self.hToolMenu,"SETTINGS",_("設定画面を開く(&w)"))
+		#設定メニューの中身
+		self.google=self.RegisterMenuCommand(self.hSettingMenu,"GOOGLE",_("Googleと連携する(&g)"))#グーグルの認証開始
+		self.sendRegist = self.RegisterMenuCommand(self.hSettingMenu,"SENDREGIST",_("送るメニューにショートカットを作成(&s)"))
+		self.setting = self.RegisterMenuCommand(self.hSettingMenu,"SETTINGS",_("設定画面を開く(&w)"))
 	
 		#ヘルプメニューの中身
 		self.Page = self.RegisterMenuCommand(self.hHelpMenu, "webpage", _("ACT Laboratoryのホームページを開く(&p)"))
@@ -140,7 +140,7 @@ class Menu(BaseMenu):
 		self.Update = self.RegisterMenuCommand(self.hHelpMenu, "UPDATE", _("最新バージョンを確認"))
 		#メニューバーの生成
 		self.hMenuBar.Append(self.hFileMenu, _("ファイル(&f)"))
-		self.hMenuBar.Append(self.hToolMenu,_("ツール(&t)"))
+		self.hMenuBar.Append(self.hSettingMenu,_("設定(&s)"))
 		self.hMenuBar.Append(self.hHelpMenu, _("ヘルプ(&h)"))
 		target.SetMenuBar(self.hMenuBar)
 		if globalVars.app.credentialManager.isOK():

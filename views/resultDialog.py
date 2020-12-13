@@ -22,7 +22,7 @@ class Dialog(BaseDialog):
 	def InstallControls(self):
 		"""いろんなwidgetを設置する。"""
 		self.creator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.sizer,wx.VERTICAL,20,style=wx.ALL,margin=20)
-		self.resEdit, dummy = self.creator.inputbox(_("認識結果"), defaultValue = self.text, style = wx.TE_READONLY|wx.TE_MULTILINE)
+		self.resEdit, dummy = self.creator.inputbox(_("認識結果"), defaultValue = self.text, style = wx.TE_READONLY|wx.TE_MULTILINE|wx.TE_DONTWRAP, )
 		self.button = self.creator.okbutton(_("閉じる"))
 
 	def getData(self):
