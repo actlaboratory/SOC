@@ -34,6 +34,7 @@ from views import versionDialog
 from views import resultDialog
 import engine
 import imageSource
+import twain
 
 class MainView(BaseView):
 	def __init__(self):
@@ -62,6 +63,7 @@ class MainView(BaseView):
 			_("縦書き通常"): "jpn_vert",
 			_("縦書き低負荷版"): "jpn_vert_fast"
 		}
+		self.twainSourceManager = twain.SourceManager(self.hFrame, Language = twain.TWLG_JAPANESE, Country = twain.TWCY_JAPAN)
 		#タブコントロールの作成
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),wx.VERTICAL)
 		self.tab = creator.tabCtrl("ソース選択", event=None, style=wx.NB_NOPAGETHEME | wx.NB_MULTILINE, sizerFlag=0, proportion=0, margin=5)
@@ -89,7 +91,7 @@ class MainView(BaseView):
 		self.exit = buttonAreaCreator.button(_("終了"), self.events.Exit)
 
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,label=_("スキャナから読込"))
-
+		creator.listbox(_("スキャナ一覧"), choices = self.twainSourceManager.source_list, state = 0)
 
 # D&D受入関連
 class DropTarget(wx.DropTarget):
