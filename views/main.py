@@ -81,17 +81,17 @@ class MainView(BaseView):
 		self.open = vCreator.button(_("追加"), self.events.open)
 		self.delete = vCreator.button(_("削除"), self.events.onDelete)
 
-		settingAreaCreator=views.ViewCreator.ViewCreator(self.viewMode,creator.GetPanel(),creator.GetSizer(),views.ViewCreator.FlexGridSizer,10, 2)
+		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,label=_("スキャナから読込"))
+		creator.listbox(_("スキャナ一覧"), choices = self.twainSourceManager.source_list, state = 0)
+
+		settingAreaCreator=views.ViewCreator.ViewCreator(self.viewMode,hPanel(),self.creator.GetSizer(),views.ViewCreator.FlexGridSizer,10, 2)
 		self.engine, self.engineStatic = settingAreaCreator.combobox(_("OCRエンジン"), list(self.engineSelection.keys()), self.events.onEngineSelect, state = 0)
 		self.tesseract, self.tesseractStatic = settingAreaCreator.combobox(_("モード"), list(self.tesseractModeSelection.keys()), state = 0)
 		self.tesseract.Disable()
-
-		buttonAreaCreator=views.ViewCreator.ViewCreator(self.viewMode,creator.GetPanel(),creator.GetSizer(),wx.HORIZONTAL,20,style=wx.ALIGN_RIGHT)
+		
+		buttonAreaCreator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),wx.HORIZONTAL,20,style=wx.ALIGN_RIGHT)
 		self.startButton = buttonAreaCreator.button(_("開始"), self.events.onStart)
 		self.exit = buttonAreaCreator.button(_("終了"), self.events.Exit)
-
-		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,label=_("スキャナから読込"))
-		creator.listbox(_("スキャナ一覧"), choices = self.twainSourceManager.source_list, state = 0)
 
 # D&D受入関連
 class DropTarget(wx.DropTarget):
