@@ -167,10 +167,20 @@ class Events(BaseEvents):
 		convertDialog = views.convert.ConvertDialog()
 		convertDialog.Initialize()
 		contain_text = False
+		over_size = False
+		over_file = []
 		result = []
 		for file in self.parent.OcrManager.OcrList:
-			if self.parent.OcrManager.Engine == 0 and pdfUtil.pdfTextChecker(str(file)):
-				contain_text = True
+			if self.parent.OcrManager.Engine == 0:
+				if pdfUtil.pdfTextChecker(str(file)):
+					contain_text = True
+				if file.stat().st_size > 1024*1024*2:
+					over_size = True
+					over_file.append(str(file))
+		if over_size:
+			over_str = str.join("\n", over_file)
+			errorDialog(_("2MBを超えるファイルが検出されました。容量の大きなファイルは認識することができません。\n検出されたファイル:%s") % (over_str))
+			return
 		if contain_text:
 			if qDialog("pdfからテキストが検出されました。画像に変換して送信しますか？") == wx.ID_YES:
 				self.parent.OcrManager.pdf_to_png = True
