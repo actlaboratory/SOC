@@ -49,6 +49,7 @@ STARTUP_FILE = "SOC.py"
 # update情報
 UPDATE_URL = "https://actlab.org/api/checkUpdate"
 UPDATER_VERSION = "1.0.0"
+UPDATER_URL = "https://github.com/actlaboratory/updater/releases/download/1.0.0/updater.zip"
 UPDATER_WAKE_WORD = "hello"
 #pipe関係
 PIPE_NAME = "SocPdfTextCheck"
