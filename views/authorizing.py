@@ -9,7 +9,7 @@ import globalVars
 import views.ViewCreator
 from logging import getLogger
 from views.baseDialog import *
-
+import webbrowser
 class authorizeDialog(BaseDialog):
 	def __init__(self):
 		super().__init__("authorizingDialog")
@@ -51,22 +51,18 @@ class authorizeDialog(BaseDialog):
 		#webView=views.web.Dialog(url,"http://localhost")
 		#webView.Initialize()
 		#webView.Show()
-		self.web=wx.Process.Open("\"C:\\Program Files\\Internet Explorer\\iexplore.exe\" "+url)
+		webbrowser.open(url)
 
 		self.authThread = threading.Thread(target=self.__auth)
 		self.authThread.start()
 
 	def __auth(self):
-		self.pid=self.web.GetPid()
-
+		
 		#ユーザの認証待ち
 		status=errorCodes.WAITING_USER
 		evt=threading.Event()
 		while(status==errorCodes.WAITING_USER):
 			if not self.__isArrive: return
-			if not wx.Process.Exists(self.pid):
-				wx.CallAfter(self.end, errorCodes.CANCELED)
-				return
 			if status==errorCodes.WAITING_USER:
 				status=globalVars.app.credentialManager.getCredential()
 				if status == errorCodes.OK:
@@ -78,7 +74,6 @@ class authorizeDialog(BaseDialog):
 	
 	def canceled(self, events):
 		self.__isArrive = False
-		if self.web != None and self.pid != None and self.web.Exists(self.pid): wx.Process.Kill(self.pid,wx.SIGTERM) #修了要請
 		self.wnd.EndModal(errorCodes.CANCELED_BY_USER)
 
 
@@ -91,7 +86,6 @@ class authorizeDialog(BaseDialog):
 		self.bStart.Enable()
 	
 	def end(self, code):
-		if self.web != None and self.pid != None and self.web.Exists(self.pid): wx.Process.Kill(self.pid,wx.SIGTERM) #修了要請
 		self.wnd.EndModal(code)
 
 	def finish(self):
