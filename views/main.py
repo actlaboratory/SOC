@@ -31,6 +31,7 @@ import views.convert
 import views.converted
 from views import authorizing
 from views import settings
+from views import versionDialog
 
 class MainView(BaseView):
 	def __init__(self):
@@ -120,7 +121,7 @@ class Menu(BaseMenu):
 		self.Update = self.RegisterMenuCommand(self.hHelpMenu, "UPDATE", _("最新バージョンを確認"))
 		#メニューバーの生成
 		self.hMenuBar.Append(self.hFileMenu, _("ファイル(&f)"))
-		self.hMenuBar.Append(self.hToolMenu,_("ツール(&t)"))
+		self.hMenuBar.Append(self.hToolMenu,_("設定(&s)"))
 		self.hMenuBar.Append(self.hHelpMenu, _("ヘルプ(&h)"))
 		target.SetMenuBar(self.hMenuBar)
 		if globalVars.app.credentialManager.isOK():
@@ -166,10 +167,20 @@ class Events(BaseEvents):
 		convertDialog = views.convert.ConvertDialog()
 		convertDialog.Initialize()
 		contain_text = False
+		over_size = False
+		over_file = []
 		result = []
 		for file in self.parent.OcrManager.OcrList:
-			if self.parent.OcrManager.Engine == 0 and pdfUtil.pdfTextChecker(str(file)):
-				contain_text = True
+			if self.parent.OcrManager.Engine == 0:
+				if pdfUtil.pdfTextChecker(str(file)):
+					contain_text = True
+				if file.stat().st_size > 1024*1024*2:
+					over_size = True
+					over_file.append(str(file))
+		if over_size:
+			over_str = str.join("\n", over_file)
+			errorDialog(_("2MBを超えるファイルが検出されました。容量の大きなファイルは認識することができません。\n検出されたファイル:%s") % (over_str))
+			return
 		if contain_text:
 			if qDialog("pdfからテキストが検出されました。画像に変換して送信しますか？") == wx.ID_YES:
 				self.parent.OcrManager.pdf_to_png = True
@@ -258,7 +269,7 @@ class Events(BaseEvents):
 			settingDialog.Destroy()
 
 		if selected == menuItemsStore.getRef("webpage"):
-			webbrowser.open("https://actlab.org")
+			webbrowser.open(constants.APP_DEVELOPERS_URL)
 			return
 		if selected == menuItemsStore.getRef("SENDREGIST"):
 			shortCut = os.environ["APPDATA"]+"\\Microsoft\\Windows\\SendTo\\"+_("SOCで文字認識を開始.lnk")
@@ -268,7 +279,8 @@ class Events(BaseEvents):
 			scut.Save()
 			dialog(_("送るメニューの登録が完了しました。送るメニューから「SOCで文字認識を開始」で実行できます。"), _("完了"))
 		if selected == menuItemsStore.getRef("ABOUT"):
-			dialog(_("SimpleOcrController（%s） version %s.\nCopyright (C) %s %s.\nこのソフトは公開されているOCRエンジンを使いやすくしたものです。") % (constants.APP_NAME, constants.APP_VERSION, constants.APP_COPYRIGHT_YEAR, constants.APP_DEVELOPERS), _("このソフトについて"))
+			versionDialog.versionDialog()
+
 		if selected == menuItemsStore.getRef("UPDATE"):
 			globalVars.update.update()
 
