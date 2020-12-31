@@ -4,8 +4,6 @@ from libloader.com import load_com
 from .base import Output, OutputError
 import pywintypes
 import logging
-import os
-import shutil
 log = logging.getLogger(__name__)
 
 SVSFDefault = 0
@@ -36,11 +34,6 @@ class SAPI5(Output):
 			self._voices = self._available_voices()
 		except pywintypes.com_error:
 			raise OutputError
-		except AttributeError:
-			print("deleting cash...")
-			genpy_path=os.path.join(os.environ["temp"], "gen_py")
-			shutil.rmtree(genpy_path)
-
 		self._pitch = 0
 
 	def _available_voices(self):
@@ -85,6 +78,8 @@ class SAPI5(Output):
 		self.object.Volume = value
 
 	def speak(self, text, interrupt=False):
+		if "aquestalk" in self.get_voice().lower():
+			text = self.fix_aqtk(text)
 		if interrupt:
 			self.silence()
 		# We need to do the pitch in XML here
@@ -98,5 +93,10 @@ class SAPI5(Output):
 		if self.object:
 			return True
 		return False
+
+	def  fix_aqtk(self, text):
+		import re
+		ret = re.sub("[っッ]+([^\u3041-\u3096\u30A1-\u30FA\u3400-\u9FFF\uF900-\uFAFF\uD840-\uD87F\uDC00-\uDFFF])", "、\\1", text)
+		return ret
 
 output_class = SAPI5
