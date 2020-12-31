@@ -1,0 +1,33 @@
+CopyLight (c)2019-2021 Kazto Kitabatake,ACT laboratory All lights reserved.
+
+本ソフトウェアは、GPL v2(or later)またはApache license v2の条件に従い、自由に利用することができます。
+本ソフトウェアのソースコードは、readme.txtに記載のURLよりダウンロード可能です。
+
+※本ソフトウェアには、以下の各ライセンスに従い他者の成果物を含みます。
+
+・Apacheライセンスv2に基づく以下のライブラリ
+	requests　(https://github.com/psf/requests)
+	pypac	(https://pypi.org/project/pypac/)
+	libloader　(https://github.com/bmarwell/libloader/)
+	google-auth-library-python-oauthlib (https://github.com/googleapis/google-auth-library-python-oauthlib)
+	tesseract	(https://github.com/tesseract-ocr/tesseract)
+
+・GPLv2
+　　poppler　(https://gitlab.freedesktop.org/poppler/poppler)
+		※コンパイルされた状態で同梱配布し、パイプでのリンクの為、SOC本体はGPLv2に拘束されません。
+・GPLv3
+	pyocr　(https://gitlab.gnome.org/World/OpenPaperwork/pyocr)
+
+・BSDライセンス
+	pyperclip	(https://pypi.org/project/pyperclip/)
+
+・MITライセンスに基づく以下のライブラリ
+	AccessibleOutput2　(https://pypi.org/project/accessible-output2/)
+
+・MS-PL
+	DotNetZip
+
+その他、個別のライセンスに基づく複数のライブラリ
+
+各ライセンスは、licensesディレクトリ内に格納されています。
+
