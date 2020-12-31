@@ -1,6 +1,6 @@
 		Simple OCR controller -SOC-
 
-	バージョン:　　0.1.0（ベータ版）
+	バージョン:　　0.5.0（ベータ版）
 	リリース:　　　2021-01-01
 	開発・配布元:　ACT Laboratory　(https://actlab.org/)
 	主要開発者:　　グレドラ　(https://guredora.com/)
