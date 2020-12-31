@@ -121,7 +121,7 @@ class Menu(BaseMenu):
 		self.Update = self.RegisterMenuCommand(self.hHelpMenu, "UPDATE", _("最新バージョンを確認"))
 		#メニューバーの生成
 		self.hMenuBar.Append(self.hFileMenu, _("ファイル(&f)"))
-		self.hMenuBar.Append(self.hToolMenu,_("ツール(&t)"))
+		self.hMenuBar.Append(self.hToolMenu,_("設定(&s)"))
 		self.hMenuBar.Append(self.hHelpMenu, _("ヘルプ(&h)"))
 		target.SetMenuBar(self.hMenuBar)
 		if globalVars.app.credentialManager.isOK():
