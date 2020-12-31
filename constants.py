@@ -8,8 +8,8 @@ import os
 APP_NAME="SOC"#アプリケーションの名前
 APP_FULL_NAME = "Simple Ocr Controller"#アプリケーションの完全な名前
 APP_ICON = None
-APP_VERSION="0.0.33"
-APP_LAST_RELEASE_DATE="2020-11-20"
+APP_VERSION="0.1.0"
+APP_LAST_RELEASE_DATE="2021-01-01"
 APP_COPYRIGHT_YEAR="2020"
 APP_LICENSE="Apache License 2.0"
 APP_DEVELOPERS="ACT Laboratory"
