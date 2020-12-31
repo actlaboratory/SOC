@@ -22,8 +22,8 @@ class settingsDialog(BaseDialog):
 			"NOSPEECH": _("読み上げなし")
 		}
 		self.colorSelection = {
-			"white": "white",
-			"dark": "dark"
+			"white": _("通常"),
+			"dark": _("白黒反転")
 		}
 
 	def Initialize(self):
