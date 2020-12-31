@@ -85,6 +85,9 @@ class Main(AppBase.MainBase):
 
 		# プロキシの設定を元に戻す
 		if self.proxyEnviron != None: self.proxyEnviron.unset_environ()
+
+		# アップデート
+		globalVars.update.runUpdate()
 		
 		#戻り値は無視される
 		return 0
