@@ -10,8 +10,9 @@ APP_FULL_NAME = "Simple Ocr Controller"#アプリケーションの完全な名�
 APP_ICON = None
 APP_VERSION="0.5.0"
 APP_LAST_RELEASE_DATE="2021-01-01"
-APP_COPYRIGHT_YEAR="2021"
+APP_COPYRIGHT_YEAR="2019-2021"
 APP_LICENSE="GPL v2(or later)"
+>>>>>>> f976f7c991ab1a3b5f4bea97e1790bfe9e2f597d
 APP_DEVELOPERS="guredora, ACT Laboratory"
 APP_DEVELOPERS_URL="https://actlab.org/"
 APP_DETAILS_URL="https://actlab.org/software/SOC"
