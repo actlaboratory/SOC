@@ -8,11 +8,11 @@ import os
 APP_NAME="SOC"#アプリケーションの名前
 APP_FULL_NAME = "Simple Ocr Controller"#アプリケーションの完全な名前
 APP_ICON = None
-APP_VERSION="0.1.0"
+APP_VERSION="0.5.0"
 APP_LAST_RELEASE_DATE="2021-01-01"
-APP_COPYRIGHT_YEAR="2020"
-APP_LICENSE="Apache License 2.0"
-APP_DEVELOPERS="ACT Laboratory"
+APP_COPYRIGHT_YEAR="2019-2020"
+APP_LICENSE="GPLv2(or lator) / Apache License 2.0"
+APP_DEVELOPERS="guredora, ACT Laboratory"
 APP_DEVELOPERS_URL="https://actlab.org/"
 APP_DETAILS_URL="https://actlab.org/software/SOC"
 APP_COPYRIGHT_MESSAGE = "Copyright (c) %s %s All lights reserved." % (APP_COPYRIGHT_YEAR, APP_DEVELOPERS)
