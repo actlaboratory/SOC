@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SOC\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-25 21:21+0900\n"
+"POT-Creation-Date: 2020-12-31 20:06+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,35 +17,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: app.py:49
-msgid "サーバーとの通信に失敗しました。"
-msgstr ""
-
-#: app.py:49 app.py:52 views\main.py:302 views\main.py:305 views\main.py:315
-msgid "アップデート"
-msgstr ""
-
-#: app.py:52 views\main.py:305
-#, python-format
-msgid ""
-"バージョン%sにアップデートすることができます。%sアップデートを開始しますか？"
-msgstr ""
-
-#: app.py:58 views\main.py:311
-#, python-format
-msgid ""
-"緊急のお知らせがあります。\n"
-"タイトル:%s\n"
-"詳細をブラウザーで開きますか？"
-msgstr ""
-
-#: app.py:81
+#: app.py:76
 msgid ""
 "対応していないフォーマットのファイルは除外され、一部のファイルのみ追加されま"
 "した。"
 msgstr ""
 
-#: app.py:83
+#: app.py:78
 msgid ""
 "このフォーマットのファイルには対応していないため、追加できませんでした。"
 msgstr ""
@@ -90,25 +68,102 @@ msgstr ""
 msgid "この組み合わせは別の用途で予約されているため、利用できません。"
 msgstr ""
 
-#: simpleDialog.py:16 views\main.py:160 views\main.py:233
+#: simpleDialog.py:16 views\main.py:165
 msgid "確認"
 msgstr ""
 
 #: simpleDialog.py:30 views\base.py:96 views\fontManager.py:25
-#: views\fontManager.py:50 views\main.py:282
+#: views\fontManager.py:50 views\main.py:262 views\updateDialog.py:65
 msgid "エラー"
 msgstr ""
 
-#: views\authorizing.py:17 views\authorizing.py:25
-msgid "大気中..."
+#: update.py:47 update.py:56 update.py:70 update.py:76 update.py:87
+#: update.py:95 update.py:100 update.py:105 update.py:157
+#: views\updateDialog.py:38
+msgid "アップデート"
 msgstr ""
 
-#: views\authorizing.py:26
-msgid "認証大気中..."
+#: update.py:47
+msgid "このバージョンではアップデートを使用できません。"
 msgstr ""
 
-#: views\authorizing.py:27 views\convert.py:27
+#: update.py:56
+msgid ""
+"アップデータが利用できません。お手数ですが、再度ソフトウェアをダウンロードし"
+"てください。"
+msgstr ""
+
+#: update.py:70
+msgid "サーバーへの通信がタイムアウトしました。"
+msgstr ""
+
+#: update.py:76
+msgid "サーバーへの接続に失敗しました。インターネット接続などをご確認ください"
+msgstr ""
+
+#: update.py:82
+msgid "サーバーとの通信中に不明なエラーが発生しました。"
+msgstr ""
+
+#: update.py:87
+msgid "サーバーとの通信に失敗しました。"
+msgstr ""
+
+#: update.py:95
+msgid "現在のバージョンが最新です。アップデートの必要はありません。"
+msgstr ""
+
+#: update.py:100
+msgid "リクエストパラメーターが不正です。開発者まで連絡してください"
+msgstr ""
+
+#: update.py:105
+msgid "アップデーターが登録されていません。開発者に連絡してください。"
+msgstr ""
+
+#: update.py:157
+msgid ""
+"ダウンロードが完了しました。\n"
+"ソフトウェア終了時に、自動でアップデートされます。"
+msgstr ""
+
+#: views\authorizing.py:23
+msgid "OAuth認証"
+msgstr ""
+
+#: views\authorizing.py:31
+msgid ""
+"ブラウザを開いて認証手続きを行います。\r\n"
+"よろしいですか？"
+msgstr ""
+
+#: views\authorizing.py:33
+msgid "開始"
+msgstr ""
+
+#: views\authorizing.py:34 views\convert.py:27 views\mkDialog.py:30
+#: views\settings.py:64 views\updateDialog.py:44
 msgid "キャンセル"
+msgstr ""
+
+#: views\authorizing.py:43
+msgid "認証を待機中..."
+msgstr ""
+
+#: views\authorizing.py:50
+msgid "ブラウザを開いています..."
+msgstr ""
+
+#: views\authorizing.py:81
+msgid "認証完了。ブラウザを閉じてください。"
+msgstr ""
+
+#: views\authorizing.py:83
+msgid "認証が完了しました。"
+msgstr ""
+
+#: views\authorizing.py:85 views\main.py:280
+msgid "完了"
 msgstr ""
 
 #: views\base.py:62
@@ -143,7 +198,7 @@ msgstr ""
 msgid "スペースを置換"
 msgstr ""
 
-#: views\converted.py:31
+#: views\converted.py:31 views\settings.py:63
 msgid "OK"
 msgstr ""
 
@@ -170,235 +225,364 @@ msgstr ""
 msgid "原因不明のエラーにより、フォントの変更に失敗しました。"
 msgstr ""
 
-#: views\main.py:53
+#: views\main.py:56
 msgid "ファイル一覧"
 msgstr ""
 
-#: views\main.py:60
+#: views\main.py:63
 msgid "追加"
 msgstr ""
 
-#: views\main.py:61
+#: views\main.py:64
 msgid "削除"
 msgstr ""
 
-#: views\main.py:64
+#: views\main.py:67
 msgid "OCRエンジン"
 msgstr ""
 
-#: views\main.py:64
+#: views\main.py:67
 msgid "google (インターネット)"
 msgstr ""
 
-#: views\main.py:64
+#: views\main.py:67
 msgid "tesseract (ローカル)"
 msgstr ""
 
-#: views\main.py:65
+#: views\main.py:68
 msgid "モード"
 msgstr ""
 
-#: views\main.py:65
+#: views\main.py:68
 msgid "横書き通常"
 msgstr ""
 
-#: views\main.py:65
+#: views\main.py:68
 msgid "横書き低負荷版"
 msgstr ""
 
-#: views\main.py:65
+#: views\main.py:68
 msgid "縦書き通常"
 msgstr ""
 
-#: views\main.py:65
+#: views\main.py:68
 msgid "縦書き低負荷版"
 msgstr ""
 
-#: views\main.py:69
+#: views\main.py:72
 msgid "変換"
 msgstr ""
 
-#: views\main.py:70
+#: views\main.py:73
 msgid "終了"
 msgstr ""
 
-#: views\main.py:108
+#: views\main.py:111
 msgid "変換ファイルの追加(&o)"
 msgstr ""
 
-#: views\main.py:109
+#: views\main.py:112
 msgid "終了(&x)"
 msgstr ""
 
-#: views\main.py:111
+#: views\main.py:114
 msgid "Googleと連携する(&g)"
 msgstr ""
 
-#: views\main.py:112
-msgid "送るメニューにショートカットを作成(&s)"
-msgstr ""
-
-#: views\main.py:114
-msgid "ACT Laboratoryホームページを開く(&p)"
-msgstr ""
-
-#: views\main.py:115 views\main.py:295
-msgid "このソフトについて"
+#: views\main.py:115
+msgid "送るメニューにショートカットを作成(&t)"
 msgstr ""
 
 #: views\main.py:116
-msgid "最新バージョンを確認"
-msgstr ""
-
-#: views\main.py:118
-msgid "ファイル(&f)"
+msgid "設定画面を開く(&s)"
 msgstr ""
 
 #: views\main.py:119
-msgid "ツール(&t)"
+msgid "ACT Laboratoryのホームページを開く(&p)"
 msgstr ""
 
 #: views\main.py:120
+msgid "このソフトについて"
+msgstr ""
+
+#: views\main.py:121
+msgid "最新バージョンを確認"
+msgstr ""
+
+#: views\main.py:123
+msgid "ファイル(&f)"
+msgstr ""
+
+#: views\main.py:124
+msgid "設定(&s)"
+msgstr ""
+
+#: views\main.py:125
 msgid "ヘルプ(&h)"
 msgstr ""
 
-#: views\main.py:135
+#: views\main.py:140
 msgid "画像ファイルを選択"
 msgstr ""
 
-#: views\main.py:135
+#: views\main.py:140
 msgid ""
 "画像ファイル(*.jpg;*.png;*.gif;*.pdf) | *.jpg;*.png;*.gif;*.pdf; | すべての"
 "ファイル(*.*) | *.*"
 msgstr ""
 
-#: views\main.py:152
+#: views\main.py:157
 msgid ""
 "変換をおこなうには最低ひとつの画像ファイルが追加されている必用があります。"
 msgstr ""
 
-#: views\main.py:155
+#: views\main.py:160
 msgid "OCRエンジンを選択してください。"
 msgstr ""
 
-#: views\main.py:158
+#: views\main.py:163
 msgid "tesseract-ocrのモードが指定されていません。"
 msgstr ""
 
-#: views\main.py:160
+#: views\main.py:165
 msgid "変換を開始します。よろしいですか？"
 msgstr ""
 
-#: views\main.py:176
+#: views\main.py:182
+#, python-format
+msgid ""
+"2MBを超えるファイルが検出されました。容量の大きなファイルは認識することができ"
+"ません。\n"
+"検出されたファイル:%s"
+msgstr ""
+
+#: views\main.py:191
 msgid "キャンセルされました。"
 msgstr ""
 
-#: views\main.py:176
+#: views\main.py:191
 msgid "結果"
 msgstr ""
 
-#: views\main.py:179
+#: views\main.py:194
 msgid "画像ファイルが存在しなかったためキャンセルされました。"
 msgstr ""
 
-#: views\main.py:182
+#: views\main.py:197
 msgid "この機能は対応していません"
 msgstr ""
 
-#: views\main.py:185
+#: views\main.py:200
 msgid ""
 "この機能を使用するには事前にグーグルと連携しておく必用があります。ツールメ"
 "ニューより連携を行ってください。"
 msgstr ""
 
-#: views\main.py:188
+#: views\main.py:203
 msgid ""
 "通信中にエラーが発生しました。ネット接続を確認するか時間をおいてから再度お試"
 "しください。"
 msgstr ""
 
-#: views\main.py:191
+#: views\main.py:206
 msgid ""
 "エラーが発生しました。ファイルが画像ファイルか、ファイルが破損していないかな"
 "どを確認してください。"
 msgstr ""
 
-#: views\main.py:194
+#: views\main.py:209
 msgid "何らかの理由により変換に失敗しました。errorlog.txtをご確認ください。"
 msgstr ""
 
-#: views\main.py:196
+#: views\main.py:211
 msgid "このエンジンではこのファイル形式は対応していません。"
 msgstr ""
 
-#: views\main.py:233
-msgid "ブラウザを開き、認証を開始します。よろしいですか？"
-msgstr ""
-
-#: views\main.py:244
-msgid "ブラウザを開いています..."
-msgstr ""
-
-#: views\main.py:269
-msgid "認証が完了しました"
-msgstr ""
-
-#: views\main.py:269 views\main.py:276 views\main.py:278 views\main.py:280
-msgid "認証結果"
-msgstr ""
-
-#: views\main.py:274
+#: views\main.py:254
 msgid "キャンセルしました。"
 msgstr ""
 
-#: views\main.py:276
+#: views\main.py:256
 msgid ""
 "認証に成功しましたが、ファイルの保存に失敗しました。ディレクトリのアクセス権"
 "限などを確認してください。"
 msgstr ""
 
-#: views\main.py:278
+#: views\main.py:256 views\main.py:258 views\main.py:260
+msgid "認証結果"
+msgstr ""
+
+#: views\main.py:258
 msgid "ブラウザが閉じられたため、認証をキャンセルしました。"
 msgstr ""
 
-#: views\main.py:280
+#: views\main.py:260
 msgid "認証が拒否されました。"
 msgstr ""
 
-#: views\main.py:282
+#: views\main.py:262
 msgid "不明なエラーが発生しました。"
 msgstr ""
 
-#: views\main.py:288
+#: views\main.py:275
 msgid "SOCで文字認識を開始.lnk"
 msgstr ""
 
-#: views\main.py:293
+#: views\main.py:280
 msgid ""
 "送るメニューの登録が完了しました。送るメニューから「SOCで文字認識を開始」で実"
 "行できます。"
 msgstr ""
 
-#: views\main.py:293
-msgid "完了"
+#: views\settings.py:16
+msgid "自動選択"
 msgstr ""
 
-#: views\main.py:295
+#: views\settings.py:21
+msgid "クリップボード出力"
+msgstr ""
+
+#: views\settings.py:22
+msgid "読み上げなし"
+msgstr ""
+
+#: views\settings.py:25
+msgid "通常"
+msgstr ""
+
+#: views\settings.py:26
+msgid "白黒反転"
+msgstr ""
+
+#: views\settings.py:31
+msgid "設定"
+msgstr ""
+
+#: views\settings.py:41
+msgid "カテゴリ選択"
+msgstr ""
+
+#: views\settings.py:43
+msgid "一般"
+msgstr ""
+
+#: views\settings.py:47
+msgid "スクリーンリーダー"
+msgstr ""
+
+#: views\settings.py:48
+msgid "配色"
+msgstr ""
+
+#: views\settings.py:50
+msgid "起動時にアップデートを確認"
+msgstr ""
+
+#: views\settings.py:51
+msgid "アップデート確認時のタイムアウト（秒）"
+msgstr ""
+
+#: views\settings.py:53
+msgid "OCR"
+msgstr ""
+
+#: views\settings.py:55
+msgid "一時ファイルの場所"
+msgstr ""
+
+#: views\settings.py:56 views\settings.py:59
+msgid "認識結果の保存先"
+msgstr ""
+
+#: views\settings.py:57
+msgid "読み込んだファイルと同じ場所"
+msgstr ""
+
+#: views\settings.py:57
+msgid "指定の場所"
+msgstr ""
+
+#: views\settings.py:60
+msgid "参照"
+msgstr ""
+
+#: views\settings.py:73
+msgid "タイムアウト秒数の設定値が不正です。"
+msgstr ""
+
+#: views\settings.py:84
+msgid "設定を保存しました。一部の設定は再起動後から有効になります。"
+msgstr ""
+
+#: views\settings.py:100
+msgid "保存先を選択"
+msgstr ""
+
+#: views\updateDialog.py:22
 #, python-format
+msgid "アップデート - %s"
+msgstr ""
+
+#: views\updateDialog.py:31
+#, python-format
+msgid "version %s にアップデートできます。"
+msgstr ""
+
+#: views\updateDialog.py:32
+msgid "進行状況"
+msgstr ""
+
+#: views\updateDialog.py:34
+#, python-format
+msgid "version %s アップデート情報"
+msgstr ""
+
+#: views\updateDialog.py:40
+msgid "緊急のお知らせがあります。"
+msgstr ""
+
+#: views\updateDialog.py:43
+msgid "お知らせページへ"
+msgstr ""
+
+#: views\updateDialog.py:58
+msgid "アップデートをダウンロード中..."
+msgstr ""
+
+#: views\updateDialog.py:65
 msgid ""
-"SimpleOcrController（%s） version %s.\n"
-"Copyright (C) %s %s.\n"
-"このソフトは公開されているOCRエンジンを使いやすくしたものです。"
+"updater.exeが見つかりませんでした。誤って削除したかなどをご確認ください。"
 msgstr ""
 
-#: views\main.py:299
-msgid "サーバーとの通信中にエラーが発生しました。"
+#: views\versionDialog.py:18
+msgid "バージョン情報"
 msgstr ""
 
-#: views\main.py:302
-msgid "現在お使いのバージョンは最新です。アップデートの必要はありません。"
+#: views\versionDialog.py:27
+msgid "ソフトウェアバージョン"
 msgstr ""
 
-#: views\main.py:315
-msgid "リクエストパラメーターが不正です。開発者にお問い合わせください。"
+#: views\versionDialog.py:28
+msgid "アップデータバージョン"
+msgstr ""
+
+#: views\versionDialog.py:30
+msgid "ライセンス"
+msgstr ""
+
+#: views\versionDialog.py:31
+msgid "開発元"
+msgstr ""
+
+#: views\versionDialog.py:32
+msgid "ソフトウェア詳細情報"
+msgstr ""
+
+#: views\versionDialog.py:34
+msgid ""
+"ライセンス/著作権情報については、同梱の license.txt を参照してください。"
+msgstr ""
+
+#: views\versionDialog.py:46
+msgid "閉じる"
 msgstr ""

@@ -28,7 +28,7 @@ class settingsDialog(BaseDialog):
 
 	def Initialize(self):
 		self.log.debug("created")
-		super().Initialize(self.app.hMainView.hFrame,_("設定画面"))
+		super().Initialize(self.app.hMainView.hFrame,_("設定"))
 		self.InstallControls()
 		self.loadSettings()
 		self.switch()
@@ -48,7 +48,7 @@ class settingsDialog(BaseDialog):
 		self.color, dummy = grid.combobox(_("配色"), list(self.colorSelection.values()),textLayout=wx.HORIZONTAL)
 
 		self.autoUpdate = creator.checkbox(_("起動時にアップデートを確認"), style = wx.CHK_2STATE)
-		self.timeout, dummy = creator.inputbox(_("アップデート確認時のタイムアウト（秒数）"),x=50,textLayout=wx.HORIZONTAL)
+		self.timeout, dummy = creator.inputbox(_("アップデート確認時のタイムアウト（秒）"),x=50,textLayout=wx.HORIZONTAL)
 
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,space=20,label=_("OCR"))
 		creator.AddSpace(20)
