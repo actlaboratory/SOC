@@ -10,8 +10,9 @@ APP_FULL_NAME = "Simple Ocr Controller"#アプリケーションの完全な名�
 APP_ICON = None
 APP_VERSION="0.5.0"
 APP_LAST_RELEASE_DATE="2021-01-01"
-APP_COPYRIGHT_YEAR="2019-2020"
-APP_LICENSE="GPLv2(or lator) / Apache License 2.0"
+APP_COPYRIGHT_YEAR="2019-2021"
+APP_LICENSE="GPL v2(or later)"
+>>>>>>> f976f7c991ab1a3b5f4bea97e1790bfe9e2f597d
 APP_DEVELOPERS="guredora, ACT Laboratory"
 APP_DEVELOPERS_URL="https://actlab.org/"
 APP_DETAILS_URL="https://actlab.org/software/SOC"
@@ -42,7 +43,7 @@ GOOGLE_CALLBACK_URL = "http://localhost:8080"
 GOOGLE_CLIENT_SECRET = '{"installed":{"client_id":"700286679735-4bssuo7bsen9o7sua8joacl18bhms6nd.apps.googleusercontent.com","project_id":"simple-ocr-controller","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"607kPxH25Wba68T3mJmoxrKD","redirect_uris":["urn:ietf:wg:oauth:2.0:oob","http://localhost"]}}'
 
 #build関連定数
-BASE_PACKAGE_URL = "https://github.com/actlaboratory/SOC/releases/download/0.0.5/SOC-0.0.5.zip"
+BASE_PACKAGE_URL = "https://github.com/actlaboratory/SOC/releases/download/SOC-latestcommit/SOC-snapshot.zip"
 PACKAGE_CONTAIN_ITEMS = ("tesseract-ocr", "poppler")
 NEED_HOOKS = ("tools/hook-googleapiclient.py",)
 STARTUP_FILE = "SOC.py"
