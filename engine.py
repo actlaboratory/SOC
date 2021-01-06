@@ -42,25 +42,26 @@ class googleEngine(engineBase):
 		self.processingContainer.append(container)
 		service = discovery.build("drive", "v3", credentials=self.credential.credential)
 		with open(container.fileName, mode = "rb") as f:
-			media_body = MediaIoBaseUpload(f, mimetype="application/vnd.google-apps.document", chunksize = 64*1024, resumable=True)
+			media_body = MediaIoBaseUpload(f, mimetype="application/vnd.google-apps.document", resumable=True)
+			req_body = {
+				"name": os.path.basename(container.fileName),
+				"mimeType":"application/vnd.google-apps.document"
+			}
 			file = service.files().create(
-				body = {
-					"name": os.path.basename(container.fileName),
-					"mimeType":"application/vnd.google-apps.document"
-				},
+				body = req_body,
 				media_body = media_body,
 				ocrLanguage = "ja",
 				fields="id"
 			).execute()
 		ID = file.get("id")
 		request = service.files().export_media(fileId=ID, mimeType = "text/plain")
-		stream = io.bytesIo()
+		stream = io.BytesIO()
 		downloader = MediaIoBaseDownload(stream, request)
 		done = False
 		while done is False:
 			status, done = downloader.next_chunk()
 		service.files().delete(fileId=ID).execute()
-		container.success(stream.getValue().decode("utf-8"))
+		container.success(stream.getvalue().decode("utf-8"))
 		self.processingContainer.remove(container)
 
 class tesseractEngine(engineBase):
