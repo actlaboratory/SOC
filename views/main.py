@@ -34,8 +34,8 @@ from views import versionDialog
 from views import resultDialog
 import engine
 import imageSource
-import twain
-
+import dtwain
+print(dtwain.getSourceStringList())
 class MainView(BaseView):
 	def __init__(self):
 		super().__init__("mainView")
@@ -63,7 +63,6 @@ class MainView(BaseView):
 			_("縦書き通常"): "jpn_vert",
 			_("縦書き低負荷版"): "jpn_vert_fast"
 		}
-		self.twainSourceManager = twain.SourceManager(self.hFrame, Language = twain.TWLG_JAPANESE, Country = twain.TWCY_JAPAN)
 		#タブコントロールの作成
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),wx.VERTICAL)
 		self.tab = creator.tabCtrl("ソース選択", event=None, style=wx.NB_NOPAGETHEME | wx.NB_MULTILINE, sizerFlag=0, proportion=0, margin=5)
@@ -82,9 +81,12 @@ class MainView(BaseView):
 		self.delete = vCreator.button(_("削除"), self.events.onDelete)
 
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,label=_("スキャナから読込"))
-		creator.listbox(_("スキャナ一覧"), choices = self.twainSourceManager.source_list, state = 0)
+		self.scannerList, self.scannerListStatic = creator.listCtrl(_("スキャナ一覧"), style = wx.LC_REPORT)
+		self.scannerList.AppendColumn(_("名前"))
+		for scanner in dtwain.getSourceStringList():
+			self.scannerList.Append((scanner,))
 
-		settingAreaCreator=views.ViewCreator.ViewCreator(self.viewMode,hPanel(),self.creator.GetSizer(),views.ViewCreator.FlexGridSizer,10, 2)
+		settingAreaCreator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),views.ViewCreator.FlexGridSizer,10, 2)
 		self.engine, self.engineStatic = settingAreaCreator.combobox(_("OCRエンジン"), list(self.engineSelection.keys()), self.events.onEngineSelect, state = 0)
 		self.tesseract, self.tesseractStatic = settingAreaCreator.combobox(_("モード"), list(self.tesseractModeSelection.keys()), state = 0)
 		self.tesseract.Disable()
@@ -172,7 +174,8 @@ class Events(BaseEvents):
 		return
 
 	def onStart(self, Events):
-		if self.parent.filebox.GetCount() == 0:
+		sourceSelection = self.parent.tab.GetSelection()
+		if sourceSelection == 0 and self.parent.filebox.GetCount() == 0:
 			errorDialog(_("変換をおこなうには最低ひとつの画像ファイルが追加されている必用があります。"))
 			return
 		if self.parent.engine.Selection == -1:
@@ -190,14 +193,19 @@ class Events(BaseEvents):
 				return
 			e = engine.tesseractEngine(self.parent.tesseractModeSelection[self.parent.tesseract.GetStringSelection()])
 		#sourceオブジェクトの生成
-		source = imageSource.fileSource(globalVars.app.fileList)
+		if sourceSelection == 0:
+			source = imageSource.fileSource(globalVars.app.fileList)
+		elif sourceSelection == 1:
+			scannerSelection = self.parent.scannerList.GetFocusedItem()
+			scannerName = self.parent.scannerList.GetItemText(scannerSelection)
+			source = imageSource.scannerSource(scannerName)
 		if qDialog(_("処理を開始します。よろしいですか？"), _("確認")) == wx.ID_NO:
 			return
 		manager = ocrManager.manager(e, source)
-		dialog = processingDialog.Dialog(manager)
-		dialog.Initialize()
+		pDialog = processingDialog.Dialog(manager)
+		pDialog.Initialize()
 		manager.start()
-		dialog.Show()
+		pDialog.Show()
 		text = manager.getText()
 		if text == "":
 			dialog(_("テキストが認識されませんでした。"))

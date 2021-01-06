@@ -1,4 +1,10 @@
 import errorCodes
+import globalVars
+import time
+import os
+import shutil
+import dtwain
+
 class container:
 	def __init__(self, fileName):
 		self.done = False
@@ -44,12 +50,18 @@ class container:
 		self.done = True
 
 class sourceBase:
+	def initialize(self):
+		return
+
 	def get(self):
 		raise NotImplementedError()
 
 	def isEmpty(self):
 		raise NotImplementedError()
 
+	def close(self):
+		"""ソースを閉じるときの処理"""
+		return None#必要な場合はオーバーライドする。
 
 class fileSource(sourceBase):
 	def __init__(self, fileList):
@@ -67,3 +79,33 @@ class fileSource(sourceBase):
 		if len(self.fileList) == 0:
 			return True
 		return False
+
+class scannerSource(sourceBase):
+	def __init__(self, scannerName, resolution = 300):
+		self.scannerName = scannerName
+		self.resolution = resolution
+		#self.dtwain_source.raiseDeviceOffline()
+		self.image_tmp = os.path.join(globalVars.app.tmpdir, "acquiredImage")
+		if os.path.exists(self.image_tmp):
+			shutil.rmtree(self.image_tmp)
+		os.mkdir(self.image_tmp)
+		self.fileName = os.path.join(self.image_tmp, "test.png")
+
+	def initialize(self):
+		self.dtwain = dtwain.dtwain()
+		self.dtwain_source = self.dtwain.getSourceByName(self.scannerName)
+
+	def get(self):
+		if self.dtwain_source.isFeederLoaded():
+			self.dtwain_source.acquireFile(self.fileName, dtwain.DTWAIN_PNG)
+			return container(self.fileName)
+		return None
+
+	def isEmpty(self):
+		if self.dtwain_source.isFeederLoaded():
+			return False
+		else:
+			return True
+
+	def close(self):
+		self.dtwain_source.close()

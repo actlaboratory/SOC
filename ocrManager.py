@@ -24,8 +24,11 @@ class manager(threading.Thread):
 		self.done = False
 
 	def run(self):
+		self.source.initialize()
 		while True:
 			file = self.source.get()
+			if file == None:#ソースがからになった
+				break
 			self.engine.recognition(file)
 			self.processedContainers.append(file)
 			if self.source.isEmpty():
@@ -35,6 +38,7 @@ class manager(threading.Thread):
 
 	def getStatusString(self):
 		return "test"
+		return 
 
 	def getText(self):
 		text = ""

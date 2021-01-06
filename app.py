@@ -37,6 +37,8 @@ class Main(AppBase.MainBase):
 			globalVars.update.update(True)
 		self.SetDefaultEncoding()
 		self.tmpdir = self.config.getstring("ocr", "tmpdir", os.path.join(os.environ["TEMP"], "soc"), None)
+		if not os.path.exists(self.tmpdir):
+			os.mkdir(self.tmpdir)
 		#popplerにパスを通す
 		os.environ["PATH"] += os.pathsep + os.getcwd() + "/poppler/bin"
 		# メインビューを表示
