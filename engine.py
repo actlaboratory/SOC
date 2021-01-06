@@ -8,6 +8,7 @@ from googleapiclient import errors
 import io
 import pyocr
 from PIL import Image
+
 class engineBase(object):
 	"""すべてのエンジンクラスが継承する基本クラス。"""
 	def __init__(self):
@@ -24,12 +25,12 @@ class engineBase(object):
 		self.cancel = True
 
 class googleEngine(engineBase):
-	def __init__(self, credential):
+	def __init__(self):
 		super().__init__()
 		self.credential = CredentialManager.CredentialManager(True)
 		if not self.credential.isOK():
 			return errorCodes.NOT_AUTHORIZED
-		self.credential.authorize()
+		self.credential.Authorize()
 
 	def getSupportedType(self):
 		return (errorCodes.TYPE_JPG, errorCodes.TYPE_PNG, errorCodes.TYPE_GIF, errorCodes.TYPE_PDF_IMAGE_ONLY)
@@ -44,7 +45,7 @@ class googleEngine(engineBase):
 			media_body = MediaIoBaseUpload(f, mimetype="application/vnd.google-apps.document", chunksize = 64*1024, resumable=True)
 			file = service.files().create(
 				body = {
-					"name": os.path.basename(filePath),
+					"name": os.path.basename(container.fileName),
 					"mimeType":"application/vnd.google-apps.document"
 				},
 				media_body = media_body,
