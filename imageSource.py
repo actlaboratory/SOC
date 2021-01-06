@@ -81,9 +81,10 @@ class fileSource(sourceBase):
 		return False
 
 class scannerSource(sourceBase):
-	def __init__(self, scannerName, resolution = 300):
+	def __init__(self, scannerName, resolution = 300, blankPageDetect = False):
 		self.scannerName = scannerName
 		self.resolution = resolution
+		self.blankPageDetect = blankPageDetect
 		#self.dtwain_source.raiseDeviceOffline()
 		self.image_tmp = os.path.join(globalVars.app.tmpdir, "acquiredImage")
 		if os.path.exists(self.image_tmp):
@@ -94,6 +95,9 @@ class scannerSource(sourceBase):
 	def initialize(self):
 		self.dtwain = dtwain.dtwain()
 		self.dtwain_source = self.dtwain.getSourceByName(self.scannerName)
+		self.dtwain_source.setResolution(self.resolution)
+		if self.blankPageDetect:
+			self.dtwain_source.setBlankPageDetection(99.5)
 
 	def get(self):
 		if self.dtwain_source.isFeederLoaded():
