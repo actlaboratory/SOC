@@ -9,11 +9,12 @@ import queue
 import errorCodes
 
 class scannerSource(base.sourceBase):
-	def __init__(self, scannerName, resolution = 300, blankPageDetect = False):
+	def __init__(self, scannerName, resolution = 300, blankPageDetect = False, isDuplex = False):
 		super().__init__()
 		self.scannerName = scannerName
 		self.resolution = resolution
 		self.blankPageDetect = blankPageDetect
+		self.isDuplex = isDuplex
 		self.scanning = False
 		self.running = True
 		#self.dtwain_source.raiseDeviceOffline()
@@ -28,7 +29,13 @@ class scannerSource(base.sourceBase):
 		self.dtwain_source = self.dtwain.getSourceByName(self.scannerName)
 		self.dtwain_source.setResolution(self.resolution)
 		if self.blankPageDetect:
+			self.log.info("Blank page detection enabled")
 			self.dtwain_source.setBlankPageDetection(99.5)
+		if self.dtwain_source.isDuplexSupported():
+			self.log.info(f'set duplex mode = {self.isDuplex}')
+			self.dtwain_source.enableDuplex(self.isDuplex)
+		if self.dtwain_source.isDuplexEnabled():
+			self.log.info("duplex scanning enabled")
 		self.nameBase = int(time.time())
 		self.pageCount = 0
 

@@ -87,6 +87,7 @@ class MainView(BaseView):
 			self.scannerList.Append((scanner,))
 
 		self.isBlankPageDetect = creator.checkbox(_("白紙を検出する"))
+		self.isDuplex = creator.checkbox(_("利用可能な場合両面スキャンを使用する"))
 		settingAreaCreator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),views.ViewCreator.FlexGridSizer,10, 2)
 		self.engine, self.engineStatic = settingAreaCreator.combobox(_("OCRエンジン"), list(self.engineSelection.keys()), self.events.onEngineSelect, state = 0)
 		self.tesseract, self.tesseractStatic = settingAreaCreator.combobox(_("モード"), list(self.tesseractModeSelection.keys()), state = 0)
@@ -199,7 +200,7 @@ class Events(BaseEvents):
 		elif sourceSelection == 1:
 			scannerSelection = self.parent.scannerList.GetFocusedItem()
 			scannerName = self.parent.scannerList.GetItemText(scannerSelection)
-			source = scanner.scannerSource(scannerName, blankPageDetect = self.parent.isBlankPageDetect.GetValue())
+			source = scanner.scannerSource(scannerName, blankPageDetect = self.parent.isBlankPageDetect.GetValue(), isDuplex = self.parent.isDuplex.GetValue())
 		if qDialog(_("処理を開始します。よろしいですか？"), _("確認")) == wx.ID_NO:
 			return
 		manager = ocrManager.manager(e, source)
