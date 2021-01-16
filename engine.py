@@ -12,7 +12,7 @@ from PIL import Image
 class engineBase(object):
 	"""すべてのエンジンクラスが継承する基本クラス。"""
 	def __init__(self):
-		self.cancel = False
+		self.interrupt = False
 		self.processingContainer = []
 
 	def recognition(self, container):
@@ -21,8 +21,8 @@ class engineBase(object):
 	def getSupportedType(self):
 		raise NotImplementedError()
 
-	def cancel(self):
-		self.cancel = True
+	def setInterrupt(self):
+		self.interrupt = True
 
 class googleEngine(engineBase):
 	def __init__(self):
@@ -36,8 +36,8 @@ class googleEngine(engineBase):
 		return (errorCodes.TYPE_JPG, errorCodes.TYPE_PNG, errorCodes.TYPE_GIF, errorCodes.TYPE_PDF_IMAGE_ONLY)
 
 	def recognition(self, container):
-		if self.cancel:
-			container.cancel()
+		if self.interrupt:
+			container.setInterrupt()
 			return
 		self.processingContainer.append(container)
 		service = discovery.build("drive", "v3", credentials=self.credential.credential)
@@ -61,7 +61,7 @@ class googleEngine(engineBase):
 		while done is False:
 			status, done = downloader.next_chunk()
 		service.files().delete(fileId=ID).execute()
-		container.success(stream.getvalue().decode("utf-8"))
+		container.setSuccess(stream.getvalue().decode("utf-8"))
 		self.processingContainer.remove(container)
 
 class tesseractEngine(engineBase):
@@ -75,8 +75,8 @@ class tesseractEngine(engineBase):
 		return (errorCodes.TYPE_JPG, errorCodes.TYPE_PNG, errorCodes.TYPE_GIF, errorCodes.TYPE_BMP)
 
 	def recognition(self, container):
-		if self.cancel:
-			container.cancel()
+		if self.interrupt:
+			container.setInterrupt()
 			return
 		self.processingContainer.append(container)
 		text = self.tesseract.image_to_string(
@@ -84,5 +84,5 @@ class tesseractEngine(engineBase):
 			lang = self.mode,
 			builder = pyocr.builders.TextBuilder()
 		)
-		container.success(text)
+		container.setSuccess(text)
 		self.processingContainer.remove(container)

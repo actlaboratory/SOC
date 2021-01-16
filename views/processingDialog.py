@@ -11,6 +11,7 @@ class Dialog(BaseDialog):
 	def __init__(self, manager):
 		super().__init__("viewBroadcasterDialog")
 		self.manager = manager
+		self.waiting = False
 
 	def Initialize(self):
 		self.log.debug("created")
@@ -23,7 +24,7 @@ class Dialog(BaseDialog):
 		"""いろんなwidgetを設置する。"""
 		self.creator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.sizer,wx.VERTICAL,20)
 		self.statusEdit,dummy = self.creator.inputbox(_("状況"), None, style = wx.TE_READONLY)
-		self.cancelButton=self.creator.button(_("キャンセル"), self.onCancel)
+		self.interruptButton=self.creator.button(_("中止"), self.onInterrupt)
 		self.timer = wx.Timer(self.wnd)
 		self.wnd.Bind(wx.EVT_TIMER, self.onTimer)
 		self.timer.Start(300)
@@ -32,13 +33,11 @@ class Dialog(BaseDialog):
 		if self.manager.isDone():
 			self.timer.Stop()
 			self.wnd.EndModal(wx.ID_OK)
-		statusStr = self.manager.getStatusString()
-		if statusStr == self.statusEdit.GetValue():
-			return
-		self.statusEdit.SetValue(statusStr)
+		status = self.manager.getStatusString()
+		
 		return
 
-	def onCancel(self, event):
+	def onInterrupt(self, event):
 		return
 
 	def GetData(self):

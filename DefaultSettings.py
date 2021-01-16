@@ -18,7 +18,8 @@ class DefaultSettings:
 			"fileVersion": "100",
 			"locale": loc,
 			"update": True,
-			"timeout": 3
+			"timeout": 3,
+			"debug": True
 		}
 
 		config["view"]={

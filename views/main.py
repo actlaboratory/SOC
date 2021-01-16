@@ -32,10 +32,10 @@ from views import authorizing
 from views import settings
 from views import versionDialog
 from views import resultDialog
+from sources import file,scanner
 import engine
-import imageSource
 import dtwain
-print(dtwain.getSourceStringList())
+
 class MainView(BaseView):
 	def __init__(self):
 		super().__init__("mainView")
@@ -177,7 +177,7 @@ class Events(BaseEvents):
 	def onStart(self, Events):
 		sourceSelection = self.parent.tab.GetSelection()
 		if sourceSelection == 0 and self.parent.filebox.GetCount() == 0:
-			errorDialog(_("変換をおこなうには最低ひとつの画像ファイルが追加されている必用があります。"))
+			errorDialog(_("ファイルから変換をおこなうには最低ひとつの画像ファイルが追加されている必用があります。"))
 			return
 		if self.parent.engine.Selection == -1:
 			errorDialog(_("OCRエンジンを選択してください。"))
@@ -195,11 +195,11 @@ class Events(BaseEvents):
 			e = engine.tesseractEngine(self.parent.tesseractModeSelection[self.parent.tesseract.GetStringSelection()])
 		#sourceオブジェクトの生成
 		if sourceSelection == 0:
-			source = imageSource.fileSource(globalVars.app.fileList)
+			source = file.fileSource(globalVars.app.fileList)
 		elif sourceSelection == 1:
 			scannerSelection = self.parent.scannerList.GetFocusedItem()
 			scannerName = self.parent.scannerList.GetItemText(scannerSelection)
-			source = imageSource.scannerSource(scannerName, blankPageDetect = self.parent.isBlankPageDetect.GetValue())
+			source = scanner.scannerSource(scannerName, blankPageDetect = self.parent.isBlankPageDetect.GetValue())
 		if qDialog(_("処理を開始します。よろしいですか？"), _("確認")) == wx.ID_NO:
 			return
 		manager = ocrManager.manager(e, source)

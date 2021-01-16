@@ -1,5 +1,6 @@
 import errorCodes
 import threading
+import time
 
 def type_to_constant(type):
 	if type.lower() == ".jpg":
@@ -25,14 +26,17 @@ class manager(threading.Thread):
 
 	def run(self):
 		self.source.initialize()
+		self.source.start()
 		while True:
-			file = self.source.get()
-			if file == None:#ソースがからになった
+			if self.source.getStatus() & errorCodes.STATUS_SOURCE_EMPTY == errorCodes.STATUS_SOURCE_EMPTY and self.source.getStatus() & errorCodes.STATUS_SOURCE_QUEUED != errorCodes.STATUS_SOURCE_QUEUED:
 				break
+			if self.source.getStatus() & errorCodes.STATUS_SOURCE_LOADING == errorCodes.STATUS_SOURCE_LOADING and self.source.getStatus() & errorCodes.STATUS_SOURCE_QUEUED != errorCodes.STATUS_SOURCE_QUEUED:
+				time.sleep(0.1)
+				continue
+			file = self.source.get()
 			self.engine.recognition(file)
 			self.processedContainers.append(file)
-			if self.source.isEmpty():
-				break
+			time.sleep(0.01)
 		self.done = True
 		return
 
@@ -43,7 +47,7 @@ class manager(threading.Thread):
 	def getText(self):
 		text = ""
 		for container in self.processedContainers:
-			if container.getStatus() == errorCodes.STATUS_SUCCESS:
+			if container.getStatus() & errorCodes.STATUS_ENGINE_SUCCESS == errorCodes.STATUS_ENGINE_SUCCESS:
 				text = container.getText()
 		return text
 
