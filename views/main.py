@@ -45,8 +45,8 @@ class MainView(BaseView):
 		title=constants.APP_NAME
 		super().Initialize(
 			title,
-			640,
-			560,
+			660,
+			700,
 			self.app.config.getint(self.identifier,"positionX"),
 			self.app.config.getint(self.identifier,"positionY"),
 			style=wx.SYSTEM_MENU | wx.CAPTION | wx.CLOSE_BOX | wx.CLIP_CHILDREN | wx.BORDER_STATIC
@@ -65,12 +65,13 @@ class MainView(BaseView):
 		}
 		#タブコントロールの作成
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),wx.VERTICAL)
-		self.tab = creator.tabCtrl("ソース選択", event=None, style=wx.NB_NOPAGETHEME | wx.NB_MULTILINE, sizerFlag=0, proportion=0, margin=5)
+		self.tab = creator.tabCtrl("ソース選択", event=None, style=wx.NB_NOPAGETHEME | wx.NB_MULTILINE, sizerFlag=wx.ALL, proportion=0, margin=20)
 
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,label=_("画像ファイルから読込"))
-		hCreator=views.ViewCreator.ViewCreator(self.viewMode,creator.GetPanel(),creator.GetSizer(),wx.HORIZONTAL)
-		vCreator=views.ViewCreator.ViewCreator(self.viewMode,hCreator.GetPanel(),hCreator.GetSizer(),wx.VERTICAL)
-		self.filebox, self.list = vCreator.listbox(_("ファイル一覧"), (), None,-1,0,(450,200))
+		hCreator=views.ViewCreator.ViewCreator(self.viewMode,creator.GetPanel(),creator.GetSizer(),wx.HORIZONTAL,proportion=1)
+		vCreator=views.ViewCreator.ViewCreator(self.viewMode,hCreator.GetPanel(),hCreator.GetSizer(),wx.VERTICAL,style=wx.EXPAND)
+
+		self.filebox, self.list = vCreator.listbox(_("ファイル一覧"), (), None,-1,0,(450,200),sizerFlag=wx.ALL,proportion=1,margin=10)
 		fileListKeymap = keymap.KeymapHandler(defaultKeymap.defaultKeymap)
 		acceleratorTable = fileListKeymap.GetTable("fileList")
 		self.filebox.SetAcceleratorTable(acceleratorTable)
@@ -81,8 +82,8 @@ class MainView(BaseView):
 		self.delete = vCreator.button(_("削除"), self.events.onDelete)
 
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,label=_("スキャナから読込"))
-		self.scannerList, self.scannerListStatic = creator.listCtrl(_("スキャナ一覧"), style = wx.LC_REPORT)
-		self.scannerList.AppendColumn(_("名前"))
+		self.scannerList, self.scannerListStatic = creator.listCtrl(_("スキャナ一覧"), style = wx.LC_REPORT,sizerFlag=wx.EXPAND | wx.ALL)
+		self.scannerList.AppendColumn(_("名前"),width=550)
 		for scanner in dtwain.getSourceStringList():
 			self.scannerList.Append((scanner,))
 
