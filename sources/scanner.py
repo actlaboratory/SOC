@@ -36,13 +36,17 @@ class scannerSource(base.sourceBase):
 			self.dtwain_source.enableDuplex(self.isDuplex)
 		if self.dtwain_source.isDuplexEnabled():
 			self.log.info("duplex scanning enabled")
+		if self.dtwain_source.isFeederSensitive():
+			self.log.info("this scanner is paper detectable")
 		self.nameBase = int(time.time())
 		self.pageCount = 0
 
 	def run(self):
 		self.dtwain_initialize()
 		while True:
-			if not self.dtwain_source.isFeederLoaded():
+			if not self.dtwain_source.isFeederSensitive():
+				self.scan()
+			if self.isScannerEmpty():
 				break
 			self.scan()
 			time.sleep(0.01)
@@ -60,6 +64,13 @@ class scannerSource(base.sourceBase):
 		for name in fileNameList:
 			if os.path.exists(name):
 				self.fileQueue.put(container(name))
+
+	def isScannerEmpty(self):
+		if not self.dtwain_source.isFeederSensitive():
+			return True
+		if not self.dtwain_source.isFeederLoaded():
+			return True
+		return False
 
 	def get(self):
 		return self.fileQueue.get()
