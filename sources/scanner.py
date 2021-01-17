@@ -53,8 +53,6 @@ class scannerSource(base.sourceBase):
 		self.running = False
 
 	def scan(self):
-		if not self.dtwain_source.isFeederLoaded():
-			return
 		fileNameList = []
 		for i in range(2):
 			self.pageCount += 1
