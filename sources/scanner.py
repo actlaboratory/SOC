@@ -64,7 +64,11 @@ class scannerSource(base.sourceBase):
 				self.fileQueue.put(container(name))
 
 	def isScannerEmpty(self):
+		if not self.dtwain_source.isFeederSupported():
+			return True
 		if not self.dtwain_source.isFeederSensitive():
+			return True
+		if not self.dtwain_source.isFeederEnabled():
 			return True
 		if not self.dtwain_source.isFeederLoaded():
 			return True
