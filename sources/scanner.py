@@ -88,6 +88,9 @@ class scannerSource(base.sourceBase):
 			status |= errorCodes.STATUS_SOURCE_QUEUED
 		return status
 
+	def getStatusString(self):
+		return "スキャナから取り込み中"
+
 	def close(self):
 		self.dtwain.close()
 		self.dtwain_source.close()

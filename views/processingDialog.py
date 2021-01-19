@@ -19,11 +19,14 @@ class Dialog(BaseDialog):
 		self.InstallControls()
 		return True
 
-
 	def InstallControls(self):
 		"""いろんなwidgetを設置する。"""
 		self.creator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.sizer,wx.VERTICAL,20)
-		self.statusEdit,dummy = self.creator.inputbox(_("状況"), None, style = wx.TE_READONLY)
+		self.statusList,dummy = self.creator.listCtrl(_("状況"), style = wx.LC_REPORT)
+		self.statusList.AppendColumn(_("項目"))
+		self.statusList.AppendColumn(_("状況"))
+		self.statusList.Append((_("出力"), ""))
+		self.statusList.Append((_("認識"), ""))
 		self.interruptButton=self.creator.button(_("中止"), self.onInterrupt)
 		self.timer = wx.Timer(self.wnd)
 		self.wnd.Bind(wx.EVT_TIMER, self.onTimer)
@@ -34,7 +37,8 @@ class Dialog(BaseDialog):
 			self.timer.Stop()
 			self.wnd.EndModal(wx.ID_OK)
 		status = self.manager.getStatusString()
-		
+		self.statusList.SetItem(0, 1, status["source"])
+		self.statusList.SetItem(1, 1, status["engine"])
 		return
 
 	def onInterrupt(self, event):

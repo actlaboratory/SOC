@@ -24,3 +24,6 @@ class fileSource(base.sourceBase):
 			status |= errorCodes.STATUS_SOURCE_ERROR
 		return status
 
+
+	def getStatusString(self):
+		return "ファイルから出力"

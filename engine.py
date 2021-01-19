@@ -64,6 +64,9 @@ class googleEngine(engineBase):
 		container.setSuccess(stream.getvalue().decode("utf-8"))
 		self.processingContainer.remove(container)
 
+	def getStatusString(self):
+		return "googleで認識中"
+
 class tesseractEngine(engineBase):
 	def __init__(self, mode):
 		super().__init__()
@@ -86,3 +89,6 @@ class tesseractEngine(engineBase):
 		)
 		container.setSuccess(text)
 		self.processingContainer.remove(container)
+
+	def getStatusString(self):
+		return "tesseractで認識中"

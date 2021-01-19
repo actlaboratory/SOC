@@ -41,8 +41,10 @@ class manager(threading.Thread):
 		return
 
 	def getStatusString(self):
-		return "test"
-		return 
+		statuses = {}
+		statuses["source"] = self.source.getStatusString()
+		statuses["engine"] = self.engine.getStatusString()
+		return statuses
 
 	def getText(self):
 		text = ""

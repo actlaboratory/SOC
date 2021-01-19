@@ -22,6 +22,9 @@ class sourceBase(threading.Thread):
 	def run(self):
 		return
 
+	def getStatusString(self):
+		return "デフォルト"
+
 	def close(self):
 		"""ソースを閉じるときの処理"""
 		return None#必要な場合はオーバーライドする。
