@@ -26,4 +26,7 @@ class fileSource(base.sourceBase):
 
 
 	def getStatusString(self):
-		return "ファイルから出力"
+		if len(self.fileList) > 0:
+			return _("残りファイル数: %d") % (len(self.fileList))
+		else:
+			return _("ファイル無し")

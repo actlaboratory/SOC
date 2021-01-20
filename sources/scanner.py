@@ -17,6 +17,7 @@ class scannerSource(base.sourceBase):
 		self.isDuplex = isDuplex
 		self.scanning = False
 		self.running = True
+		self.initialized = False
 		#self.dtwain_source.raiseDeviceOffline()
 		self.image_tmp = os.path.join(globalVars.app.tmpdir, "acquiredImage")
 		if os.path.exists(self.image_tmp):
@@ -40,6 +41,7 @@ class scannerSource(base.sourceBase):
 			self.log.info("this scanner is paper detectable")
 		self.nameBase = int(time.time())
 		self.pageCount = 0
+		self.initialized = True
 
 	def run(self):
 		self.dtwain_initialize()
@@ -89,8 +91,9 @@ class scannerSource(base.sourceBase):
 		return status
 
 	def getStatusString(self):
-		return "スキャナから取り込み中"
-
-	def close(self):
-		self.dtwain.close()
-		self.dtwain_source.close()
+		if not self.initialized:
+			return _("開始中")
+		if self.dtwain_source.isAcquiring():
+			return _("スキャン中...")
+		else:
+			return _("大気中...")

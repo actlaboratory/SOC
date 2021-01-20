@@ -23,7 +23,7 @@ class sourceBase(threading.Thread):
 		return
 
 	def getStatusString(self):
-		return "デフォルト"
+		return _("未定義")
 
 	def close(self):
 		"""ソースを閉じるときの処理"""
