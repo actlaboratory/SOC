@@ -1,6 +1,7 @@
 import errorCodes
 import threading
 import time
+import queue
 
 def type_to_constant(type):
 	if type.lower() == ".jpg":
@@ -23,6 +24,7 @@ class manager(threading.Thread):
 		self.engine = engine
 		self.source = source
 		self.done = False
+		self._messageQueue = queue.Queue()
 
 	def run(self):
 		self.source.initialize()
@@ -52,6 +54,20 @@ class manager(threading.Thread):
 			if container.getStatus() & errorCodes.STATUS_ENGINE_SUCCESS == errorCodes.STATUS_ENGINE_SUCCESS:
 				text = container.getText()
 		return text
+
+	def updateMessageQueue(self):
+		while not self.source.messageQueue.empty():
+			self._messageQueue.put(self.source.messageQueue.get())
+		while not self.engine.messageQueue.empty():
+			self._messageQueue.put(self.engine.messageQueue.get())
+
+	def getMessage(self):
+		if self.isMessageEmpty():
+			return
+		return self._messageQueue.get()
+
+	def isMessageEmpty(self):
+		return self._messageQueue.empty()
 
 	def isDone(self):
 		return self.done

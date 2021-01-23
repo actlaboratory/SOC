@@ -7,6 +7,7 @@ import shutil
 import dtwain
 import queue
 import errorCodes
+import wx
 
 class scannerSource(base.sourceBase):
 	def __init__(self, scannerName, resolution = 300, blankPageDetect = False, isDuplex = False):
@@ -49,7 +50,8 @@ class scannerSource(base.sourceBase):
 			if not self.dtwain_source.isFeederEnabled():
 				self.scan()
 			if self.isScannerEmpty():
-				break
+				if self.showMessage(_("スキャナに紙がセットされていません。スキャンを継続しますか？")) == wx.ID_NO:
+					break
 			self.scan()
 			time.sleep(0.01)
 		self.running = False

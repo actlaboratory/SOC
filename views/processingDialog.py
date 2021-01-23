@@ -6,6 +6,7 @@ import globalVars
 import views.ViewCreator
 from logging import getLogger
 from views.baseDialog import *
+import simpleDialog
 
 class Dialog(BaseDialog):
 	def __init__(self, manager):
@@ -30,7 +31,7 @@ class Dialog(BaseDialog):
 		self.interruptButton=self.creator.button(_("中止"), self.onInterrupt)
 		self.timer = wx.Timer(self.wnd)
 		self.wnd.Bind(wx.EVT_TIMER, self.onTimer)
-		self.timer.Start(300)
+		self.timer.Start(100)
 
 	def onTimer(self, event):
 		if self.manager.isDone():
@@ -39,7 +40,17 @@ class Dialog(BaseDialog):
 		status = self.manager.getStatusString()
 		self.statusList.SetItem(0, 1, status["source"])
 		self.statusList.SetItem(1, 1, status["engine"])
-		return
+		self.manager.updateMessageQueue()
+		if self.manager.isMessageEmpty():
+			return
+		self._showMessage()
+
+	def _showMessage(self):
+		data = self.manager.getMessage()
+		text = data[0]
+		retQueue = data[1]
+		result = simpleDialog.qDialog(text)
+		retQueue.put(result)
 
 	def onInterrupt(self, event):
 		return
