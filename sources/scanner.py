@@ -37,8 +37,8 @@ class scannerSource(base.sourceBase):
 			self.dtwain_source.enableDuplex(self.isDuplex)
 		if self.dtwain_source.isDuplexEnabled():
 			self.log.info("duplex scanning enabled")
-		if self.dtwain_source.isFeederSensitive():
-			self.log.info("this scanner is paper detectable")
+		#if self.dtwain_source.isPaperDetectable():
+			#self.log.info("this scanner is paper detectable")
 		self.nameBase = int(time.time())
 		self.pageCount = 0
 		self.initialized = True
@@ -46,7 +46,7 @@ class scannerSource(base.sourceBase):
 	def run(self):
 		self.dtwain_initialize()
 		while True:
-			if not self.dtwain_source.isFeederSensitive():
+			if not self.dtwain_source.isFeederEnabled():
 				self.scan()
 			if self.isScannerEmpty():
 				break
@@ -66,12 +66,6 @@ class scannerSource(base.sourceBase):
 				self.fileQueue.put(container(name))
 
 	def isScannerEmpty(self):
-		if not self.dtwain_source.isFeederSupported():
-			return True
-		if not self.dtwain_source.isFeederSensitive():
-			return True
-		if not self.dtwain_source.isFeederEnabled():
-			return True
 		if not self.dtwain_source.isFeederLoaded():
 			return True
 		return False
