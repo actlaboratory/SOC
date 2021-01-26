@@ -33,7 +33,7 @@ from views import settings
 from views import versionDialog
 from views import resultDialog
 from sources import file,scanner
-import engine
+from engines import google, tesseract
 import dtwain
 
 class MainView(BaseView):
@@ -186,7 +186,7 @@ class Events(BaseEvents):
 			return
 		#エンジンの生成
 		if self.parent.engineSelection[self.parent.engine.GetStringSelection()] == "google":
-			e = engine.googleEngine()
+			e = google.googleEngine()
 			if e == errorCodes.NOT_AUTHORIZED:
 				errorDialog(_("googleのOCRエンジンを使用するにはお使いのgoogleアカウントを連携する必要があります。\n設定メニューよりン連携を行ってください。"))
 				return
@@ -194,7 +194,7 @@ class Events(BaseEvents):
 			if self.parent.tesseract.Selection == -1:
 				errorDialog(_("tesseract-ocrのモードが指定されていません。"))
 				return
-			e = engine.tesseractEngine(self.parent.tesseractModeSelection[self.parent.tesseract.GetStringSelection()])
+			e = tesseract.tesseractEngine(self.parent.tesseractModeSelection[self.parent.tesseract.GetStringSelection()])
 		#sourceオブジェクトの生成
 		if sourceSelection == 0:
 			source = file.fileSource(globalVars.app.fileList)

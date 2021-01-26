@@ -6,38 +6,9 @@ from googleapiclient.http import MediaIoBaseUpload
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient import errors
 import io
-import pyocr
-from PIL import Image
-import queue
+from engines import base
 
-class engineBase(object):
-	"""すべてのエンジンクラスが継承する基本クラス。"""
-	def __init__(self):
-		self.interrupt = False
-		self.processingContainer = []
-		self.messageQueue = queue.Queue()
-
-	def recognition(self, container):
-		raise NotImplementedError()
-
-	def getSupportedType(self):
-		raise NotImplementedError()
-
-	def setInterrupt(self):
-		self.interrupt = True
-
-	def showMessage(self, text):
-		result = queue.Queue()
-		data = (text, result)
-		self.messageQueue.put(data)
-		while not result.empty():
-			time.sleep(0.01)
-		return result.get()
-
-	def getStatusString(self):
-		return _("未定義")
-
-class googleEngine(engineBase):
+class googleEngine(base.engineBase):
 	def __init__(self):
 		super().__init__()
 		self.credential = CredentialManager.CredentialManager(True)
@@ -85,31 +56,3 @@ class googleEngine(engineBase):
 	def getStatusString(self):
 		return self._statusString
 
-class tesseractEngine(engineBase):
-	def __init__(self, mode):
-		super().__init__()
-		self.mode = mode
-		tools = pyocr.get_available_tools()
-		self.tesseract = tools[0]
-		self._statusString = _("大気中")
-
-	def getSupportedType(self):
-		return (errorCodes.TYPE_JPG, errorCodes.TYPE_PNG, errorCodes.TYPE_GIF, errorCodes.TYPE_BMP)
-
-	def recognition(self, container):
-		if self.interrupt:
-			container.setInterrupt()
-			return
-		self.processingContainer.append(container)
-		self._statusString = _("認識開始")
-		text = self.tesseract.image_to_string(
-			Image.open(container.fileName),
-			lang = self.mode,
-			builder = pyocr.builders.TextBuilder()
-		)
-		container.setSuccess(text)
-		self.processingContainer.remove(container)
-		self._statusString = _("大気中")
-
-	def getStatusString(self):
-		return self._statusString
