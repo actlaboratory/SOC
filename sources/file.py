@@ -1,13 +1,15 @@
-from sources import base
+from .base import sourceBase
 from fileContainer import container
 import errorCodes
 
-class fileSource(base.sourceBase):
-	def __init__(self, fileList):
-		super().__init__()
-		self.fileList = fileList
+class fileSource(sourceBase):
+	# 画像ファイルを入れておくリスト
+	fileList = []
 
-	def get(self):
+	def __init__(self):
+		super().__init__("fileSource")
+
+	def _internal_get_item(self):
 		if len(self.fileList) == 0:
 			return
 		fileName = self.fileList[0]
@@ -29,4 +31,5 @@ class fileSource(base.sourceBase):
 		if len(self.fileList) > 0:
 			return _("残りファイル数: %d") % (len(self.fileList))
 		else:
-			return _("ファイル無し")
+			return _("用済み")
+

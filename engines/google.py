@@ -6,32 +6,28 @@ from googleapiclient.http import MediaIoBaseUpload
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient import errors
 import io
-from engines import base
+from .base import engineBase
 
-class googleEngine(base.engineBase):
+class googleEngine(engineBase):
 	def __init__(self):
-		super().__init__()
+		super().__init__("google")
 		self.credential = CredentialManager.CredentialManager(True)
-		if not self.credential.isOK():
-			return errorCodes.NOT_AUTHORIZED
 		self.credential.Authorize()
+		print("authorize success")
 		self._statusString = ("大気中...")
 
 	def getSupportedType(self):
 		return (errorCodes.TYPE_JPG, errorCodes.TYPE_PNG, errorCodes.TYPE_GIF, errorCodes.TYPE_PDF_IMAGE_ONLY)
 
-	def recognition(self, container):
-		if self.interrupt:
-			container.setInterrupt()
-			return
-		self.processingContainer.append(container)
+	def _recognize(self, item):
+		print("recognize")
 		self._statusString = _("認識開始")
 		service = discovery.build("drive", "v3", credentials=self.credential.credential)
-		with open(container.fileName, mode = "rb") as f:
+		with open(item.fileName, mode = "rb") as f:
 			self._statusString = _("アップロード中")
 			media_body = MediaIoBaseUpload(f, mimetype="application/vnd.google-apps.document", resumable=True)
 			req_body = {
-				"name": os.path.basename(container.fileName),
+				"name": os.path.basename(item.fileName),
 				"mimeType":"application/vnd.google-apps.document"
 			}
 			file = service.files().create(
@@ -49,8 +45,7 @@ class googleEngine(base.engineBase):
 		while done is False:
 			status, done = downloader.next_chunk()
 		service.files().delete(fileId=ID).execute()
-		container.setSuccess(stream.getvalue().decode("utf-8"))
-		self.processingContainer.remove(container)
+		item.setSuccess(stream.getvalue().decode("utf-8"))
 		self._statusString = _("大気中")
 
 	def getStatusString(self):

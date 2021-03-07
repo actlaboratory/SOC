@@ -10,7 +10,7 @@ import simpleDialog
 
 class Dialog(BaseDialog):
 	def __init__(self, manager):
-		super().__init__("viewBroadcasterDialog")
+		super().__init__("processingDialog")
 		self.manager = manager
 		self.waiting = False
 

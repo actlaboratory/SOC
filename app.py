@@ -16,6 +16,7 @@ from simpleDialog import *
 import util
 import os
 import globalVars
+from sources.file import fileSource
 
 class Main(AppBase.MainBase):
 	def __init__(self):
@@ -68,9 +69,9 @@ class Main(AppBase.MainBase):
 				error=True
 				continue
 			if suffix in constants.AVAILABLE_FORMATS:
-				if file in self.fileList:
+				if file in fileSource.fileList:
 					continue
-				self.fileList.append(file)
+				fileSource.fileList.append(file)
 				self.hMainView.filebox.Append(os.path.basename(file))
 				add = True
 			else:

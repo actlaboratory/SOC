@@ -6,19 +6,24 @@ import constants
 import queue
 
 class sourceBase(threading.Thread):
-	def __init__(self):
+	def __init__(self, identifier):
+		self.identifier = identifier# このソースを表す文字列
 		self.error = False
-		self.log=getLogger("%s.%s" % (constants.LOG_PREFIX,"source"))
+		self.log=getLogger("%s.%s" % (constants.LOG_PREFIX,identifier))
 		self.messageQueue = queue.Queue()
 		super().__init__()
 
 	def initialize(self):
 		return
 
-	def get(self):
+	def _internal_get_item(self):
 		raise NotImplementedError()
 
-	def isEmpty(self):
+	def get_item(self):
+		self.log.info("The item was sent to manager")
+		return self._internal_get_item()
+
+	def empty(self):
 		raise NotImplementedError()
 
 	def run(self):
@@ -27,7 +32,7 @@ class sourceBase(threading.Thread):
 	def getStatusString(self):
 		return _("未定義")
 
-	def showMessage(self, text):
+	def _showMessage(self, text):
 		result = queue.Queue()
 		data = (text, result)
 		self.messageQueue.put(data)

@@ -1,4 +1,4 @@
-from sources import base
+from .base import sourceBase
 from fileContainer import container
 import globalVars
 import time
@@ -9,9 +9,9 @@ import queue
 import errorCodes
 import wx
 
-class scannerSource(base.sourceBase):
+class scannerSource(sourceBase):
 	def __init__(self, scannerName, resolution = 300, blankPageDetect = False, isDuplex = False):
-		super().__init__()
+		super().__init__("scannerSource")
 		self.scannerName = scannerName
 		self.resolution = resolution
 		self.blankPageDetect = blankPageDetect
@@ -24,7 +24,7 @@ class scannerSource(base.sourceBase):
 		if os.path.exists(self.image_tmp):
 			shutil.rmtree(self.image_tmp)
 		os.mkdir(self.image_tmp)
-		self.fileQueue = queue.Queue()
+		self._fileQueue = queue.Queue()
 
 	def dtwain_initialize(self):
 		self.dtwain = dtwain.dtwain(True)
@@ -40,49 +40,49 @@ class scannerSource(base.sourceBase):
 			self.log.info("duplex scanning enabled")
 		#if self.dtwain_source.isPaperDetectable():
 			#self.log.info("this scanner is paper detectable")
-		self.nameBase = int(time.time())
-		self.pageCount = 0
+		self._nameBase = int(time.time())
+		self._pageCount = 0
 		self.initialized = True
 
 	def run(self):
 		self.dtwain_initialize()
 		while True:
 			if not self.dtwain_source.isFeederEnabled():
-				self.scan()
-			if self.isScannerEmpty():
-				if self.showMessage(_("スキャナに紙がセットされていません。スキャンを継続しますか？")) == wx.ID_NO:
+				self._scan()
+			if self._isScannerEmpty():
+				if self._showMessage(_("スキャナに紙がセットされていません。スキャンを継続しますか？")) == wx.ID_NO:
 					break
-			self.scan()
+			self._scan()
 			time.sleep(0.01)
 		self.running = False
 
-	def scan(self):
+	def _scan(self):
 		fileNameList = []
 		for i in range(2):
-			self.pageCount += 1
-			fileName = "%s_%d.png" % (self.nameBase, self.pageCount)
+			self._pageCount += 1
+			fileName = "%s_%d.png" % (self._nameBase, self._pageCount)
 			fileNameList.append(os.path.join(self.image_tmp, fileName))
 		self.dtwain_source.acquireFile(fileNameList, dtwain.DTWAIN_PNG)
 		for name in fileNameList:
 			if os.path.exists(name):
-				self.fileQueue.put(container(name))
+				self._fileQueue.put(container(name))
 
-	def isScannerEmpty(self):
+	def _isScannerEmpty(self):
 		if not self.dtwain_source.isFeederLoaded():
 			return True
 		return False
 
-	def get(self):
-		return self.fileQueue.get()
+	def _internal_get_item(self):
+		return self._fileQueue.get()
 
 	def getStatus(self):
 		status = 0
 		if self.running:
 			status |= errorCodes.STATUS_SOURCE_LOADING
 		else:
-			if self.fileQueue.empty():
+			if self._fileQueue.empty():
 				status |= errorCodes.STATUS_SOURCE_EMPTY
-		if not self.fileQueue.empty():
+		if not self._fileQueue.empty():
 			status |= errorCodes.STATUS_SOURCE_QUEUED
 		return status
 
