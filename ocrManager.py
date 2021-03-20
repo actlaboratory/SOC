@@ -67,7 +67,7 @@ class manager(threading.Thread):
 		text = ""
 		for item in self.processedItem:
 			if item.success:
-				text = item.getText()
+				text += item.getText()
 		return text
 
 	def updateMessageQueue(self):
