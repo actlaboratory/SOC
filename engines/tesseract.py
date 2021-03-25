@@ -1,8 +1,8 @@
 from .base import engineBase
 import errorCodes
+import constants
 import pyocr
 from PIL import Image
-import queue
 
 class tesseractEngine(engineBase):
 	def __init__(self, mode):
@@ -13,7 +13,7 @@ class tesseractEngine(engineBase):
 		self._statusString = _("大気中")
 
 	def getSupportedType(self):
-		return (errorCodes.TYPE_JPG, errorCodes.TYPE_PNG, errorCodes.TYPE_GIF, errorCodes.TYPE_BMP)
+		return constants.FORMAT_JPEG | constants.FORMAT_PNG | constants.FORMAT_BMP
 
 	def _recognize(self, item):
 		self._statusString = _("認識開始")

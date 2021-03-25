@@ -6,6 +6,7 @@ import threading
 import constants
 from logging import getLogger
 import errorCodes
+
 class engineBase(threading.Thread):
 	"""すべてのエンジンクラスが継承する基本クラス。"""
 
@@ -52,7 +53,7 @@ class engineBase(threading.Thread):
 		self._status |= errorCodes.STATUS_ENGINE_STOPSOURCE
 
 	def getSupportedType(self):
-		raise NotImplementedError()
+		return 0
 
 	def getEngineStatus(self):
 		return self._status

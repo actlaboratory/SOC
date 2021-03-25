@@ -64,11 +64,11 @@ class Main(AppBase.MainBase):
 		error = False
 		add = False
 		for file in files:
-			suffix = os.path.splitext(file)[1].lower()
+			suffix = os.path.splitext(file)[1][1:].lower()
 			if os.path.isdir(file):
 				error=True
 				continue
-			if suffix in constants.AVAILABLE_FORMATS:
+			if suffix in constants.EXT_TO_FORMAT.keys():
 				if file in fileSource.fileList:
 					continue
 				fileSource.fileList.append(file)

@@ -2,6 +2,7 @@ import os
 import CredentialManager
 from apiclient import discovery
 import errorCodes
+import constants
 from googleapiclient.http import MediaIoBaseUpload
 from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient import errors
@@ -17,7 +18,7 @@ class googleEngine(engineBase):
 		self._statusString = ("大気中...")
 
 	def getSupportedType(self):
-		return (errorCodes.TYPE_JPG, errorCodes.TYPE_PNG, errorCodes.TYPE_GIF, errorCodes.TYPE_PDF_IMAGE_ONLY)
+		return constants.FORMAT_JPEG | constants.FORMAT_PNG | constants.FORMAT_GIF
 
 	def _recognize(self, item):
 		print("recognize")

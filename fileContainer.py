@@ -1,4 +1,6 @@
 import errorCodes
+import constants
+import os
 
 class container:
 	def __init__(self, fileName):
@@ -7,6 +9,9 @@ class container:
 		self.success = False
 		self.fileName = fileName
 
+	def getFormat(self):
+		ext = os.path.splitext(self.fileName)[1][1:]
+		return constants.EXT_TO_FORMAT.get(ext.lower(), None)
 
 	def getErrorString(self):
 		if not self.error:
