@@ -12,7 +12,7 @@ class tesseractEngine(engineBase):
 		self.tesseract = tools[0]
 		self._statusString = _("大気中")
 
-	def getSupportedType(self):
+	def getSupportedFormats(self):
 		return constants.FORMAT_JPEG | constants.FORMAT_PNG | constants.FORMAT_BMP
 
 	def _recognize(self, item):

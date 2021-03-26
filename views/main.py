@@ -4,37 +4,38 @@
 #Copyright (C) 2019-2020 yamahubuki <itiro.ishino@gmail.com>
 #Copyright (C) 2020 guredora <contact@guredora.com>
 
+import ctypes
 import logging
 import os
-import sys
-import wx
-import re
-import ctypes
-import pywintypes
 import pathlib
-import time
-import win32com.client
-import clipboard
+import re
+import sys
 import threading
+import time
 import webbrowser
-import constants
-import errorCodes
-import pdfUtil
-import globalVars
-import menuItemsStore
-import keymap
 from logging import getLogger
-from .base import *
-from simpleDialog import *
-import ocrManager
-from views import processingDialog
-from views import authorizing
-from views import settings
-from views import versionDialog
-from views import resultDialog
-from sources import file,scanner
-from engines import google, tesseract
+
+import clipboard
+import constants
 import dtwain
+import errorCodes
+import globalVars
+import keymap
+import menuItemsStore
+import ocrManager
+import pdfUtil
+import pywintypes
+import win32com.client
+import wx
+from engines import google, tesseract
+from simpleDialog import *
+from sources import file, scanner
+
+from views import (authorizing, processingDialog, resultDialog, settings,
+                   versionDialog)
+
+from .base import *
+
 
 class MainView(BaseView):
 	def __init__(self):

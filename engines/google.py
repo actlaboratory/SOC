@@ -17,15 +17,15 @@ class googleEngine(engineBase):
 		print("authorize success")
 		self._statusString = ("大気中...")
 
-	def getSupportedType(self):
+	def getSupportedFormats(self):
 		return constants.FORMAT_JPEG | constants.FORMAT_PNG | constants.FORMAT_GIF
 
 	def _recognize(self, item):
-		print("recognize")
 		self._statusString = _("認識開始")
 		service = discovery.build("drive", "v3", credentials=self.credential.credential)
 		with open(item.fileName, mode = "rb") as f:
 			self._statusString = _("アップロード中")
+			self.log.info("uploading...")
 			media_body = MediaIoBaseUpload(f, mimetype="application/vnd.google-apps.document", resumable=True)
 			req_body = {
 				"name": os.path.basename(item.fileName),

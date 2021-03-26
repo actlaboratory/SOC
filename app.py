@@ -37,9 +37,8 @@ class Main(AppBase.MainBase):
 		if self.config.getboolean("general", "update"):
 			globalVars.update.update(True)
 		self.SetDefaultEncoding()
-		self.tmpdir = self.config.getstring("ocr", "tmpdir", os.path.join(os.environ["TEMP"], "soc"), None)
-		if not os.path.exists(self.tmpdir):
-			os.mkdir(self.tmpdir)
+		if not os.path.exists(self.getTmpDir()):
+			os.mkdir(self.getTmpDir())
 		#popplerにパスを通す
 		os.environ["PATH"] += os.pathsep + os.getcwd() + "/poppler/bin"
 		# メインビューを表示
@@ -82,11 +81,14 @@ class Main(AppBase.MainBase):
 			else:
 				errorDialog(_("このフォーマットのファイルには対応していないため、追加できませんでした。"))
 
+	def getTmpDir(self):
+		return self.config.getstring("ocr", "tmpdir", os.path.join(os.environ["TEMP"], "soc"), None)
+
 	def OnExit(self):
 		#設定の保存やリソースの開放など、終了前に行いたい処理があれば記述できる
 		#ビューへのアクセスや終了の抑制はできないので注意。
-		if os.path.exists(self.tmpdir):
-			util.allDelete(self.tmpdir)
+		if os.path.exists(self.getTmpDir()):
+			util.allDelete(self.getTmpDir())
 
 		# プロキシの設定を元に戻す
 		if self.proxyEnviron != None: self.proxyEnviron.unset_environ()

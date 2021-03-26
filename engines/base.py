@@ -6,6 +6,7 @@ import threading
 import constants
 from logging import getLogger
 import errorCodes
+import converter
 
 class engineBase(threading.Thread):
 	"""すべてのエンジンクラスが継承する基本クラス。"""
@@ -23,6 +24,7 @@ class engineBase(threading.Thread):
 
 	def put(self, item):
 		self.log.debug("item received")
+		converter.convert(item,self.getSupportedFormats())
 		self._itemQueue.put(item)
 
 	def setCallbackOnAfterRecognize(self, callback):
@@ -52,7 +54,7 @@ class engineBase(threading.Thread):
 		self.log.debug("notifyed source stoped")
 		self._status |= errorCodes.STATUS_ENGINE_STOPSOURCE
 
-	def getSupportedType(self):
+	def getSupportedFormats(self):
 		return 0
 
 	def getEngineStatus(self):
