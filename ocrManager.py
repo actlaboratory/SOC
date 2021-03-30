@@ -5,24 +5,10 @@ import queue
 from logging import getLogger
 import constants
 
-def type_to_constant(type):
-	if type.lower() == ".jpg":
-		return errorCodes.TYPE_JPG
-	elif type.lower() == ".png":
-		return errorCodes.TYPE_PNG
-	elif type.lower() == ".gif":
-		return errorCodes.TYPE_GIF
-	elif type.lower() == ".pdf":
-		return errorCodes.TYPE_PDF_ALL
-	elif type.lower() == ".bmp":
-		return errorCodes.TYPE_BMP
-	else:
-		return errorCodes.TYPE_UNKNOWN
-
 class manager(threading.Thread):
 	def __init__(self, engine, source):
 		super().__init__()
-		self.processedItem = []
+		self.processedJob = []
 		self.engine = engine
 		self.source = source
 		self.done = False
@@ -54,8 +40,8 @@ class manager(threading.Thread):
 		self.done = True
 		return
 
-	def onAfterRecognize(self, item):
-		self.processedItem.append(item)
+	def onAfterRecognize(self, job):
+		self.processedJob.append(job)
 
 	def getStatusString(self):
 		statuses = {}
@@ -65,9 +51,10 @@ class manager(threading.Thread):
 
 	def getText(self):
 		text = ""
-		for item in self.processedItem:
-			if item.success:
-				text += item.getText()
+		for job in self.processedJob:
+			for item in job.items:
+				if item.success:
+					text += item.getText()
 		return text
 
 	def updateMessageQueue(self):

@@ -1,5 +1,5 @@
 from .base import sourceBase
-from fileContainer import container
+from jobObjects import job
 import errorCodes
 
 class fileSource(sourceBase):
@@ -14,7 +14,7 @@ class fileSource(sourceBase):
 			return
 		fileName = self.fileList[0]
 		del self.fileList[0]
-		return container(fileName)
+		return job(fileName)
 
 	def getStatus(self):
 		status = 0

@@ -1,5 +1,5 @@
 from .base import sourceBase
-from fileContainer import container
+from jobObjects import job
 import globalVars
 import time
 import os
@@ -65,7 +65,7 @@ class scannerSource(sourceBase):
 		self.dtwain_source.acquireFile(fileNameList, dtwain.DTWAIN_PNG)
 		for name in fileNameList:
 			if os.path.exists(name):
-				self._fileQueue.put(container(name))
+				self._fileQueue.put(job(name))
 
 	def _isScannerEmpty(self):
 		if not self.dtwain_source.isFeederLoaded():
