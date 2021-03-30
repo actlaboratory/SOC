@@ -1,15 +1,15 @@
+from pdf2image import convert_from_path
 from .base import converterBase
 from jobObjects import item
-from PIL import Image, ImageSequence
 import constants
 
-class pillow(converterBase):
-	_SUPPORTED_FORMATS = constants.FORMAT_BMP | constants.FORMAT_PNG | constants.FORMAT_GIF | constants.FORMAT_JPEG | constants.FORMAT_TIFF
+class pdf2image(converterBase):
+	_SUPPORTED_FORMATS = constants.FORMAT_PDF_ALL
 	_CONVERTABLE_FORMATS = constants.FORMAT_BMP | constants.FORMAT_PNG | constants.FORMAT_GIF | constants.FORMAT_JPEG
 
 	def convert(self, job, target_format):
-		self.log.info("running converter...")
-		for img in ImageSequence.Iterator(Image.open(job.filename)):
+		images = convert_from_path(job.filename,dpi=400)
+		for image in images:
 			if target_format == constants.FORMAT_BMP:
 				path = self.getTmpFilePath(".bmp")
 			elif target_format == constants.FORMAT_PNG:
@@ -17,9 +17,10 @@ class pillow(converterBase):
 			elif target_format == constants.FORMAT_GIF:
 				path = self.getTmpFilePath(".gif")
 			elif target_format == constants.FORMAT_JPEG:
-				if img.mode != "RGB":
-					img = img.convert("RGB")
+				if image.mode != "RGB":
+					image = image.convert("RGB")
 				path = self.getTmpFilePath(".jpg")
-			img.save(path)
+			image.save(path)
 			job.items.append(item(path))
-		self.log.info("convert done!")
+		self.log.info("pdf converted")
+

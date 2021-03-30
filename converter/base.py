@@ -11,6 +11,7 @@ class converterBase():
 		if not os.path.exists(os.path.join(globalVars.app.getTmpDir(), "convertFiles")):
 			os.mkdir(os.path.join(globalVars.app.getTmpDir(), "convertFiles"))
 		self.log = getLogger("SOC.converter")
+		self.log.info("initialized")
 
 	@classmethod
 	def getSupportedFormats(cls):
@@ -20,7 +21,7 @@ class converterBase():
 	def getConvertableFormats(cls):
 		return cls._CONVERTABLE_FORMATS
 
-	def convert(self, item, target_format):
+	def convert(self, job, target_format):
 		raise NotImplementedError()
 
 	def getTmpFilePath(self, ext):

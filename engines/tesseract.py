@@ -18,7 +18,7 @@ class tesseractEngine(engineBase):
 	def _recognize(self, item):
 		self._statusString = _("認識開始")
 		text = self.tesseract.image_to_string(
-			Image.open(item.fileName),
+			Image.open(item.filename),
 			lang = self.mode,
 			builder = pyocr.builders.TextBuilder()
 		)

@@ -19,13 +19,13 @@ class engineBase(threading.Thread):
 		self.log.info("initialized")
 		super().__init__()
 		self._status = errorCodes.OK
-		self._itemQueue = queue.Queue()
+		self._jobQueue = queue.Queue()
 		self._onAfterRecognize = None
 
-	def put(self, item):
-		self.log.debug("item received")
-		converter.convert(item,self.getSupportedFormats())
-		self._itemQueue.put(item)
+	def put(self, job):
+		self.log.debug("job received")
+		converter.convert(job, self.getSupportedFormats())
+		self._jobQueue.put(job)
 
 	def setCallbackOnAfterRecognize(self, callback):
 		self._onAfterRecognize = callback
@@ -34,21 +34,25 @@ class engineBase(threading.Thread):
 		self.log.debug("thread started")
 		while True:
 			time.sleep(0.01)
-			if self._itemQueue.empty():
+			if self._jobQueue.empty():
 				if self._status & errorCodes.STATUS_ENGINE_STOPSOURCE == errorCodes.STATUS_ENGINE_STOPSOURCE:break
 				continue
 			if self._status & errorCodes.STATUS_ENGINE_NEEDSTOP == errorCodes.STATUS_ENGINE_NEEDSTOP:
 				break
-			item = self._itemQueue.get()
+			job = self._jobQueue.get()
 			self.log.debug("executing recognition...")
-			self._recognize(item)
+			self._execRecognize(job)
 			self.log.debug("finished recognition")
-			self._onAfterRecognize(item)
+			self._onAfterRecognize(job)
 		self.log.debug("finish engine thread")
 		self._status |= errorCodes.STATUS_ENGINE_FINISHED
 
 	def _recognize(self, item):
 		raise NotImplementedError()
+
+	def _execRecognize(self, job):
+		for item in job.items:
+			self._recognize(item)
 
 	def notifyStopSource(self):
 		self.log.debug("notifyed source stoped")
