@@ -54,7 +54,7 @@ class settingsDialog(BaseDialog):
 		creator.AddSpace(20)
 		self.tmpEdit, dummy = creator.inputbox(_("一時ファイルの場所"),None,x=-1)
 		creator=views.ViewCreator.ViewCreator(self.viewMode,creator.GetPanel(),creator.GetSizer(),wx.VERTICAL,space=0,style=wx.EXPAND | wx.ALL,label=_("認識結果の保存先"))
-		self.saveSelect = creator.radio((_("読み込んだファイルと同じ場所"),_("指定の場所")), self.switch)
+		self.saveSelect = creator.checkbox(_("可能な場合ファイルと同じ場所に認識結果を保存する"))
 		creator=views.ViewCreator.ViewCreator(self.viewMode,creator.GetPanel(),creator.GetSizer(),wx.HORIZONTAL,style=wx.EXPAND,space=5)
 		self.saveDir, dummy = creator.inputbox(_("認識結果の保存先"), None,style = wx.TE_READONLY,sizerFlag=wx.LEFT,textLayout=None,margin=30)
 		self.changeBtn = creator.button(_("参照"), self.browse,sizerFlag=wx.ALIGN_CENTER_VERTICAL)
@@ -72,7 +72,7 @@ class settingsDialog(BaseDialog):
 		except ValueError:
 			simpleDialog.errorDialog(_("タイムアウト秒数の設定値が不正です。"))
 		tmpdir = self.tmpEdit.GetValue()
-		saveSourceDir = self.saveSelect[0].GetValue()
+		saveSourceDir = self.saveSelect.GetValue()
 		savedir = self.saveDir.GetValue()
 		globalVars.app.config["speech"]["reader"] = reader
 		globalVars.app.config["view"]["colormode"] = colormode
@@ -87,14 +87,6 @@ class settingsDialog(BaseDialog):
 	def onCancelBtn(self, event):
 		print("cancel")
 		self.Destroy()
-
-	def switch(self, event = None):
-		if self.saveSelect[0].GetValue():
-			self.saveDir.Disable()
-			self.changeBtn.Disable()
-		else:
-			self.saveDir.Enable()
-			self.changeBtn.Enable()
 
 	def browse(self, event):
 		dialog = wx.DirDialog(None, _("保存先を選択"))
@@ -120,10 +112,7 @@ class settingsDialog(BaseDialog):
 		tmpdir = globalVars.app.tmpdir
 		self.tmpEdit.SetValue(tmpdir)
 		savesourcedir = globalVars.app.config.getboolean("ocr", "saveSourceDir")
-		if savesourcedir:
-			self.saveSelect[0].SetValue(True)
-		else:
-			self.saveSelect[1].SetValue(False)
+		self.saveSelect.SetValue(savesourcedir)
 		savedir = globalVars.app.config.getstring("ocr", "savedir", "")
 		self.saveDir.SetValue(savedir)
 		return

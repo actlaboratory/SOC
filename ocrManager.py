@@ -41,6 +41,7 @@ class manager(threading.Thread):
 		return
 
 	def onAfterRecognize(self, job):
+		job.save()
 		self.processedJob.append(job)
 
 	def getStatusString(self):
@@ -53,8 +54,7 @@ class manager(threading.Thread):
 		text = ""
 		for job in self.processedJob:
 			for item in job.items:
-				if item.success:
-					text += item.getText()
+				text += job.getAllItemText()
 		return text
 
 	def updateMessageQueue(self):

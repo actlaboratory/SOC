@@ -14,7 +14,7 @@ class fileSource(sourceBase):
 			return
 		fileName = self.fileList[0]
 		del self.fileList[0]
-		return job(fileName)
+		return job(fileName, temporally=False)
 
 	def getStatus(self):
 		status = 0

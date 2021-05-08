@@ -1,9 +1,13 @@
+from os.path import basename
 import errorCodes
 import constants
 import os
 import re
 import subprocess
 import namedPipe
+import globalVars
+import datetime
+import util
 
 
 class job():
@@ -37,7 +41,27 @@ class job():
 			else:
 				format = constants.FORMAT_PDF_IMAGE
 		self.format = format
-		print(hex(format))
+
+	def getAllItemText(self):
+		text = ""
+		for item in self.items:
+			if not item.success:
+				continue
+			text += item.getText()
+		return text
+
+	def save(self):
+		text  = self.getAllItemText()
+		default_path = globalVars.app.config.getstring("ocr", "savedir")
+		name = util.get_change_ext(self.filename, "txt")
+		if self.temporally:
+			name = os.path.join(default_path,datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S.txt"))
+		if not globalVars.app.config.getboolean("ocr", "savesourcedir", True):
+			name = util.get_change_ext(os.path.join(default_path, os.path.basename(self.filename)), "txt")
+		with open(name, mode = "w") as f:
+			f.write(text)
+
+
 
 
 class item:
