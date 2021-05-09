@@ -1,6 +1,6 @@
 import pathlib
 import threading
-
+import os
 
 def allDelete(dirname):
 	"""dirnameに指定したディレクトリの中身をすべて削除する。
@@ -26,3 +26,5 @@ def textSave(name, text):
 		path = pathlib.Path(name)
 	path.write_text(text)
 
+def get_change_ext(filepath, new_ext):
+	return "%s.%s" % (os.path.splitext(filepath)[0], new_ext)

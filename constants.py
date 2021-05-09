@@ -2,8 +2,10 @@
 #constant values
 #Copyright (C) 2020 guredora <contact@guredora.com>
 
-import wx
 import os
+
+import wx
+
 #アプリケーション基本情報
 APP_NAME="SOC"#アプリケーションの名前
 APP_FULL_NAME = "Simple Ocr Controller"#アプリケーションの完全な名前
@@ -41,11 +43,43 @@ GOOGLE_NEED_SCOPES = ["https://www.googleapis.com/auth/drive.file"]
 GOOGLE_CALLBACK_URL = "http://localhost:8080"
 GOOGLE_CLIENT_SECRET = '{"installed":{"client_id":"700286679735-4bssuo7bsen9o7sua8joacl18bhms6nd.apps.googleusercontent.com","project_id":"simple-ocr-controller","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"607kPxH25Wba68T3mJmoxrKD","redirect_uris":["urn:ietf:wg:oauth:2.0:oob","http://localhost"]}}'
 
+#画像ファイル形式定数
+FORMAT_UNKNOWN = 0
+FORMAT_PNG = 0x1
+FORMAT_JPEG = 0x2
+FORMAT_BMP = 0x4
+FORMAT_GIF = 0x8
+FORMAT_TIFF = 0x10
+FORMAT_PDF_UNKNOWN = 0x20
+FORMAT_PDF_TEXT = 0x40
+FORMAT_PDF_IMAGE = 0x80
+FORMAT_PDF_ALL = FORMAT_PDF_UNKNOWN | FORMAT_PDF_TEXT | FORMAT_PDF_IMAGE
+
+#対応形式一覧
+#定数を優先順位準に並べる
+
+IMAGE_FORMAT_LIST = [
+	FORMAT_BMP,
+	FORMAT_PNG,
+	FORMAT_GIF,
+	FORMAT_JPEG,
+]
+#ファイル形式と拡張子の辞書
+EXT_TO_FORMAT = {
+	"bmp": FORMAT_BMP,
+	"png": FORMAT_PNG,
+	"gif": FORMAT_GIF,
+	"jpg": FORMAT_JPEG,
+	"tif": FORMAT_TIFF,
+	"pdf": FORMAT_PDF_UNKNOWN
+}
+
 #build関連定数
 BASE_PACKAGE_URL = "https://github.com/actlaboratory/SOC/releases/download/0.5.0/SOC-0.5.0.zip"
 PACKAGE_CONTAIN_ITEMS = ("tesseract-ocr", "poppler")
 NEED_HOOKS = ("tools/hook-googleapiclient.py",)
 STARTUP_FILE = "SOC.py"
+
 # update情報
 UPDATE_URL = "https://actlab.org/api/checkUpdate"
 UPDATER_VERSION = "1.0.0"

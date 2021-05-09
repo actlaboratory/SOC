@@ -32,39 +32,6 @@ class OcrTool():
 	def __init__(self):
 		self.available_language=("jpn", "jpn_fast", "jpn_vert", "jpn_vert_fast")#tesseract-ocrの設定の保存
 
-	def google_ocr(self, local_file_path, credential, pdf_to_png = False, dialog=None):
-		if local_file_path.suffix == ".pdf" and pdf_to_png:
-			text = ""
-			file = pathlib.Path(globalVars.app.tmpdir).joinpath("tmp.png")
-			images = pdfUtil.pdf_to_image(str(local_file_path))
-			for image in images:
-				if dialog is not None and dialog.cancel:
-					return ""
-				image.save(str(file))
-				text += self.google_ocr(file, credential)
-			return text
-		service = discovery.build("drive", "v3", credentials=credential)
-		with local_file_path.open("rb") as f:
-			media_body = MediaIoBaseUpload(f, mimetype="application/vnd.google-apps.document", resumable=True)
-			file = service.files().create(
-				body = {
-					"name": local_file_path.name,
-					"mimeType":"application/vnd.google-apps.document"
-				},
-				media_body = media_body,
-				ocrLanguage = "ja",
-				fields="id"
-			).execute()
-		ID = file.get("id")
-		request = service.files().export_media(fileId=ID, mimeType = "text/plain")
-		fh = io.BytesIO()
-		downloader = MediaIoBaseDownload(fh, request)
-		done = False
-		while done is False:
-			status, done = downloader.next_chunk()
-		service.files().delete(fileId=ID).execute()
-		return fh.getvalue().decode("utf-8")
-
 	# tesseract-ocrの呼び出し
 	def tesseract_ocr(self, local_file_path, number, dialog):
 		lang = self.available_language[number]
@@ -99,8 +66,7 @@ class OcrManager():
 		self.mode = 0
 		self.tool = OcrTool()
 		self.pdf_to_png = False
-		os.environ["PATH"] += os.pathsep + os.getcwd() + "/poppler/bin"
-
+		
 	def _allDelete(self):
 		"""変換済みファイルを一層する。"""
 		for path in self.saved:

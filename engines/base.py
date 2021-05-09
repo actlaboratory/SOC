@@ -1,0 +1,81 @@
+#engine base
+
+import queue
+import time
+import threading
+import constants
+from logging import getLogger
+import errorCodes
+import converter
+
+class engineBase(threading.Thread):
+	"""すべてのエンジンクラスが継承する基本クラス。"""
+
+	messageQueue = queue.Queue()
+
+	def __init__(self, identifier):
+		self.identifier = identifier
+		self.log = getLogger("%s.%s" % (constants.APP_NAME, self.identifier))
+		self.log.info("initialized")
+		super().__init__()
+		self._status = errorCodes.OK
+		self._jobQueue = queue.Queue()
+		self._onAfterRecognize = None
+
+	def put(self, job):
+		self.log.debug("job received")
+		converter.convert(job, self.getSupportedFormats())
+		self._jobQueue.put(job)
+
+	def setCallbackOnAfterRecognize(self, callback):
+		self._onAfterRecognize = callback
+
+	def run(self):
+		self.log.debug("thread started")
+		while True:
+			time.sleep(0.01)
+			if self._jobQueue.empty():
+				if self._status & errorCodes.STATUS_ENGINE_STOPSOURCE == errorCodes.STATUS_ENGINE_STOPSOURCE:break
+				continue
+			if self._status & errorCodes.STATUS_ENGINE_NEEDSTOP == errorCodes.STATUS_ENGINE_NEEDSTOP:
+				break
+			job = self._jobQueue.get()
+			self.log.debug("executing recognition...")
+			self._execRecognize(job)
+			self.log.debug("finished recognition")
+			self._onAfterRecognize(job)
+		self.log.debug("finish engine thread")
+		self._status |= errorCodes.STATUS_ENGINE_FINISHED
+
+	def _recognize(self, item):
+		raise NotImplementedError()
+
+	def _execRecognize(self, job):
+		for item in job.items:
+			self._recognize(item)
+
+	def notifyStopSource(self):
+		self.log.debug("notifyed source stoped")
+		self._status |= errorCodes.STATUS_ENGINE_STOPSOURCE
+
+	def getSupportedFormats(self):
+		return 0
+
+	def getEngineStatus(self):
+		return self._status
+
+	def _showMessage(self, text):
+		result = queue.Queue()
+		data = (text, result)
+		self.messageQueue.put(data)
+		while not result.empty():
+			time.sleep(0.01)
+		return result.get()
+
+	def getStatusString(self):
+		return _("未定義")
+
+
+	def interrupt(self):
+		self._status |= errorCodes.STATUS_ENGINE_INTERRUPT
+
