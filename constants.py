@@ -10,11 +10,11 @@ import wx
 APP_NAME="SOC"#アプリケーションの名前
 APP_FULL_NAME = "Simple Ocr Controller"#アプリケーションの完全な名前
 APP_ICON = None
-APP_VERSION="0.0.33"
-APP_LAST_RELEASE_DATE="2020-11-20"
-APP_COPYRIGHT_YEAR="2020"
-APP_LICENSE="Apache License 2.0"
-APP_DEVELOPERS="ACT Laboratory"
+APP_VERSION="0.5.1"
+APP_LAST_RELEASE_DATE="2021-01-07"
+APP_COPYRIGHT_YEAR="2019-2021"
+APP_LICENSE="GPL v2(or later)"
+APP_DEVELOPERS="guredora, ACT Laboratory"
 APP_DEVELOPERS_URL="https://actlab.org/"
 APP_DETAILS_URL="https://actlab.org/software/SOC"
 APP_COPYRIGHT_MESSAGE = "Copyright (c) %s %s All lights reserved." % (APP_COPYRIGHT_YEAR, APP_DEVELOPERS)
@@ -75,7 +75,7 @@ EXT_TO_FORMAT = {
 }
 
 #build関連定数
-BASE_PACKAGE_URL = "https://github.com/actlaboratory/SOC/releases/download/0.0.5/SOC-0.0.5.zip"
+BASE_PACKAGE_URL = "https://github.com/actlaboratory/SOC/releases/download/0.5.0/SOC-0.5.0.zip"
 PACKAGE_CONTAIN_ITEMS = ("tesseract-ocr", "poppler")
 NEED_HOOKS = ("tools/hook-googleapiclient.py",)
 STARTUP_FILE = "SOC.py"
@@ -83,6 +83,7 @@ STARTUP_FILE = "SOC.py"
 # update情報
 UPDATE_URL = "https://actlab.org/api/checkUpdate"
 UPDATER_VERSION = "1.0.0"
+UPDATER_URL = "https://github.com/actlaboratory/updater/releases/download/1.0.0/updater.zip"
 UPDATER_WAKE_WORD = "hello"
 #pipe関係
 PIPE_NAME = "SocPdfTextCheck"
