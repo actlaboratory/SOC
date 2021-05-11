@@ -4,34 +4,38 @@
 #Copyright (C) 2019-2020 yamahubuki <itiro.ishino@gmail.com>
 #Copyright (C) 2020 guredora <contact@guredora.com>
 
+import ctypes
 import logging
 import os
-import sys
-import wx
-import re
-import ctypes
-import pywintypes
 import pathlib
-import time
-import win32com.client
-import clipboard
+import re
+import sys
 import threading
+import time
 import webbrowser
-import constants
-import errorCodes
-import pdfUtil
-import globalVars
-import menuItemsStore
-import keymap
 from logging import getLogger
-from .base import *
+
+import clipboard
+import constants
+import dtwain
+import errorCodes
+import globalVars
+import keymap
+import menuItemsStore
+import ocrManager
+import pdfUtil
+import pywintypes
+import win32com.client
+import wx
+from engines import google, tesseract
 from simpleDialog import *
-import Ocr
-import views.convert
-import views.converted
-from views import authorizing
-from views import settings
-from views import versionDialog
+from sources import file, scanner
+
+from views import (authorizing, processingDialog, resultDialog, settings,
+                   versionDialog)
+
+from .base import *
+
 
 class MainView(BaseView):
 	def __init__(self):
@@ -40,37 +44,60 @@ class MainView(BaseView):
 		self.app=globalVars.app
 		self.events=Events(self,self.identifier)
 		title=constants.APP_NAME
-		self.OcrManager = Ocr.OcrManager()
 		super().Initialize(
 			title,
-			640,
-			500,
+			660,
+			700,
 			self.app.config.getint(self.identifier,"positionX"),
 			self.app.config.getint(self.identifier,"positionY"),
 			style=wx.SYSTEM_MENU | wx.CAPTION | wx.CLOSE_BOX | wx.CLIP_CHILDREN | wx.BORDER_STATIC
 		)
 
 		self.InstallMenuEvent(Menu(self.identifier),self.events.OnMenuSelect)
-		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),wx.HORIZONTAL)
-		vCreator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,creator.GetSizer(),wx.VERTICAL)
-		self.filebox, self.list = vCreator.listbox(_("ファイル一覧"), (), None,-1,0,(450,200))
+		self.engineSelection = {
+			_("google (インターネット)"): "google",
+			_("tesseract (ローカル"): "tesseract"
+		}
+		self.tesseractModeSelection = {
+			_("横書き通常"): "jpn",
+			_("横書き低負荷版"): "jpn_fast",
+			_("縦書き通常"): "jpn_vert",
+			_("縦書き低負荷版"): "jpn_vert_fast"
+		}
+		#タブコントロールの作成
+		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),wx.VERTICAL)
+		self.tab = creator.tabCtrl("ソース選択", event=None, style=wx.NB_NOPAGETHEME | wx.NB_MULTILINE, sizerFlag=wx.ALL, proportion=0, margin=20)
+
+		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,label=_("画像ファイルから読込"))
+		hCreator=views.ViewCreator.ViewCreator(self.viewMode,creator.GetPanel(),creator.GetSizer(),wx.HORIZONTAL,proportion=1)
+		vCreator=views.ViewCreator.ViewCreator(self.viewMode,hCreator.GetPanel(),hCreator.GetSizer(),wx.VERTICAL,style=wx.EXPAND)
+
+		self.filebox, self.list = vCreator.listbox(_("ファイル一覧"), (), None,-1,0,(450,200),sizerFlag=wx.ALL,proportion=1,margin=10)
 		fileListKeymap = keymap.KeymapHandler(defaultKeymap.defaultKeymap)
 		acceleratorTable = fileListKeymap.GetTable("fileList")
 		self.filebox.SetAcceleratorTable(acceleratorTable)
 		self.filebox.SetDropTarget(DropTarget(self))	#D&Dの受け入れ
 
-		vCreator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,creator.GetSizer(),wx.VERTICAL,20)
+		vCreator=views.ViewCreator.ViewCreator(self.viewMode,hCreator.GetPanel(),hCreator.GetSizer(),wx.VERTICAL,20)
 		self.open = vCreator.button(_("追加"), self.events.open)
-		self.delete = vCreator.button(_("削除"), self.events.delete)
+		self.delete = vCreator.button(_("削除"), self.events.onDelete)
 
-		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),views.ViewCreator.FlexGridSizer,10, 2)
-		self.engine, self.engineStatic = creator.combobox(_("OCRエンジン"), (_("google (インターネット)"), _("tesseract (ローカル)")), self.events.engine, state = 0)
-		self.tesseract, self.tesseractStatic = creator.combobox(_("モード"), (_("横書き通常"), _("横書き低負荷版"), _("縦書き通常"), _("縦書き低負荷版")), self.events.tesseract_mode, state = 0)
+		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,label=_("スキャナから読込"))
+		self.scannerList, self.scannerListStatic = creator.listCtrl(_("スキャナ一覧"), style = wx.LC_REPORT,sizerFlag=wx.EXPAND | wx.ALL)
+		self.scannerList.AppendColumn(_("名前"),width=550)
+		for scanner in dtwain.getSourceStringList():
+			self.scannerList.Append((scanner,))
+
+		self.isBlankPageDetect = creator.checkbox(_("白紙を検出する"))
+		self.isDuplex = creator.checkbox(_("利用可能な場合両面スキャンを使用する"))
+		settingAreaCreator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),views.ViewCreator.FlexGridSizer,10, 2)
+		self.engine, self.engineStatic = settingAreaCreator.combobox(_("OCRエンジン"), list(self.engineSelection.keys()), self.events.onEngineSelect, state = 0)
+		self.tesseract, self.tesseractStatic = settingAreaCreator.combobox(_("モード"), list(self.tesseractModeSelection.keys()), state = 0)
 		self.tesseract.Disable()
-
-		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),wx.HORIZONTAL,20,style=wx.ALIGN_RIGHT)
-		self.convert = creator.button(_("変換"), self.events.convert)
-		self.exit = creator.button(_("終了"), self.events.Exit)
+		
+		buttonAreaCreator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),wx.HORIZONTAL,20,style=wx.ALIGN_RIGHT)
+		self.startButton = buttonAreaCreator.button(_("開始"), self.events.onStart)
+		self.exit = buttonAreaCreator.button(_("終了"), self.events.Exit)
 
 # D&D受入関連
 class DropTarget(wx.DropTarget):
@@ -105,15 +132,15 @@ class Menu(BaseMenu):
 		"""指定されたウィンドウに、メニューを適用する。"""
 		#メニューの大項目を作る
 		self.hFileMenu = wx.Menu()
-		self.hToolMenu=wx.Menu()
+		self.hSettingMenu=wx.Menu()
 		self.hHelpMenu = wx.Menu()
 		#ファイルメニューの中身
 		self.open = self.RegisterMenuCommand(self.hFileMenu, "OPEN", _("変換ファイルの追加(&o)"))#ファイルリストの追加
 		self.exit = self.RegisterMenuCommand(self.hFileMenu, "EXIT", _("終了(&x)"))#プログラムの終了
-		#ツールメニューの中身
-		self.google=self.RegisterMenuCommand(self.hToolMenu,"GOOGLE",_("Googleと連携する(&g)"))#グーグルの認証開始
-		self.sendRegist = self.RegisterMenuCommand(self.hToolMenu,"SENDREGIST",_("送るメニューにショートカットを作成(&t)"))
-		self.setting = self.RegisterMenuCommand(self.hToolMenu,"SETTINGS",_("設定画面を開く(&s)"))
+		#設定メニューの中身
+		self.google=self.RegisterMenuCommand(self.hSettingMenu,"GOOGLE",_("Googleと連携する(&g)"))#グーグルの認証開始
+		self.sendRegist = self.RegisterMenuCommand(self.hSettingMenu,"SENDREGIST",_("送るメニューにショートカットを作成(&s)"))
+		self.setting = self.RegisterMenuCommand(self.hSettingMenu,"SETTINGS",_("設定画面を開く(&w)"))
 	
 		#ヘルプメニューの中身
 		self.Page = self.RegisterMenuCommand(self.hHelpMenu, "webpage", _("ACT Laboratoryのホームページを開く(&p)"))
@@ -121,19 +148,19 @@ class Menu(BaseMenu):
 		self.Update = self.RegisterMenuCommand(self.hHelpMenu, "UPDATE", _("最新バージョンを確認"))
 		#メニューバーの生成
 		self.hMenuBar.Append(self.hFileMenu, _("ファイル(&f)"))
-		self.hMenuBar.Append(self.hToolMenu,_("設定(&s)"))
+		self.hMenuBar.Append(self.hSettingMenu,_("設定(&s)"))
 		self.hMenuBar.Append(self.hHelpMenu, _("ヘルプ(&h)"))
 		target.SetMenuBar(self.hMenuBar)
 		if globalVars.app.credentialManager.isOK():
 			self.hMenuBar.Enable(menuItemsStore.getRef("GOOGLE"), False)
 
 class Events(BaseEvents):
-	def delete(self, events=None):
+	def onDelete(self, events=None):
 		index = self.parent.filebox.GetSelection()
 		if index == -1:
 			return
 		self.parent.filebox.Delete(index)
-		del self.parent.OcrManager.OcrList[index]
+		del file.fileSource.fileList[index]
 		self.parent.filebox.SetSelection(index-1)
 		return
 	def open(self, events=None):
@@ -142,87 +169,56 @@ class Events(BaseEvents):
 			return
 		self.parent.app.addFileList(dialog.GetPaths())
 		return
-	def engine(self, events):
-		index = self.parent.engine.GetSelection()
-		self.parent.OcrManager.Engine = index
-		if index == 0:
+	def onEngineSelect(self, events):
+		selection = self.parent.engine.GetStringSelection()
+		if self.parent.engineSelection[selection] == "google":
 			self.parent.tesseract.Disable()
-		if index == 1:
+		if self.parent.engineSelection[selection] == "tesseract":
 			self.parent.tesseract.Enable()
 		return
-	def tesseract_mode(self, event):
-		self.parent.OcrManager.mode = self.parent.tesseract.GetSelection()
-	def convert(self, Events):
-		if self.parent.filebox.GetCount() == 0:
-			errorDialog(_("変換をおこなうには最低ひとつの画像ファイルが追加されている必用があります。"))
+
+	def onStart(self, Events):
+		sourceSelection = self.parent.tab.GetSelection()
+		if sourceSelection == 0 and self.parent.filebox.GetCount() == 0:
+			errorDialog(_("ファイルから変換をおこなうには最低ひとつの画像ファイルが追加されている必用があります。"))
 			return
-		if self.parent.engine.GetSelection() == -1:
+		if self.parent.engine.Selection == -1:
 			errorDialog(_("OCRエンジンを選択してください。"))
 			return
-		if self.parent.engine.GetSelection() == 1 and self.parent.tesseract.GetSelection() == -1:
-			errorDialog(_("tesseract-ocrのモードが指定されていません。"))
+		#エンジンの生成
+		if self.parent.engineSelection[self.parent.engine.GetStringSelection()] == "google":
+			e = google.googleEngine()
+			if e == errorCodes.NOT_AUTHORIZED:
+				errorDialog(_("googleのOCRエンジンを使用するにはお使いのgoogleアカウントを連携する必要があります。\n設定メニューよりン連携を行ってください。"))
+				return
+		elif self.parent.engineSelection[self.parent.engine.GetStringSelection()] == "tesseract":
+			if self.parent.tesseract.Selection == -1:
+				errorDialog(_("tesseract-ocrのモードが指定されていません。"))
+				return
+			e = tesseract.tesseractEngine(self.parent.tesseractModeSelection[self.parent.tesseract.GetStringSelection()])
+		#sourceオブジェクトの生成
+		if sourceSelection == 0:
+			source = file.fileSource()
+		elif sourceSelection == 1:
+			scannerSelection = self.parent.scannerList.GetFocusedItem()
+			scannerName = self.parent.scannerList.GetItemText(scannerSelection)
+			source = scanner.scannerSource(scannerName, blankPageDetect = self.parent.isBlankPageDetect.GetValue(), isDuplex = self.parent.isDuplex.GetValue())
+		if qDialog(_("処理を開始します。よろしいですか？"), _("確認")) == wx.ID_NO:
 			return
-		if qDialog(_("変換を開始します。よろしいですか？"), _("確認")) == wx.ID_NO:
+		manager = ocrManager.manager(e, source)
+		pDialog = processingDialog.Dialog(manager)
+		pDialog.Initialize()
+		manager.start()
+		pDialog.Show()
+		text = manager.getText()
+		if text == "":
+			dialog(_("テキストが認識されませんでした。"))
 			return
-		convertDialog = views.convert.ConvertDialog()
-		convertDialog.Initialize()
-		contain_text = False
-		over_size = False
-		over_file = []
-		result = []
-		for file in self.parent.OcrManager.OcrList:
-			if self.parent.OcrManager.Engine == 0:
-				if pdfUtil.pdfTextChecker(str(file)):
-					contain_text = True
-				if file.stat().st_size > 1024*1024*2:
-					over_size = True
-					over_file.append(str(file))
-		if over_size:
-			over_str = str.join("\n", over_file)
-			errorDialog(_("2MBを超えるファイルが検出されました。容量の大きなファイルは認識することができません。\n検出されたファイル:%s") % (over_str))
-			return
-		if contain_text:
-			if qDialog("pdfからテキストが検出されました。画像に変換して送信しますか？") == wx.ID_YES:
-				self.parent.OcrManager.pdf_to_png = True
-		ocrThread = threading.Thread(target=self.parent.OcrManager.lapped_ocr_exe, args=(convertDialog, result))
-		ocrThread.start()
-		convertDialog.Show(True)
-		if errorCodes.CANCELED in result:
-			dialog(_("キャンセルされました。"), _("結果"))
-			return
-		if errorCodes.FILE_NOT_FOUND in result:
-			errorDialog(_("画像ファイルが存在しなかったためキャンセルされました。"))
-			return
-		if errorCodes.NOT_SUPPORTED in result:
-			errorDialog(_("この機能は対応していません"))
-			return
-		if errorCodes.NOT_AUTHORIZED in result:
-			errorDialog(_("この機能を使用するには事前にグーグルと連携しておく必用があります。ツールメニューより連携を行ってください。"))
-			return
-		if errorCodes.NET_ERROR in result:
-			errorDialog(_("通信中にエラーが発生しました。ネット接続を確認するか時間をおいてから再度お試しください。"))
-			return
-		if errorCodes.GOOGLE_ERROR in result:
-			errorDialog(_("エラーが発生しました。ファイルが画像ファイルか、ファイルが破損していないかなどを確認してください。"))
-			return
-		if errorCodes.UNKNOWN in result:
-			errorDialog(_("何らかの理由により変換に失敗しました。errorlog.txtをご確認ください。"))
-		if errorCodes.FILE_NOT_SUPPORTED in result:
-			errorDialog(_("このエンジンではこのファイル形式は対応していません。"))
-			return
-		if errorCodes.OK in result:
-			converted = views.converted.Dialog()
-			converted.result = self.parent.OcrManager.SavedText
-			if self.parent.OcrManager.Engine == 1:
-				converted.tesseract_flag = True
-				converted.list = self.parent.OcrManager.saved
-			converted.Initialize()
-			converted.Show()
-			converted.Destroy()
-			self.parent.OcrManager.SavedText = ""
-			self.parent.filebox.Clear()
-			self.parent.OcrManager.OcrList.clear()
+		resDialog = resultDialog.Dialog(text)
+		resDialog.Initialize()
+		resDialog.Show()
 		return
+
 	def OnMenuSelect(self,event):
 		"""メニュー項目が選択されたときのイベントハンドら。"""
 		#ショートカットキーが無効状態のときは何もしない
@@ -237,7 +233,7 @@ class Events(BaseEvents):
 		if selected == menuItemsStore.getRef("EXIT"):
 			self.Exit()
 		if selected == menuItemsStore.getRef("DELETE"):
-			self.delete()
+			self.onDelete()
 		if selected == menuItemsStore.getRef("PAST"):
 			c=clipboard.ClipboardFile()
 			pathList = c.GetFileList()
