@@ -135,17 +135,11 @@ class Menu(BaseMenu):
 		self.hSettingMenu=wx.Menu()
 		self.hHelpMenu = wx.Menu()
 		#ファイルメニューの中身
-		self.open = self.RegisterMenuCommand(self.hFileMenu, "OPEN", _("変換ファイルの追加(&o)"))#ファイルリストの追加
-		self.exit = self.RegisterMenuCommand(self.hFileMenu, "EXIT", _("終了(&x)"))#プログラムの終了
+		self.RegisterMenuCommand(self.hFileMenu, ["OPEN", "EXIT"])
 		#設定メニューの中身
-		self.google=self.RegisterMenuCommand(self.hSettingMenu,"GOOGLE",_("Googleと連携する(&g)"))#グーグルの認証開始
-		self.sendRegist = self.RegisterMenuCommand(self.hSettingMenu,"SENDREGIST",_("送るメニューにショートカットを作成(&s)"))
-		self.setting = self.RegisterMenuCommand(self.hSettingMenu,"SETTINGS",_("設定画面を開く(&w)"))
-	
+		self.RegisterMenuCommand(self.hSettingMenu, ["GOOGLE", "SENDREGIST", "SETTINGS"])
 		#ヘルプメニューの中身
-		self.Page = self.RegisterMenuCommand(self.hHelpMenu, "webpage", _("ACT Laboratoryのホームページを開く(&p)"))
-		self.About = self.RegisterMenuCommand(self.hHelpMenu, "ABOUT", _("このソフトについて"))
-		self.Update = self.RegisterMenuCommand(self.hHelpMenu, "UPDATE", _("最新バージョンを確認"))
+		self.RegisterMenuCommand(self.hHelpMenu, ["HOMEPAGE", "UPDATE", "ABOUT"])
 		#メニューバーの生成
 		self.hMenuBar.Append(self.hFileMenu, _("ファイル(&f)"))
 		self.hMenuBar.Append(self.hSettingMenu,_("設定(&s)"))
@@ -219,6 +213,9 @@ class Events(BaseEvents):
 		resDialog.Show()
 		return
 
+	def Exit(self, event = None):
+		self.parent.hFrame.Close()
+
 	def OnMenuSelect(self,event):
 		"""メニュー項目が選択されたときのイベントハンドら。"""
 		#ショートカットキーが無効状態のときは何もしない
@@ -264,7 +261,7 @@ class Events(BaseEvents):
 			settingDialog.Show(True)
 			settingDialog.Destroy()
 
-		if selected == menuItemsStore.getRef("webpage"):
+		if selected == menuItemsStore.getRef("HOMEPAGE"):
 			webbrowser.open(constants.APP_DEVELOPERS_URL)
 			return
 		if selected == menuItemsStore.getRef("SENDREGIST"):

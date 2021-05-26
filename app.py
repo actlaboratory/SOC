@@ -3,7 +3,6 @@
 
 import proxyUtil
 import AppBase
-from views import main
 import CredentialManager
 import sys
 import locale
@@ -25,11 +24,8 @@ class Main(AppBase.MainBase):
 	def initialize(self):
 		"""アプリを初期化する。"""
 		# プロキシの設定を適用
-		if self.config.getboolean("network", "auto_proxy"):
-			self.proxyEnviron = proxyUtil.virtualProxyEnviron()
-			self.proxyEnviron.set_environ()
-		else:
-			self.proxyEnviron = None
+		self.proxyEnviron = proxyUtil.virtualProxyEnviron()
+		self.setProxyEnviron()
 		# googleのCredentialを準備
 		self.credentialManager=CredentialManager.CredentialManager()
 		self.setGlobalVars()
@@ -42,6 +38,7 @@ class Main(AppBase.MainBase):
 		#popplerにパスを通す
 		os.environ["PATH"] += os.pathsep + os.getcwd() + "/poppler/bin"
 		# メインビューを表示
+		from views import main
 		self.hMainView=main.MainView()
 		self.fileList = []
 		self.addFileList(sys.argv[1:])
@@ -49,6 +46,13 @@ class Main(AppBase.MainBase):
 			self.hMainView.hFrame.Maximize()
 		self.hMainView.Show()
 		return True
+
+
+	def setProxyEnviron(self):
+		if self.config.getboolean("proxy", "usemanualsetting", False) == True:
+			self.proxyEnviron.set_environ(self.config["proxy"]["server"], self.config.getint("proxy", "port", 8080, 0, 65535))
+		else:
+			self.proxyEnviron.set_environ()
 
 	#windows標準のコードページではなくUTF-8を強制するHack
 	def SetDefaultEncoding(self):

@@ -19,6 +19,7 @@ if platform.system() == 'Windows':
 			# try again
 			return load_com(*names)
 	com.load_com = _load_com
+
 	from . import nvda
 	from . import jaws
 	from . import sapi5

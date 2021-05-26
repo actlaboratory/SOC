@@ -14,6 +14,9 @@ from logging import getLogger, FileHandler, Formatter
 import constants
 import DefaultSettings
 import views.langDialog
+import simpleDialog
+import os
+import traceback
 
 class MaiｎBase(wx.App):
 	def __init__(self):
@@ -37,6 +40,9 @@ class MaiｎBase(wx.App):
 		self.SetTimeZone()
 		self.InitTranslation()
 		self.InitSpeech()
+		# ログのファイルハンドラーが利用可能でなければ警告を出す
+		if not self.log.hasHandlers():
+			simpleDialog.errorDialog(_("ログ機能の初期化に失敗しました。下記のファイルへのアクセスが可能であることを確認してください。") + "\n" + os.path.abspath(constants.LOG_FILE_NAME))
 
 	def InitSpeech(self):
 		# 音声読み上げの準備
@@ -73,16 +79,19 @@ class MaiｎBase(wx.App):
 
 	def InitLogger(self):
 		"""ログ機能を初期化して準備する。"""
-		self.hLogHandler=FileHandler(constants.LOG_FILE_NAME, mode="w", encoding="UTF-8")
-		self.hLogHandler.setLevel(logging.DEBUG)
-		self.hLogFormatter=Formatter("%(name)s - %(levelname)s - %(message)s (%(asctime)s)")
-		self.hLogHandler.setFormatter(self.hLogFormatter)
-		logger=getLogger(constants.LOG_PREFIX)
-		logger.setLevel(logging.DEBUG)
-		logger.addHandler(self.hLogHandler)
+		try:
+			self.hLogHandler=FileHandler(constants.LOG_FILE_NAME, mode="w", encoding="UTF-8")
+			self.hLogHandler.setLevel(logging.DEBUG)
+			self.hLogFormatter=Formatter("%(name)s - %(levelname)s - %(message)s (%(asctime)s)")
+			self.hLogHandler.setFormatter(self.hLogFormatter)
+			logger=getLogger(constants.LOG_PREFIX)
+			logger.setLevel(logging.DEBUG)
+			logger.addHandler(self.hLogHandler)
+		except Exception as e:
+			traceback.print_exc()
 		self.log=getLogger(constants.LOG_PREFIX+".Main")
 		r="executable" if self.frozen else "interpreter"
-		self.log.info("Starting"+constants.APP_NAME+" as %s!" % r)
+		self.log.info("Starting"+constants.APP_NAME+" "+constants.APP_VERSION+" as %s!" % r)
 
 	def LoadSettings(self):
 		"""設定ファイルを読み込む。なければデフォルト設定を適用し、設定ファイルを書く。"""
@@ -91,6 +100,7 @@ class MaiｎBase(wx.App):
 			#初回起動
 			self.config.read_dict(DefaultSettings.initialValues)
 			self.config.write()
+		self.hLogHandler.setLevel(self.config.getint("general","log_level",20,0,50))
 
 	def InitTranslation(self):
 		"""翻訳を初期化する。"""
@@ -123,3 +133,13 @@ class MaiｎBase(wx.App):
 		hours=bias//60
 		minutes=bias%60
 		self.timezone=datetime.timezone(datetime.timedelta(hours=hours,minutes=minutes))
+
+	def getAppPath(self):
+		"""アプリの絶対パスを返す
+		"""
+		if self.frozen:
+			# exeファイルで実行されている
+			return sys.executable
+		else:
+			# pyファイルで実行されている
+			return os.path.join(os.path.dirname(__file__), os.path.basename(sys.argv[0]))

@@ -10,6 +10,6 @@ defaultKeymap["mainView"]={
 	"EXIT": "ctrl+X",
 }
 defaultKeymap["fileList"] = {
-"DELETE": "DELETE",
-"PAST": "ctrl+V",
+	"DELETE": "DELETE",
+	"PAST": "ctrl+V",
 }
