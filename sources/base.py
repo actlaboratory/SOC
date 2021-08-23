@@ -8,7 +8,6 @@ import queue
 class sourceBase(threading.Thread):
 	def __init__(self, identifier):
 		self.identifier = identifier# このソースを表す文字列
-		self.error = False
 		self.log=getLogger("%s.%s" % (constants.LOG_PREFIX,identifier))
 		self.messageQueue = queue.Queue()
 		super().__init__()
@@ -29,9 +28,6 @@ class sourceBase(threading.Thread):
 	def run(self):
 		return
 
-	def getStatusString(self):
-		return _("未定義")
-
 	def _showMessage(self, text):
 		result = queue.Queue()
 		data = (text, result)
@@ -40,7 +36,7 @@ class sourceBase(threading.Thread):
 			time.sleep(0.01)
 		return result.get()
 
-	def close(self):
+	def terminate(self):
 		"""ソースを閉じるときの処理"""
 		return None#必要な場合はオーバーライドする。
 
