@@ -8,6 +8,7 @@ import dtwain
 import queue
 import errorCodes
 import wx
+import tempfile
 
 class scannerSource(sourceBase):
 	def __init__(self, scannerName, resolution = 300, blankPageDetect = False, isDuplex = False):
@@ -20,10 +21,8 @@ class scannerSource(sourceBase):
 		self.running = True
 		self.initialized = False
 		#self.dtwain_source.raiseDeviceOffline()
-		self.image_tmp = os.path.join(globalVars.app.tmpdir, "acquiredImage")
-		if os.path.exists(self.image_tmp):
-			shutil.rmtree(self.image_tmp)
-		os.mkdir(self.image_tmp)
+		self.temp_dir = tempfile.TemporaryDirectory()
+		self.image_tmp = self.temp_dir.name
 		self._fileQueue = queue.Queue()
 
 	def dtwain_initialize(self):
@@ -93,3 +92,6 @@ class scannerSource(sourceBase):
 			return _("スキャン中...")
 		else:
 			return _("大気中...")
+
+	def terminate(self):
+		self.temp_dir.cleanup()
