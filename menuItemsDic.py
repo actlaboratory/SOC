@@ -13,6 +13,7 @@ dic={
 	"EXIT": _("終了(&x)"),
 	"GOOGLE": _("Googleと連携する(&g)"),
 	"SENDREGIST": _("送るメニューにショートカットを作成(&s)"),
+	"OPENVIEW": "OCRダイアログを開く（テスト用）",
 	"SETTINGS": _("設定画面を開く(&w)"),
 	"HOMEPAGE": _("ACT Laboratoryのホームページを開く(&p)"),
 	"ABOUT": _("このソフトについて"),

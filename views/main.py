@@ -31,8 +31,9 @@ from engines import google, tesseract
 from simpleDialog import *
 from sources import file, scanner
 
+from stub import stub
 from views import (authorizing, processingDialog, resultDialog, settings,
-                   versionDialog)
+                   versionDialog, OcrDialog)
 
 from .base import *
 
@@ -135,7 +136,7 @@ class Menu(BaseMenu):
 		self.hSettingMenu=wx.Menu()
 		self.hHelpMenu = wx.Menu()
 		#ファイルメニューの中身
-		self.RegisterMenuCommand(self.hFileMenu, ["OPEN", "EXIT"])
+		self.RegisterMenuCommand(self.hFileMenu, ["OPEN", "OPENVIEW", "EXIT"])
 		#設定メニューの中身
 		self.RegisterMenuCommand(self.hSettingMenu, ["GOOGLE", "SENDREGIST", "SETTINGS"])
 		#ヘルプメニューの中身
@@ -276,6 +277,11 @@ class Events(BaseEvents):
 
 		if selected == menuItemsStore.getRef("UPDATE"):
 			globalVars.update.update()
+		if selected == menuItemsStore.getRef("OPENVIEW"):
+			dialog = OcrDialog.Dialog()
+			dialog.Initialize(stub())
+			dialog.Show()
+
 
 
 

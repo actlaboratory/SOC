@@ -20,6 +20,12 @@ class job():
 		self.temporally = temporally
 		self.items = []
 
+	def getItems(self):
+		return self.items
+
+	def appendItem(self, item):
+		self.items.append(item)
+
 	def getFormat(self):
 		if not hasattr(self, "format"):
 			self._register_format()
@@ -50,40 +56,14 @@ class job():
 			text += item.getText()
 		return text
 
-	def save(self):
-		text  = self.getAllItemText()
-		default_path = globalVars.app.config.getstring("ocr", "savedir")
-		name = util.get_change_ext(self.filename, "txt")
-		if self.temporally:
-			name = os.path.join(default_path,datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S.txt"))
-		if not globalVars.app.config.getboolean("ocr", "savesourcedir", True):
-			name = util.get_change_ext(os.path.join(default_path, os.path.basename(self.filename)), "txt")
-		with open(name, mode = "w") as f:
-			f.write(text)
-
-
-
 
 class item:
 	def __init__(self, filename):
-		self.error = False
-		self.success = False
 		self.filename = filename
 
-	def getErrorString(self):
-		if not self.error:
-			return ""
-		return self.errorMessage
-
-	def setSuccess(self, text):
+	def setText(self, text):
 		self.text = text
-		self.success = True
 
 	def getText(self):
 		return self.text
-
-	def setError(self, message):
-		self.error = True
-		self.errorMessage = message
-		self.done = True
 
