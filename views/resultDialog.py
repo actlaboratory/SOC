@@ -28,7 +28,7 @@ class Dialog(BaseDialog):
 
 
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("認識結果"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
-		self.resEdit, dummy = creator.inputbox(_("認識結果"), defaultValue = self.text, style = wx.TE_READONLY|wx.TE_MULTILINE|wx.TE_DONTWRAP, )
+		self.resEdit, dummy = page.inputbox(_("認識結果"), defaultValue = self.text, style = wx.TE_READONLY|wx.TE_MULTILINE|wx.TE_DONTWRAP, )
 
 		self.button = self.creator.okbutton(_("閉じる"))
 
