@@ -155,7 +155,7 @@ class Events(BaseEvents):
 		if index == -1:
 			return
 		self.parent.filebox.Delete(index)
-		del file.fileSource.fileList[index]
+		del globalVars.app.fileList[index]
 		self.parent.filebox.SetSelection(index-1)
 		return
 	def open(self, events=None):
@@ -193,7 +193,7 @@ class Events(BaseEvents):
 			e = tesseract.tesseractEngine(self.parent.tesseractModeSelection[self.parent.tesseract.GetStringSelection()])
 		#sourceオブジェクトの生成
 		if sourceSelection == 0:
-			source = file.fileSource()
+			source = file.fileSource(globalVars.app.fileList)
 		elif sourceSelection == 1:
 			scannerSelection = self.parent.scannerList.GetFocusedItem()
 			scannerName = self.parent.scannerList.GetItemText(scannerSelection)
@@ -212,6 +212,8 @@ class Events(BaseEvents):
 		resDialog = resultDialog.Dialog(text)
 		resDialog.Initialize()
 		resDialog.Show()
+		globalVars.app.fileList.clear()
+		self.parent.fileList.Clear()
 		return
 
 	def Exit(self, event = None):

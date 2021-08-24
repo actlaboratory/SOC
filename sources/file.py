@@ -3,11 +3,11 @@ from jobObjects import job
 import errorCodes
 
 class fileSource(sourceBase):
-	# 画像ファイルを入れておくリスト
-	fileList = []
-
-	def __init__(self):
+	def __init__(self, fileList):
 		super().__init__("fileSource")
+		self.fileList = fileList
+		self.log.info("%d files was stored" % len(flieList))
+
 
 	def _internal_get_item(self):
 		if len(self.fileList) == 0:
@@ -15,21 +15,4 @@ class fileSource(sourceBase):
 		fileName = self.fileList[0]
 		del self.fileList[0]
 		return job(fileName, temporally=False)
-
-	def getStatus(self):
-		status = 0
-		if len(self.fileList) > 0:
-			status |= errorCodes.STATUS_SOURCE_QUEUED
-		else:
-			status |= errorCodes.STATUS_SOURCE_EMPTY
-		if self.error:
-			status |= errorCodes.STATUS_SOURCE_ERROR
-		return status
-
-
-	def getStatusString(self):
-		if len(self.fileList) > 0:
-			return _("残りファイル数: %d") % (len(self.fileList))
-		else:
-			return _("用済み")
 

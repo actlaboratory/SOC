@@ -1,16 +1,19 @@
 #sourceBase
-
 import threading
 from logging import getLogger
 import constants
+from sources.constants import sourceStatus
 import queue
 
 class sourceBase(threading.Thread):
 	def __init__(self, identifier):
 		self.identifier = identifier# このソースを表す文字列
 		self.log=getLogger("%s.%s" % (constants.LOG_PREFIX,identifier))
+		self.log.debug("created")
+		self.status = 0
 		self.messageQueue = queue.Queue()
 		super().__init__()
+		self.raiseStatusFlag(sourceStatus.RUNNING)
 
 	def initialize(self):
 		return
@@ -39,4 +42,15 @@ class sourceBase(threading.Thread):
 	def terminate(self):
 		"""ソースを閉じるときの処理"""
 		return None#必要な場合はオーバーライドする。
+
+	def raiseStatusFlag(self, flag):
+		assert isinstance(flag, sourceStatus)
+		self.status |= flag
+
+	def lowerStatusFlag(self, flag):
+		assert isinstance(flag, sourceStatus)
+		self.status &= -1-flag
+
+	def getStatus(self):
+		return self.status
 

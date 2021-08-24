@@ -72,9 +72,9 @@ class Main(AppBase.MainBase):
 				error=True
 				continue
 			if suffix in constants.EXT_TO_FORMAT.keys():
-				if file in fileSource.fileList:
+				if file in self.fileList:
 					continue
-				fileSource.fileList.append(file)
+				self.fileList.append(file)
 				self.hMainView.filebox.Append(os.path.basename(file))
 				add = True
 			else:

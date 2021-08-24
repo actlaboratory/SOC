@@ -41,35 +41,5 @@ class manager(threading.Thread):
 		return
 
 	def onAfterRecognize(self, job):
-		job.save()
 		self.processedJob.append(job)
 
-	def getStatusString(self):
-		statuses = {}
-		statuses["source"] = self.source.getStatusString()
-		statuses["engine"] = self.engine.getStatusString()
-		return statuses
-
-	def getText(self):
-		text = ""
-		for job in self.processedJob:
-			for item in job.items:
-				text += job.getAllItemText()
-		return text
-
-	def updateMessageQueue(self):
-		while not self.source.messageQueue.empty():
-			self._messageQueue.put(self.source.messageQueue.get())
-		while not self.engine.messageQueue.empty():
-			self._messageQueue.put(self.engine.messageQueue.get())
-
-	def getMessage(self):
-		if self.isMessageEmpty():
-			return
-		return self._messageQueue.get()
-
-	def isMessageEmpty(self):
-		return self._messageQueue.empty()
-
-	def isDone(self):
-		return self.done
