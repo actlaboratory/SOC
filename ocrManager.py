@@ -4,6 +4,7 @@ import time
 import queue
 from logging import getLogger
 import constants
+from sources.constants import sourceStatus
 
 class manager(threading.Thread):
 	def __init__(self, engine, source):
@@ -24,9 +25,10 @@ class manager(threading.Thread):
 		self.log.info("Ocr started")
 		time.sleep(1)
 		while True:
-			if self.source.getStatus() & errorCodes.STATUS_SOURCE_EMPTY == errorCodes.STATUS_SOURCE_EMPTY and self.source.getStatus() & errorCodes.STATUS_SOURCE_QUEUED != errorCodes.STATUS_SOURCE_QUEUED:
-				break
-			if self.source.getStatus() & errorCodes.STATUS_SOURCE_LOADING == errorCodes.STATUS_SOURCE_LOADING and self.source.getStatus() & errorCodes.STATUS_SOURCE_QUEUED != errorCodes.STATUS_SOURCE_QUEUED:
+			if not self.source.getStatus() & sourceStatus.RUNNING:
+				if self.source.empty():
+					break
+			if self.source.empty():
 				time.sleep(0.1)
 				continue
 			item = self.source.get_item()
