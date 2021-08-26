@@ -6,14 +6,14 @@ from jobObjects import item
 converter_list = [pillow.pillow, pdf2image]
 
 def convert(job, engine_supported_formats):
-	if job.getFormat() & engine_supported_formats != 0:
+	if job.getFormat() & engine_supported_formats:
 		job.appendItem(item(job.getFileName()))
 		return
 	for converter in converter_list:
-		if converter.getSupportedFormats() & job.getFormat() != job.getFormat():
+		if not (converter.getSupportedFormats() & job.getFormat()):
 			continue
 		for format in constants.IMAGE_FORMAT_LIST:
-			if converter.getConvertableFormats() & format == format & engine_supported_formats & format == format:
+			if (converter.getConvertableFormats() & format) & (engine_supported_formats & format):
 				c = converter()
 				c.convert(job, format)
 				return
