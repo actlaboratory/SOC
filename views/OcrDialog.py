@@ -6,6 +6,7 @@ import globalVars
 import views.ViewCreator
 from logging import getLogger
 from views.baseDialog import *
+import copy
 
 class Dialog(BaseDialog):
 	def __init__(self):
@@ -53,7 +54,7 @@ class Dialog(BaseDialog):
 		else:
 			# タイマーでのみ実行
 			root = self.tree.GetRootItem()
-			ret = self.jobs[len(jobs):]
+			ret = jobs[len(self.jobs):]
 		self.map[root] = self.manager.getAllText()
 		for job in ret:
 			item1 = self.tree.AppendItem(root, job.getFileName())
@@ -62,7 +63,7 @@ class Dialog(BaseDialog):
 				item2 = self.tree.AppendItem(item1, item.getFileName())
 				self.map[item2] = item.getText()
 		self.updateText()
-		self.jobs = jobs
+		self.jobs = copy.deepcopy(jobs)
 
 	def updateText(self):
 		# 「全て」を選択時、新しく認識されたテキストを追加する
