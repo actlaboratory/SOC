@@ -59,7 +59,10 @@ class Dialog(BaseDialog):
 		for job in ret:
 			item1 = self.tree.AppendItem(root, job.getFileName())
 			self.map[item1] = job.getAllItemText()
-			for item in job.getItems():
+			items = job.getItems()
+			if len(items) < 2:
+				continue
+			for item in items:
 				item2 = self.tree.AppendItem(item1, item.getFileName())
 				self.map[item2] = item.getText()
 		self.updateText()
