@@ -5,6 +5,7 @@ import queue
 from logging import getLogger
 import constants
 from sources.constants import sourceStatus
+from engines.constants import engineStatus
 
 class manager(threading.Thread):
 	def __init__(self, engine, source):
@@ -12,7 +13,7 @@ class manager(threading.Thread):
 		self.processedJob = []
 		self.engine = engine
 		self.source = source
-		self.done = False
+		self.running = True
 		self._messageQueue = queue.Queue()
 		self.log = getLogger("%s.manager" % (constants.APP_NAME))
 
@@ -36,12 +37,26 @@ class manager(threading.Thread):
 			self.engine.put(item)
 			time.sleep(0.01)
 		self.engine.notifyStopSource()
-		while not self.engine.getEngineStatus() & errorCodes.STATUS_ENGINE_FINISHED == errorCodes.STATUS_ENGINE_FINISHED:
+		while not self.engine.getStatus() & engineStatus.FINISHED:
 			time.sleep(0.01)
 		self.log.debug("Ocr stoped")
-		self.done = True
+		self.running = False
 		return
 
 	def onAfterRecognize(self, job):
 		self.processedJob.append(job)
 
+	def getEngineStatus(self):
+		return self.engine.getStatus()
+
+	def getSourceStatus(self):
+		return self.source.getStatus()
+
+	def getProcessedJobs(self):
+		return self.processedJob
+
+	def getAllText(self):
+		text = ""
+		for job in self.getProcessedJobs():
+			text += job.getAllItemText()
+		return text

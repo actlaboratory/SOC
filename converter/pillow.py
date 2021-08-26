@@ -9,7 +9,7 @@ class pillow(converterBase):
 
 	def convert(self, job, target_format):
 		self.log.info("running converter...")
-		for img in ImageSequence.Iterator(Image.open(job.filename)):
+		for img in ImageSequence.Iterator(Image.open(job.getFileName())):
 			if target_format == constants.FORMAT_BMP:
 				path = self.getTmpFilePath(".bmp")
 			elif target_format == constants.FORMAT_PNG:
@@ -21,5 +21,5 @@ class pillow(converterBase):
 					img = img.convert("RGB")
 				path = self.getTmpFilePath(".jpg")
 			img.save(path)
-			job.items.append(item(path))
+			job.appendItem(item(path))
 		self.log.info("convert done!")

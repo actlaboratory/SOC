@@ -8,7 +8,7 @@ class pdf2image(converterBase):
 	_CONVERTABLE_FORMATS = constants.FORMAT_BMP | constants.FORMAT_PNG | constants.FORMAT_GIF | constants.FORMAT_JPEG
 
 	def convert(self, job, target_format):
-		images = convert_from_path(job.filename,dpi=400)
+		images = convert_from_path(job.getFileName,dpi=400)
 		for image in images:
 			if target_format == constants.FORMAT_BMP:
 				path = self.getTmpFilePath(".bmp")
@@ -21,6 +21,6 @@ class pdf2image(converterBase):
 					image = image.convert("RGB")
 				path = self.getTmpFilePath(".jpg")
 			image.save(path)
-			job.items.append(item(path))
+			job.appendItem(item(path))
 		self.log.info("pdf converted")
 
