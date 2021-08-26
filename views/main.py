@@ -206,7 +206,7 @@ class Events(BaseEvents):
 		manager.start()
 		oDialog.Show()
 		globalVars.app.fileList.clear()
-		self.parent.fileBox.Clear()
+		self.parent.filebox.Clear()
 		return
 
 	def Exit(self, event = None):
