@@ -7,6 +7,7 @@ import constants
 from logging import getLogger
 import errorCodes
 import converter
+from .constants import engineStatus
 
 class engineBase(threading.Thread):
 	"""すべてのエンジンクラスが継承する基本クラス。"""
@@ -18,13 +19,16 @@ class engineBase(threading.Thread):
 		self.log = getLogger("%s.%s" % (constants.APP_NAME, self.identifier))
 		self.log.info("initialized")
 		super().__init__()
-		self._status = errorCodes.OK
+		self.status = 0
 		self._jobQueue = queue.Queue()
-		self._onAfterRecognize = None
+		self._onAfterRecognize = lambda a: None
+		self.raiseStatusFlag(engineStatus.RUNNING)
 
 	def put(self, job):
 		self.log.debug("job received")
+		self.raiseStatusFlag(engineStatus.CONVERTER_PROCESSING)
 		converter.convert(job, self.getSupportedFormats())
+		self.lowerStatusFlag(engineStatus.CONVERTER_PROCESSING)
 		self._jobQueue.put(job)
 
 	def setCallbackOnAfterRecognize(self, callback):
@@ -35,17 +39,19 @@ class engineBase(threading.Thread):
 		while True:
 			time.sleep(0.01)
 			if self._jobQueue.empty():
-				if self._status & errorCodes.STATUS_ENGINE_STOPSOURCE == errorCodes.STATUS_ENGINE_STOPSOURCE:break
+				if self.getStatus() & engineStatus.SOURCESTOPED:
+					break
 				continue
-			if self._status & errorCodes.STATUS_ENGINE_NEEDSTOP == errorCodes.STATUS_ENGINE_NEEDSTOP:
-				break
 			job = self._jobQueue.get()
 			self.log.debug("executing recognition...")
+			self.raiseStatusFlag(engineStatus.EXECUTING)
 			self._execRecognize(job)
 			self.log.debug("finished recognition")
 			self._onAfterRecognize(job)
+			self.lowerStatusFlag(engineStatus.EXECUTING)
 		self.log.debug("finish engine thread")
-		self._status |= errorCodes.STATUS_ENGINE_FINISHED
+		self.lowerStatusFlag(engineStatus.RUNNING)
+		self.raiseStatusFlag(engineStatus.FINISHED)
 
 	def _recognize(self, item):
 		raise NotImplementedError()
@@ -56,13 +62,22 @@ class engineBase(threading.Thread):
 
 	def notifyStopSource(self):
 		self.log.debug("notifyed source stoped")
-		self._status |= errorCodes.STATUS_ENGINE_STOPSOURCE
+		self.raiseStatusFlag(engineStatus.SOURCESTOPED)
 
 	def getSupportedFormats(self):
 		return 0
 
-	def getEngineStatus(self):
-		return self._status
+	def raiseStatusFlag(self, flag):
+		assert isinstance(flag, engineStatus)
+		self.status |= flag
+
+	def lowerStatusFlag(self, flag):
+		assert isinstance(flag, engineStatus)
+		self.status &= -1-flag
+
+	def getStatus(self):
+		return self.status
+
 
 	def _showMessage(self, text):
 		result = queue.Queue()
@@ -71,11 +86,3 @@ class engineBase(threading.Thread):
 		while not result.empty():
 			time.sleep(0.01)
 		return result.get()
-
-	def getStatusString(self):
-		return _("未定義")
-
-
-	def interrupt(self):
-		self._status |= errorCodes.STATUS_ENGINE_INTERRUPT
-

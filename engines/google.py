@@ -15,20 +15,17 @@ class googleEngine(engineBase):
 		self.credential = CredentialManager.CredentialManager(True)
 		self.credential.Authorize()
 		print("authorize success")
-		self._statusString = ("大気中...")
 
 	def getSupportedFormats(self):
 		return constants.FORMAT_JPEG | constants.FORMAT_PNG | constants.FORMAT_GIF|constants.FORMAT_PDF_IMAGE
 
 	def _recognize(self, item):
-		self._statusString = _("認識開始")
 		service = discovery.build("drive", "v3", credentials=self.credential.credential)
-		with open(item.filename, mode = "rb") as f:
-			self._statusString = _("アップロード中")
+		with open(item.getFileName, mode = "rb") as f:
 			self.log.info("uploading...")
 			media_body = MediaIoBaseUpload(f, mimetype="application/vnd.google-apps.document", resumable=True)
 			req_body = {
-				"name": os.path.basename(item.filename),
+				"name": os.path.basename(item.getFileName),
 				"mimeType":"application/vnd.google-apps.document"
 			}
 			file = service.files().create(
@@ -42,13 +39,7 @@ class googleEngine(engineBase):
 		stream = io.BytesIO()
 		downloader = MediaIoBaseDownload(stream, request)
 		done = False
-		self._statusString = _("ダウンロード中")
 		while done is False:
 			status, done = downloader.next_chunk()
 		service.files().delete(fileId=ID).execute()
-		item.setSuccess(stream.getvalue().decode("utf-8"))
-		self._statusString = _("大気中")
-
-	def getStatusString(self):
-		return self._statusString
-
+		item.setText(stream.getvalue().decode("utf-8"))
