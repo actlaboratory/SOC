@@ -16,6 +16,7 @@ import util
 import os
 import globalVars
 from sources.file import fileSource
+import threading
 
 class Main(AppBase.MainBase):
 	def __init__(self):
@@ -29,6 +30,7 @@ class Main(AppBase.MainBase):
 		# googleのCredentialを準備
 		self.credentialManager=CredentialManager.CredentialManager()
 		self.setGlobalVars()
+		self.installThreadExcepthook()
 		# update関係を準備
 		if self.config.getboolean("general", "update"):
 			globalVars.update.update(True)
@@ -102,3 +104,20 @@ class Main(AppBase.MainBase):
 		
 		#戻り値は無視される
 		return 0
+
+	def installThreadExcepthook(self):
+		_init = threading.Thread.__init__
+
+		def init(self, *args, **kwargs):
+			_init(self, *args, **kwargs)
+			_run = self.run
+
+			def run(*args, **kwargs):
+				try:
+					_run(*args, **kwargs)
+				except:
+					sys.excepthook(*sys.exc_info())
+			self.run = run
+
+		threading.Thread.__init__ = init
+
