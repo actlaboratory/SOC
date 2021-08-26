@@ -21,11 +21,11 @@ class googleEngine(engineBase):
 
 	def _recognize(self, item):
 		service = discovery.build("drive", "v3", credentials=self.credential.credential)
-		with open(item.getFileName, mode = "rb") as f:
+		with open(item.getFileName(), mode = "rb") as f:
 			self.log.info("uploading...")
 			media_body = MediaIoBaseUpload(f, mimetype="application/vnd.google-apps.document", resumable=True)
 			req_body = {
-				"name": os.path.basename(item.getFileName),
+				"name": os.path.basename(item.getFileName()),
 				"mimeType":"application/vnd.google-apps.document"
 			}
 			file = service.files().create(
