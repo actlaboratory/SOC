@@ -19,7 +19,7 @@ class engineBase(threading.Thread):
 		self.log = getLogger("%s.%s" % (constants.APP_NAME, self.identifier))
 		self.log.info("initialized")
 		super().__init__()
-		self.status = 0
+		self.status = engineStatus(0)
 		self._jobQueue = queue.Queue()
 		self._onAfterRecognize = lambda a: None
 		self.raiseStatusFlag(engineStatus.RUNNING)

@@ -31,7 +31,7 @@ class job():
 		return self.format
 
 	def _register_format(self):
-		ext = os.path.splitext(self.getFileName)[1][1:]
+		ext = os.path.splitext(self.getFileName())[1][1:]
 		format = constants.EXT_TO_FORMAT.get(ext.lower(), constants.FORMAT_UNKNOWN)
 		if format == constants.FORMAT_PDF_UNKNOWN:
 			# 埋め込みテキストの含まれるPDFであるか判定

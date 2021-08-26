@@ -1,8 +1,7 @@
 #constants for sources
 
-from enum import Flag, auto
+from enum import IntFlag, auto
 
-class sourceStatus(Flag):
+class sourceStatus(IntFlag):
 	QUEUED = auto()
 	RUNNING = auto()
-	

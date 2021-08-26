@@ -1,6 +1,6 @@
-from enum import Flag, auto
+from enum import IntFlag, auto
 
-class engineStatus(Flag):
+class engineStatus(IntFlag):
 	RUNNING = auto()
 	CONVERTER_PROCESSING = auto()
 	FINISHED = auto()

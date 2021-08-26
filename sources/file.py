@@ -9,7 +9,7 @@ class fileSource(sourceBase):
 	def __init__(self, fileList):
 		super().__init__("fileSource")
 		self.fileList = fileList
-		self.log.info("%d files was stored" % len(flieList))
+		self.log.info("%d files was stored" % len(fileList))
 
 	def _internal_get_item(self):
 		if len(self.fileList) == 0:

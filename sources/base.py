@@ -10,7 +10,7 @@ class sourceBase(threading.Thread):
 		self.identifier = identifier# このソースを表す文字列
 		self.log=getLogger("%s.%s" % (constants.LOG_PREFIX,identifier))
 		self.log.debug("created")
-		self.status = 0
+		self.status = sourceStatus(0)
 		self.messageQueue = queue.Queue()
 		super().__init__()
 		self.raiseStatusFlag(sourceStatus.RUNNING)

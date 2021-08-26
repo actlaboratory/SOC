@@ -6,6 +6,7 @@ from logging import getLogger
 import constants
 from sources.constants import sourceStatus
 from engines.constants import engineStatus
+import winsound
 
 class manager(threading.Thread):
 	def __init__(self, engine, source):
@@ -44,6 +45,8 @@ class manager(threading.Thread):
 		return
 
 	def onAfterRecognize(self, job):
+		self.log.info("processed job received")
+		winsound.Beep(1000, 200)
 		self.processedJob.append(job)
 
 	def getEngineStatus(self):

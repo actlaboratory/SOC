@@ -201,19 +201,12 @@ class Events(BaseEvents):
 		if qDialog(_("処理を開始します。よろしいですか？"), _("確認")) == wx.ID_NO:
 			return
 		manager = ocrManager.manager(e, source)
-		pDialog = processingDialog.Dialog(manager)
-		pDialog.Initialize()
+		oDialog = OcrDialog.Dialog()
+		oDialog.Initialize(manager)
 		manager.start()
-		pDialog.Show()
-		text = manager.getText()
-		if text == "":
-			dialog(_("テキストが認識されませんでした。"))
-			return
-		resDialog = resultDialog.Dialog(text)
-		resDialog.Initialize()
-		resDialog.Show()
+		oDialog.Show()
 		globalVars.app.fileList.clear()
-		self.parent.fileList.Clear()
+		self.parent.fileBox.Clear()
 		return
 
 	def Exit(self, event = None):
@@ -283,9 +276,3 @@ class Events(BaseEvents):
 			dialog = OcrDialog.Dialog()
 			dialog.Initialize(stub())
 			dialog.Show()
-
-
-
-
-
-

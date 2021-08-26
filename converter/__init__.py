@@ -7,7 +7,7 @@ converter_list = [pillow.pillow, pdf2image]
 
 def convert(job, engine_supported_formats):
 	if job.getFormat() & engine_supported_formats != 0:
-		job.items.append(item(job.filename))
+		job.appendItem(item(job.getFileName()))
 		return
 	for converter in converter_list:
 		if converter.getSupportedFormats() & job.getFormat() != job.getFormat():
