@@ -22,6 +22,7 @@ class stub:
 		dummyItem.setText("２ページ目でございます。\nスタブ作るのも結構大変です。")
 		dummy.appendItem(dummyItem)
 		self.jobs.append(dummy)
+		self.processedJobs = []
 
 	def getEngineStatus(self):
 		return 0
@@ -30,7 +31,7 @@ class stub:
 		return 0
 
 	def getProcessedJobs(self):
-		return self.jobs
+		return self.processedJobs
 
 	def getAllText(self):
 		jobs = self.getProcessedJobs()
@@ -38,3 +39,7 @@ class stub:
 		for i in jobs:
 			text += i.getAllItemText()
 		return text
+
+	def processNextJob(self):
+		self.processedJobs.append(self.jobs[0])
+		del self.jobs[0]
