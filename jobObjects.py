@@ -50,8 +50,6 @@ class job():
 	def getAllItemText(self):
 		text = ""
 		for item in self.items:
-			if not item.success:
-				continue
 			text += item.getText()
 		return text
 
