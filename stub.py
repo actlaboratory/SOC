@@ -31,3 +31,10 @@ class stub:
 
 	def getProcessedJobs(self):
 		return self.jobs
+
+	def getAllText(self):
+		jobs = self.getProcessedJobs()
+		text = ""
+		for i in jobs:
+			text += i.getAllItemText()
+		return text
