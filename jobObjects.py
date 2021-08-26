@@ -9,14 +9,13 @@ import globalVars
 import datetime
 import util
 
-
 class job():
 	"""OCRの単位のなるクラス。
 	処理のもととなるファイル名を持ち実際に処理されるファイルを持ったitemをリストとして保持している。
 	"""
 
-	def __init__(self, filename, temporally = True):
-		self.filename = filename
+	def __init__(self, fileName, temporally = True):
+		self.fileName = fileName
 		self.temporally = temporally
 		self.items = []
 
@@ -32,13 +31,13 @@ class job():
 		return self.format
 
 	def _register_format(self):
-		ext = os.path.splitext(self.filename)[1][1:]
+		ext = os.path.splitext(self.getFileName)[1][1:]
 		format = constants.EXT_TO_FORMAT.get(ext.lower(), constants.FORMAT_UNKNOWN)
 		if format == constants.FORMAT_PDF_UNKNOWN:
 			# 埋め込みテキストの含まれるPDFであるか判定
 			pipeServer = namedPipe.Server(constants.PIPE_NAME)
 			pipeServer.start()
-			subprocess.run(("pdftotext", self.filename, pipeServer.getFullName()))
+			subprocess.run(("pdftotext", self.getFileName(), pipeServer.getFullName()))
 			list = pipeServer.getNewMessageList()
 			pipeServer.exit()
 			text = list[0]
@@ -56,10 +55,12 @@ class job():
 			text += item.getText()
 		return text
 
+	def getFileName(self):
+		return self.fileName
 
 class item:
-	def __init__(self, filename):
-		self.filename = filename
+	def __init__(self, fileName):
+		self.fileName = fileName
 
 	def setText(self, text):
 		self.text = text
@@ -67,3 +68,5 @@ class item:
 	def getText(self):
 		return self.text
 
+	def getFileName(self):
+		return self.fileName
