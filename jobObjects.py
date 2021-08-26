@@ -51,6 +51,8 @@ class job():
 		text = ""
 		for item in self.items:
 			text += item.getText()
+			if text[-1] != "\n":
+				text += "\n"
 		return text
 
 	def getFileName(self):
