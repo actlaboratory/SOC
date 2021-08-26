@@ -46,7 +46,6 @@ class Dialog(BaseDialog):
 
 	def update(self):
 		jobs = self.manager.getProcessedJobs()
-		self.map[root] = self.manager.getAllText()
 		if not self.initialized:
 			# 初回のみ実行
 			root = self.tree.AddRoot(_("（全て）"))
@@ -55,6 +54,7 @@ class Dialog(BaseDialog):
 			# タイマーでのみ実行
 			root = self.tree.GetRootItem()
 			ret = self.jobs[len(jobs):]
+		self.map[root] = self.manager.getAllText()
 		for job in ret:
 			item1 = self.tree.AppendItem(root, job.getFileName())
 			self.map[item1] = job.getAllItemText()
