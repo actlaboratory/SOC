@@ -51,20 +51,27 @@ class Dialog(BaseDialog):
 			# 初回のみ実行
 			root = self.tree.AddRoot(_("（全て）"))
 			ret = jobs
+			self.map[root] = {"cursor": 0, "text": self.manager.getAllText()}
 		else:
 			# タイマーでのみ実行
 			root = self.tree.GetRootItem()
 			ret = jobs[len(self.jobs):]
-		self.map[root] = self.manager.getAllText()
+			self.map[root]["text"] = self.manager.getAllText()
 		for job in ret:
 			item1 = self.tree.AppendItem(root, job.getFileName())
-			self.map[item1] = job.getAllItemText()
+			if item1 in self.map:
+				self.map[item1]["text"] = job.getAllItemText()
+			else:
+				self.map[item1] = {"cursor": 0, "text": job.getAllItemText()}
 			items = job.getItems()
 			if len(items) < 2:
 				continue
 			for item in items:
 				item2 = self.tree.AppendItem(item1, item.getFileName())
-				self.map[item2] = item.getText()
+				if item2 in self.map:
+					self.map[item2]["text"] = item.getText()
+				else:
+					self.map[item2] = {"cursor": 0, "text": item.getText()}
 		self.updateText()
 		self.jobs = copy.deepcopy(jobs)
 
@@ -73,14 +80,20 @@ class Dialog(BaseDialog):
 		root = self.tree.GetRootItem()
 		if self.tree.GetFocusedItem() != root:
 			return
-		new = self.map[root][len(self.text.GetValue()):]
+		new = self.map[root]["text"][len(self.text.GetValue()):]
 		cursor = self.text.GetSelection()
 		self.text.AppendText(new)
 		self.text.SetSelection(cursor[0], cursor[1])
 
 	def itemSelected(self, event):
+		prev = event.GetOldItem()
+		cursor = self.text.GetInsertionPoint()
+		if prev.GetID() is not None:
+			self.map[prev]["cursor"] = cursor
 		self.text.Clear()
-		self.text.SetValue(self.map[event.GetItem()])
+		focus = event.GetItem()
+		self.text.SetValue(self.map[focus]["text"])
+		self.text.SetInsertionPoint(self.map[focus]["cursor"])
 
 	def onTimerEvent(self, event):
 		self.update()
