@@ -11,7 +11,7 @@ import winsound
 class manager(threading.Thread):
 	def __init__(self, engine, source):
 		super().__init__()
-		self.processedJob = []
+		self.jobs = []
 		self.engine = engine
 		self.source = source
 		self.running = True
@@ -34,7 +34,8 @@ class manager(threading.Thread):
 				time.sleep(0.1)
 				continue
 			item = self.source.get_item()
-			self.log.debug("item received")
+			self.jobs.append(item)
+			self.log.debug("job received")
 			self.engine.put(item)
 			time.sleep(0.01)
 		self.engine.notifyStopSource()
@@ -47,7 +48,6 @@ class manager(threading.Thread):
 	def onAfterRecognize(self, job):
 		self.log.info("processed job received")
 		winsound.Beep(1000, 200)
-		self.processedJob.append(job)
 
 	def getEngineStatus(self):
 		return self.engine.getStatus()
@@ -56,10 +56,13 @@ class manager(threading.Thread):
 		return self.source.getStatus()
 
 	def getProcessedJobs(self):
-		return self.processedJob
+		return self.jobs
 
 	def getAllText(self):
 		text = ""
 		for job in self.getProcessedJobs():
 			text += job.getAllItemText()
 		return text
+
+	def getJobs(self):
+		return self.jobs
