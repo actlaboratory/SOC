@@ -1,4 +1,5 @@
 from os.path import basename
+
 import errorCodes
 import constants
 import os
@@ -8,6 +9,7 @@ import namedPipe
 import globalVars
 import datetime
 import util
+from enum import IntFlag, auto
 
 class job():
 	"""OCRの単位のなるクラス。
@@ -18,6 +20,7 @@ class job():
 		self.fileName = fileName
 		self.temporally = temporally
 		self.items = []
+		self.status = jobStatus(0)
 
 	def getItems(self):
 		return self.items
@@ -56,12 +59,25 @@ class job():
 	def getFileName(self):
 		return self.fileName
 
+	def raiseStatusFlag(self, flag):
+		assert isinstance(flag, jobStatus)
+		self.status |= flag
+
+	def lowerStatusFlag(self, flag):
+		assert isinstance(flag, jobStatus)
+		self.status &= -1-flag
+
+	def getStatus(self):
+		return self.status
+
 class item:
 	def __init__(self, fileName):
 		self.fileName = fileName
+		self.done = False
 
 	def setText(self, text):
 		self.text = text
+		self.done = True
 
 	def getText(self):
 		text = self.text
@@ -71,3 +87,13 @@ class item:
 
 	def getFileName(self):
 		return self.fileName
+
+	def isDone(self):
+		return self.done
+
+
+class jobStatus(IntFlag):
+	READY = auto()
+	PROCESSING = auto()
+	DONE = auto()
+
