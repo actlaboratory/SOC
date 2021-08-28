@@ -7,6 +7,7 @@ import views.ViewCreator
 from logging import getLogger
 from views.baseDialog import *
 import copy
+from views.base import BaseMenu
 
 class Dialog(BaseDialog):
 	def __init__(self):
@@ -33,6 +34,9 @@ class Dialog(BaseDialog):
 
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("認識結果"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
 		self.tree, dummy = page.treeCtrl(_("認識済みファイル"), self.itemSelected)
+		self.tree.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
+		self.treeIdentifier = "resultTree"
+		globalVars.app.hMainView.menu.keymap.Set(self.treeIdentifier, self.tree, globalVars.app.hMainView.events.OnMenuSelect)
 		self.text, dummy = page.inputbox(_("認識結果"), style=wx.TE_READONLY|wx.TE_MULTILINE)
 		self.update()
 		self.creator.okbutton(_("閉じる"), self.onClose)
@@ -101,3 +105,12 @@ class Dialog(BaseDialog):
 	def onClose(self, event):
 		self.timer.Stop()
 		event.Skip()
+
+	def onContextMenu(self, event):
+		menu = wx.Menu()
+		menu.Bind(wx.EVT_MENU, globalVars.app.hMainView.events.OnMenuSelect)
+		baseMenu = BaseMenu(self.treeIdentifier)
+		baseMenu.RegisterMenuCommand(menu, [
+			"COPY_TEXT",
+		])
+		self.tree.PopupMenu(menu, event)

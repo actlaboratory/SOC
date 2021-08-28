@@ -18,4 +18,6 @@ dic={
 	"HOMEPAGE": _("ACT Laboratoryのホームページを開く(&p)"),
 	"ABOUT": _("このソフトについて"),
 	"UPDATE": _("最新バージョンを確認"),
+	# for Context Menu
+	"COPY_TEXT": _("本文のコピー(&C)"),
 }

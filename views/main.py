@@ -16,6 +16,7 @@ import webbrowser
 from logging import getLogger
 
 import clipboard
+import clipboardHelper
 import constants
 import dtwain
 import errorCodes
@@ -202,6 +203,7 @@ class Events(BaseEvents):
 			return
 		manager = ocrManager.manager(e, source)
 		oDialog = OcrDialog.Dialog()
+		self.oDialog = oDialog
 		oDialog.Initialize(manager)
 		manager.start()
 		oDialog.Show()
@@ -274,5 +276,11 @@ class Events(BaseEvents):
 			globalVars.update.update()
 		if selected == menuItemsStore.getRef("OPENVIEW"):
 			dialog = OcrDialog.Dialog()
+			self.oDialog = dialog
 			dialog.Initialize(stub())
 			dialog.Show()
+		if selected == menuItemsStore.getRef("COPY_TEXT"):
+			item = self.oDialog.tree.GetFocusedItem()
+			text = self.oDialog.map[item]["text"]
+			with clipboardHelper.Clipboard() as c:
+				c.set_unicode_text(text)

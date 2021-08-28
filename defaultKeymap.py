@@ -13,3 +13,6 @@ defaultKeymap["fileList"] = {
 	"DELETE": "DELETE",
 	"PAST": "ctrl+V",
 }
+defaultKeymap["resultTree"] = {
+	"COPY_TEXT": "CTRL+C",
+}
