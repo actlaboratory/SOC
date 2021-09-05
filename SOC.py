@@ -42,6 +42,11 @@ import constants
 import globalVars
 
 def main():
+	if os.path.exists("errorLog.txt"):
+		try:
+			os.remove("errorLog.txt")
+		except:
+			pass
 	app=application.Main()
 	globalVars.app=app
 	result = app.initialize()
