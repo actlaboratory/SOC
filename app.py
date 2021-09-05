@@ -41,7 +41,7 @@ class Main(AppBase.MainBase):
 		#popplerにパスを通す
 		os.environ["PATH"] += os.pathsep + os.getcwd() + "/poppler/bin"
 		#managerの開始
-		globalVars.manager.start
+		globalVars.manager.start()
 		# メインビューを表示
 		from views import main
 		self.hMainView=main.MainView()
