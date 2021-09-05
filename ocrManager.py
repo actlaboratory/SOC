@@ -11,7 +11,7 @@ class manager(threading.Thread):
 	def __init__(self):
 		super().__init__()
 		self.taskQueue = queue.Queue()
-		self.gotTasks = []
+		self.tasks = []
 		self.needStop = False
 		self.running = False
 		self.log = getLogger("%s.manager" % (constants.APP_NAME))
@@ -21,7 +21,6 @@ class manager(threading.Thread):
 		while self.needStop:
 			time.sleep(0.01)
 			task = self.taskQueue.get(True)
-			self.gotTasks.append(task)
 			self.processTask(task)
 		self.running = False
 
@@ -32,11 +31,17 @@ class manager(threading.Thread):
 			continue
 		return
 
+	def addTask(self, task):
+		self.tasks.append(task)
+		self.taskQueue.put(task)
+
+
 	def stop(self):
 		self.needStop = True
 
 	def isRunning(self):
 		return self.running
 
-	def getGotTasks(self):
-		return self.gotTasks
+	def getTasks(self):
+		return self.tasks
+
