@@ -1,16 +1,21 @@
+from enum import IntFlag, auto
+
 class task:
 	def __init__(self, source, engine):
-		self._source = source
-		self._engine = engine
+		self.source = source
+		self.engine = engine
 		self.jobs = []
-
-	@property
-	def source(self):
-		return _source
-
-	@property
-	def engine(self):
-		return self._engine
 
 	def getJobs(self):
 		return self.jobs
+
+	def getEngineStatus(self):
+		return self.engine.getStatus()
+
+	def getSourceStatus(self):
+		return self.source.getStatus()
+
+class taskStatus(IntFlag):
+	STARTED = auto()
+	DONE = auto()
+
