@@ -7,13 +7,18 @@ from engines.constants import engineStatus
 import time
 import winsound
 
+nextTask_id = 1
+
 class task(threading.Thread):
 	def __init__(self, source, engine):
+		global nextTask_id
 		super().__init__()
 		self.source = source
 		self.engine = engine
 		self.jobs = []
-		self.log = getLogger("%s.task" % (constants.APP_NAME))
+		self.id = nextTask_id
+		nextTask_id += 1
+		self.log = getLogger("%s.task-%d" % (constants.APP_NAME, self.id))
 		self.log.debug("initialized")
 
 	def run(self):
@@ -64,6 +69,9 @@ class task(threading.Thread):
 	def onAfterRecognize(self, job):
 		self.log.info("processed job received")
 		winsound.Beep(1000, 200)
+
+	def getID(self):
+		return self.id
 
 	def raiseStatusFlag(self, flag):
 		assert isinstance(flag, taskStatus)
