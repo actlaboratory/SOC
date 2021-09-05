@@ -17,6 +17,7 @@ import os
 import globalVars
 from sources.file import fileSource
 import threading
+import ocrManager
 
 class Main(AppBase.MainBase):
 	def __init__(self):
@@ -39,6 +40,8 @@ class Main(AppBase.MainBase):
 			os.mkdir(self.getTmpDir())
 		#popplerにパスを通す
 		os.environ["PATH"] += os.pathsep + os.getcwd() + "/poppler/bin"
+		#managerの開始
+		globalVars.manager.start
 		# メインビューを表示
 		from views import main
 		self.hMainView=main.MainView()
@@ -48,7 +51,6 @@ class Main(AppBase.MainBase):
 			self.hMainView.hFrame.Maximize()
 		self.hMainView.Show()
 		return True
-
 
 	def setProxyEnviron(self):
 		if self.config.getboolean("proxy", "usemanualsetting", False) == True:
@@ -63,6 +65,7 @@ class Main(AppBase.MainBase):
 
 	def setGlobalVars(self):
 		globalVars.update = update.update()
+		globalVars.manager = ocrManager.manager()
 		return
 
 	def addFileList(self, files):

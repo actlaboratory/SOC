@@ -9,4 +9,5 @@
 
 app=None
 update = None
+manager = None
 dtwain = None
