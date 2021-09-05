@@ -4,6 +4,7 @@ from logging import getLogger
 import constants
 from sources.constants import sourceStatus
 import queue
+import time
 
 class sourceBase(threading.Thread):
 	def __init__(self, identifier):
@@ -21,7 +22,7 @@ class sourceBase(threading.Thread):
 	def _internal_get_item(self):
 		raise NotImplementedError()
 
-	def get_item(self):
+	def getNextJob(self):
 		self.log.info("The item was sent to manager")
 		return self._internal_get_item()
 

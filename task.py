@@ -5,6 +5,7 @@ import constants
 from sources.constants import sourceStatus
 from engines.constants import engineStatus
 import time
+import winsound
 
 class task(threading.Thread):
 	def __init__(self, source, engine):
@@ -45,11 +46,24 @@ class task(threading.Thread):
 	def getJobs(self):
 		return self.jobs
 
+	def getProcessedJobs(self):
+		return self.jobs
+
+	def getAllText(self):
+		text = ""
+		for job in self.getProcessedJobs():
+			text += job.getAllItemText()
+		return text
+
 	def getEngineStatus(self):
 		return self.engine.getStatus()
 
 	def getSourceStatus(self):
 		return self.source.getStatus()
+
+	def onAfterRecognize(self, job):
+		self.log.info("processed job received")
+		winsound.Beep(1000, 200)
 
 	def raiseStatusFlag(self, flag):
 		assert isinstance(flag, taskStatus)
@@ -61,6 +75,7 @@ class task(threading.Thread):
 
 	def getStatus(self):
 		return self.status
+
 
 class taskStatus(IntFlag):
 	STARTED = auto()
