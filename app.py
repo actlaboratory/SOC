@@ -50,8 +50,12 @@ class Main(AppBase.MainBase):
 			self.hMainView.hFrame.Maximize()
 		self.hMainView.Show()
 		files = []
+		formats = constants.EXT_TO_FORMAT.keys()
 		for i in sys.argv[1:]:
 			path = os.path.abspath(i)
+			ext = os.path.splitext(path)[1][1:]
+			if ext not in formats:
+				continue
 			if os.path.isfile(path):
 				files.append(path)
 		dialog = views.new.Dialog()
