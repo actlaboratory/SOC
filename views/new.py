@@ -1,5 +1,5 @@
 ﻿# -*- coding: utf-8 -*-
-# sample
+# Add New dialog
 
 import os
 import wx
@@ -29,10 +29,11 @@ class Dialog(BaseDialog):
 		}
 		self.files = []
 
-	def Initialize(self):
+	def Initialize(self, files=[]):
 		self.log.debug("created")
 		super().Initialize(self.app.hMainView.hFrame,_("新しく文字認識を開始"))
 		self.InstallControls()
+		self.addFiles(files)
 		return True
 
 	def InstallControls(self):
@@ -78,6 +79,9 @@ class Dialog(BaseDialog):
 		if dialog.ShowModal() == wx.ID_CANCEL:
 			return
 		files = dialog.GetPaths()
+		self.addFiles(files)
+
+	def addFiles(self, files):
 		for file in files:
 			self.filebox.Append(os.path.basename(file))
 			self.files.append(file)

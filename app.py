@@ -18,6 +18,7 @@ import globalVars
 from sources.file import fileSource
 import threading
 import ocrManager
+import views.new
 
 class Main(AppBase.MainBase):
 	def __init__(self):
@@ -45,11 +46,17 @@ class Main(AppBase.MainBase):
 		# メインビューを表示
 		from views import main
 		self.hMainView=main.MainView()
-		self.fileList = []
-		self.addFileList(sys.argv[1:])
 		if self.config.getboolean(self.hMainView.identifier,"maximized",False):
 			self.hMainView.hFrame.Maximize()
 		self.hMainView.Show()
+		files = []
+		for i in sys.argv[1:]:
+			path = os.path.abspath(i)
+			if os.path.isfile(path):
+				files.append(path)
+		dialog = views.new.Dialog()
+		dialog.Initialize(files)
+		dialog.Show()
 		return True
 
 	def setProxyEnviron(self):
@@ -67,27 +74,6 @@ class Main(AppBase.MainBase):
 		globalVars.update = update.update()
 		globalVars.manager = ocrManager.manager()
 		return
-
-	def addFileList(self, files):
-		error = False
-		add = False
-		for file in files:
-			suffix = os.path.splitext(file)[1][1:].lower()
-			if os.path.isdir(file):
-				error=True
-				continue
-			if suffix in constants.EXT_TO_FORMAT.keys():
-				if file in self.fileList:
-					continue
-				self.fileList.append(file)
-				add = True
-			else:
-				error = True
-		if error:
-			if add:
-				errorDialog(_("対応していないフォーマットのファイルは除外され、一部のファイルのみ追加されました。"))
-			else:
-				errorDialog(_("このフォーマットのファイルには対応していないため、追加できませんでした。"))
 
 	def getTmpDir(self):
 		return self.config.getstring("ocr", "tmpdir", os.path.join(os.environ["TEMP"], "soc"), None)
