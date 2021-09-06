@@ -22,7 +22,9 @@ class manager(threading.Thread):
 		self.running = True
 		while not self.needStop:
 			time.sleep(0.01)
-			task = self.taskQueue.get(True)
+			if self.taskQueue.empty():
+				continue
+			task = self.taskQueue.get()
 			self.log.debug("got task-%d" % task.getID())
 			self.processTask(task)
 		self.log.info("stoped")
