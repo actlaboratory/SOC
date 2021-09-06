@@ -20,7 +20,7 @@ class manager(threading.Thread):
 	def run(self):
 		self.log.info("manager started")
 		self.running = True
-		while self.needStop:
+		while not self.needStop:
 			time.sleep(0.01)
 			task = self.taskQueue.get(True)
 			self.log.debug("got task-%d" % task.getID())
