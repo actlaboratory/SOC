@@ -80,7 +80,6 @@ class Main(AppBase.MainBase):
 				if file in self.fileList:
 					continue
 				self.fileList.append(file)
-				self.hMainView.filebox.Append(os.path.basename(file))
 				add = True
 			else:
 				error = True
@@ -96,6 +95,10 @@ class Main(AppBase.MainBase):
 	def OnExit(self):
 		#設定の保存やリソースの開放など、終了前に行いたい処理があれば記述できる
 		#ビューへのアクセスや終了の抑制はできないので注意。
+
+		# managerを止める
+		globalVars.manager.stop()
+
 		if os.path.exists(self.getTmpDir()):
 			util.allDelete(self.getTmpDir())
 
