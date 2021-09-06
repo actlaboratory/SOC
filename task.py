@@ -20,6 +20,7 @@ class task(threading.Thread):
 		nextTask_id += 1
 		self.log = getLogger("%s.task-%d" % (constants.APP_NAME, self.id))
 		self.log.debug("initialized")
+		self.status = taskStatus(0)
 
 	def run(self):
 		self.raiseStatusFlag(taskStatus.STARTED)
