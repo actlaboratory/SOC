@@ -91,7 +91,7 @@ class Dialog(BaseDialog):
 		if index == -1:
 			return
 		self.filebox.Delete(index)
-		del globalVars.app.fileList[index]
+		del self.files[index]
 		self.filebox.SetSelection(index-1)
 		return
 
@@ -144,5 +144,5 @@ class DropTarget(wx.DropTarget):
 	#データを受け入れ、結果を返す
 	def OnData(self,x,y,defResult):
 		self.GetData()
-		globalVars.app.addFileList(self.DataObject.GetFilenames())
+		self.parent.addFiles(self.DataObject.GetFilenames())
 		return defResult		#推奨されたとおりに返しておく
