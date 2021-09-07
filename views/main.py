@@ -73,7 +73,6 @@ class MainView(BaseView):
 		self.menu.keymap.Set(self.treeIdentifier, self.tree)
 		self.text, dummy = page.inputbox(_("認識結果"), style=wx.TE_READONLY|wx.TE_MULTILINE)
 		self.update()
-		self.creator.okbutton(_("閉じる"), self.onClose)
 
 		self.evtHandler = wx.EvtHandler()
 		self.evtHandler.Bind(wx.EVT_TIMER, self.onTimerEvent)
