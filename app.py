@@ -89,6 +89,13 @@ class Main(AppBase.MainBase):
 		# managerを止める
 		globalVars.manager.stop()
 
+		# タイマーを止める
+		try:
+			self.hMainView.timer.Stop()
+			self.hMainView.timer.Destroy()
+		except:
+			pass
+
 		if os.path.exists(self.getTmpDir()):
 			util.allDelete(self.getTmpDir())
 

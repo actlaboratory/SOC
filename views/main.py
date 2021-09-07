@@ -153,10 +153,6 @@ class MainView(BaseView):
 	def onTimerEvent(self, event):
 		self.update()
 
-	def onClose(self, event):
-		self.timer.Stop()
-		event.Skip()
-
 	def onContextMenu(self, event):
 		menu = wx.Menu()
 		menu.Bind(wx.EVT_MENU, globalVars.app.hMainView.events.OnMenuSelect)
