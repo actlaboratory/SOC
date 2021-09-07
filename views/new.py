@@ -38,7 +38,7 @@ class Dialog(BaseDialog):
 
 	def InstallControls(self):
 		"""いろんなwidgetを設置する。"""
-		self.creator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.sizer,wx.VERTICAL,20,style=wx.ALL,margin=20)
+		self.creator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.sizer,wx.VERTICAL,20,margin=0)
 		#タブコントロールの作成
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.creator.GetSizer(),wx.VERTICAL)
 		self.tab = creator.tabCtrl(_("ソース選択"), event=None, style=wx.NB_NOPAGETHEME | wx.NB_MULTILINE, sizerFlag=wx.ALL, proportion=0, margin=20)
