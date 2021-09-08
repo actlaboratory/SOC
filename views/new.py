@@ -13,6 +13,7 @@ from views.baseDialog import *
 from sources import file, scanner
 from engines import google, tesseract
 import task
+from simpleDialog import errorDialog
 
 class Dialog(BaseDialog):
 	def __init__(self):
@@ -82,9 +83,26 @@ class Dialog(BaseDialog):
 		self.addFiles(files)
 
 	def addFiles(self, files):
+		error = False
+		add = False
 		for file in files:
-			self.filebox.Append(os.path.basename(file))
-			self.files.append(file)
+			suffix = os.path.splitext(file)[1][1:].lower()
+			if os.path.isdir(file):
+				error=True
+				continue
+			if suffix in constants.EXT_TO_FORMAT.keys():
+				if file in self.fileList:
+					continue
+				self.fileList.append(file)
+				self.hMainView.filebox.Append(os.path.basename(file))
+				add = True
+			else:
+				error = True
+		if error:
+			if add:
+				errorDialog(_("対応していないフォーマットのファイルは除外され、一部のファイルのみ追加されました。"))
+			else:
+				errorDialog(_("このフォーマットのファイルには対応していないため、追加できませんでした。"))
 
 	def onDelete(self, event=None):
 		index = self.filebox.GetSelection()
