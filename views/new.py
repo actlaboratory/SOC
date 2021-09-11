@@ -91,10 +91,10 @@ class Dialog(BaseDialog):
 				error=True
 				continue
 			if suffix in constants.EXT_TO_FORMAT.keys():
-				if file in self.fileList:
+				if file in self.files:
 					continue
-				self.fileList.append(file)
-				self.hMainView.filebox.Append(os.path.basename(file))
+				self.files.append(file)
+				self.filebox.Append(os.path.basename(file))
 				add = True
 			else:
 				error = True
