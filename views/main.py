@@ -6,6 +6,7 @@
 
 import ctypes
 import copy
+from jobObjects import job
 import logging
 import os
 import pathlib
@@ -59,18 +60,34 @@ class MainView(BaseView):
 		self.InstallMenuEvent(Menu(self.identifier),self.events.OnMenuSelect)
 
 		self.initialized = False
+		self.initializeVariables()
+		self.installControls()
+		self.initialized = True
+
+	def initializeVariables(self):
 		self.jobs = []
-		self.map = {}
+		self.pages = []
+		self.selectedPages = []
+		self.texts = []
+		self.cursors = []
+
+	def installControls(self):
 		tabCtrl = self.creator.tabCtrl(_("ページ切替"),sizerFlag=wx.ALL|wx.EXPAND, proportion=1, margin=5)
 
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("進行状況"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
 
 
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("認識結果"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
-		self.tree, dummy = page.treeCtrl(_("認識済みファイル"), self.itemSelected)
-		self.tree.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
-		self.treeIdentifier = "resultTree"
-		self.menu.keymap.Set(self.treeIdentifier, self.tree)
+		self.jobCtrl, dummy = page.listCtrl(_("認識済みファイル"), self.itemSelected)
+		self.jobCtrl.AppendColumn(_("ファイル名"))
+		self.jobCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
+		self.jobCtrlIdentifier = "jobCtrl"
+		self.menu.keymap.Set(self.jobCtrlIdentifier, self.jobCtrl)
+		self.pageCtrl, dummy = page.combobox(_("ページ選択"), [], self.itemSelected)
+		self.pageCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
+		self.pageCtrlIdentifier = "pageCtrl"
+		self.menu.keymap.Set(self.pageCtrlIdentifier, self.pageCtrl)
+		self.pageCtrl.Disable()
 		self.text, dummy = page.inputbox(_("認識結果"), style=wx.TE_READONLY|wx.TE_MULTILINE)
 		self.update()
 
@@ -79,35 +96,37 @@ class MainView(BaseView):
 		self.timer = wx.Timer(self.evtHandler)
 		self.timer.Start(300)
 
-		self.initialized = True
-
 	def update(self):
+		self.log.debug("Fetching new jobs...")
 		jobs = self.getAllJobs()
 		if not self.initialized:
 			# 初回のみ実行
-			root = self.tree.AddRoot(_("（全て）"))
 			ret = jobs
-			self.map[root] = {"cursor": 0, "text": self.getAllText()}
 		else:
 			# タイマーでのみ実行
-			root = self.tree.GetRootItem()
 			ret = jobs[len(self.jobs):]
-			self.map[root]["text"] = self.getAllText()
+		self.log.debug("%d jobs retrieved." % len(ret))
 		for job in ret:
-			item1 = self.tree.AppendItem(root, job.getFileName())
-			if item1 in self.map:
-				self.map[item1]["text"] = job.getAllItemText()
-			else:
-				self.map[item1] = {"cursor": 0, "text": job.getAllItemText()}
+			fileName = job.getFileName()
+			self.log.debug("New job: %s" % fileName)
+			self.jobs.append(fileName)
+			self.jobCtrl.Append((fileName,))
+			self.pages.append([])
+			self.texts.append(self.getJobText(job))
+			self.cursors.append(0)
+			self.selectedPages.append(-1)
 			items = job.getItems()
 			if len(items) < 2:
+				self.log.debug("This job contains only one item.")
 				continue
+			self.selectedPages[-1] = 0
+			self.texts[-1] = []
+			self.cursors[-1] = []
+			self.log.debug("This job contains %d items." % len(items))
 			for item in items:
-				item2 = self.tree.AppendItem(item1, item.getFileName())
-				if item2 in self.map:
-					self.map[item2]["text"] = item.getText()
-				else:
-					self.map[item2] = {"cursor": 0, "text": item.getText()}
+				self.pages[-1].append(item)
+				self.cursors[-1].append(0)
+				self.texts[-1].append(item.getText())
 		self.updateText()
 		self.jobs = copy.deepcopy(jobs)
 
@@ -131,24 +150,38 @@ class MainView(BaseView):
 		return "".join(ret)
 
 	def updateText(self):
-		# 「全て」を選択時、新しく認識されたテキストを追加する
-		root = self.tree.GetRootItem()
-		if self.tree.GetFocusedItem() != root:
+		jobIdx = self.jobCtrl.GetFocusedItem()
+		if jobIdx < 0:
 			return
-		new = self.map[root]["text"][len(self.text.GetValue()):]
-		cursor = self.text.GetSelection()
-		self.text.AppendText(new)
-		self.text.SetSelection(cursor[0], cursor[1])
+		if len(self.pages[jobIdx]) > 0:
+			pageIdx = self.pageCtrl.GetSelection()
+			text = self.texts[jobIdx][pageIdx]
+			cursor = self.cursors[jobIdx][pageIdx]
+		else:
+			text = self.texts[jobIdx]
+			cursor = self.cursors[jobIdx]
+		self.text.SetValue(text)
+		self.text.SetInsertionPoint(cursor)
 
 	def itemSelected(self, event):
-		prev = event.GetOldItem()
-		cursor = self.text.GetInsertionPoint()
-		if prev.GetID() is not None:
-			self.map[prev]["cursor"] = cursor
-		self.text.Clear()
-		focus = event.GetItem()
-		self.text.SetValue(self.map[focus]["text"])
-		self.text.SetInsertionPoint(self.map[focus]["cursor"])
+		jobIdx = self.jobCtrl.GetFocusedItem()
+		hasMultiplePages = len(self.pages[jobIdx]) > 0
+		obj = event.GetEventObject()
+		if obj == self.jobCtrl:
+			self.log.debug("Job selection has changed.")
+			self.pageCtrl.Clear()
+			self.pageCtrl.Append(all)
+			for i in range(1, len(self.pages[jobIdx]) + 1):
+				self.pageCtrl.Append(_("%dページ") % i)
+			if hasMultiplePages:
+				self.pageCtrl.SetSelection(self.selectedPages[jobIdx])
+				self.text.SetValue(self.texts[jobIdx][self.pageCtrl.GetSelection()])
+			else:
+				self.text.SetValue(self.texts[jobIdx])
+			self.pageCtrl.Enable(hasMultiplePages)
+		elif obj == self.pageCtrl:
+			self.log.debug("Item selection has changed.")
+			self.selectedPages[jobIdx] = self.pageCtrl.GetSelection()
 
 	def onTimerEvent(self, event):
 		self.update()
