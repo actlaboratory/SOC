@@ -307,3 +307,13 @@ class Events(BaseEvents):
 			text = self.oDialog.map[item]["text"]
 			with clipboardHelper.Clipboard() as c:
 				c.set_unicode_text(text)
+
+	def OnExit(self,event):
+		# タイマーを止める
+		try:
+			self.hMainView.timer.Stop()
+			self.hMainView.timer.Destroy()
+		except:
+			pass
+
+		event.Skip()
