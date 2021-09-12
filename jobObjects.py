@@ -1,5 +1,4 @@
 from os.path import basename
-
 import errorCodes
 import constants
 import os
@@ -10,23 +9,77 @@ import globalVars
 import datetime
 import util
 from enum import IntFlag, auto
+import queue
+import events
+from logging import getLogger
+
+next_job_id = 1
 
 class job():
-	"""OCRの単位のなるクラス。
-	処理のもととなるファイル名を持ち実際に処理されるファイルを持ったitemをリストとして保持している。
-	"""
-
-	def __init__(self, fileName, temporally = True):
-		self.fileName = fileName
-		self.temporally = temporally
-		self.items = []
+	def __init__(self, path = None, temp = True):
+		global next_job_id
+		self._path = path
+		self._id = next_job_id
+		next_job_id += 1
+		self._temp = temp
+		if path:
+			self._name = os.path.basename(path)
+		else:
+			self._name = "job-%d" % self.id
+		self.onEvent = lambda event, job = None, item = None, source = None, engine = None: None
+		self.convertQueue = queue.Queue()
+		self.processQueue = queue.Queue()
+		self.processedItem = []
 		self.status = jobStatus(0)
 
-	def getItems(self):
-		return self.items
+	def setOnEvent(self, callback):
+		assert callable(callback)
+		self.onEvent = callback
 
-	def appendItem(self, item):
-		self.items.append(item)
+	def getName(self):
+		return self._name
+
+	def setName(self, name):
+		self._name = name
+		self.onEvent(events.job.NAME_CHANGED, job = self)
+
+	def addCreatedItem(self, item):
+		self.convertQueue.put(item)
+		self.onEvent(events.item.ADDED, job = self, item = item)
+
+	def getConvertItem(self):
+		if self.convertQueue.empty():
+			self.onEvent(events.job.CONVERTQUEUE_EMPTY, job = self)
+			return None
+		item = self.convertQueue.get()
+		self.onEvent(events.item.CONVERT_STARTED, job = self, item = item)
+		return item
+
+	def addConvertedItem(self, item):
+		self.processQueue.put(item)
+		self.onEvent(events.item.CONVERTED, job = self, item = item)
+		if self.convertQueue.empty() & (self.getStatus() & jobStatus.SOURCE_END):
+			self.raiseStatusFlag(jobStatus.CONVERT_COMPLETE)
+			self.onEvent(events.job.CONVERT_COMPLETED, job = self)
+
+	def getProcessItem(self):
+		if self.processQueue.empty():
+			self.onEvent(events.job.PROCESSQUEUE_EMPTY, job = self)
+			return None
+		item = self.processQueue.get()
+		self.onEvent(events.item.PROCESS_STARTED, job = self, item = item)
+		return item
+
+	def addProcessedItem(self, item):
+		self.processedItem.append(item)
+		self.onEvent(events.item.PROCESSED, job = self, item = item)
+		if self.processQueue.empty() & (self.getStatus() & jobStatus.CONVERT_COMPLETED):
+			self.raiseStatusFlag(jobStatus.PROCESS_COMPLETE)
+			self.onEvent(events.job.PROCESS_COMPLETED, job = self)
+
+	def endSource(self):
+		self.raiseStatusFlag(jobStatus.SOURCE_END)
+		self.onEvent(events.job.SOURCE_END, job = self)
 
 	def getFormat(self):
 		if not hasattr(self, "format"):
@@ -55,9 +108,6 @@ class job():
 		for item in self.items:
 			text += item.getText()
 		return text
-
-	def getFileName(self):
-		return self.fileName
 
 	def raiseStatusFlag(self, flag):
 		assert isinstance(flag, jobStatus)
@@ -93,7 +143,6 @@ class item:
 
 
 class jobStatus(IntFlag):
-	READY = auto()
-	PROCESSING = auto()
-	DONE = auto()
-
+	SOURCE_END = auto()
+	CONVERT_COMPLETE = auto()
+	PROCESS_COMPLETE = auto()
