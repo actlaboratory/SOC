@@ -1,6 +1,6 @@
-from enum import enum,auto
+from enum import Enum,auto
 
-class job(enum):
+class job(Enum):
 	CREATED = auto()
 	STARTED = auto()
 	ADDED_ITEM = auto()
@@ -8,10 +8,10 @@ class job(enum):
 	PROCESSED = auto()
 	CANCELED = auto()
 
-class engine(enum):
+class engine(Enum):
 	STARTED = auto()
 	STOPED = auto()
 
-class source(enum):
+class source(Enum):
 	END = auto()
 	
