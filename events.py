@@ -1,7 +1,6 @@
-from enum import enum,auto
+from enum import Enum,auto
 
-
-class job(enum):
+class job(Enum):
 	CREATED = auto()
 	CONVERTQUEUE_EMPTY = auto()
 	PROCESSQUEUE_EMPTY = auto()
@@ -11,7 +10,7 @@ class job(enum):
 	PROCESS_COMPLETED = auto()
 	CANCELED = auto()
 
-class engine(enum):
+class engine(Enum):
 	STARTED = auto()
 	STOPED = auto()
 
@@ -20,7 +19,6 @@ class source(enum):
 	STARTED = auto()
 	END = auto()
 	TERMINATED = auto()
-
 
 class item(enum):
 	ADDED = auto()

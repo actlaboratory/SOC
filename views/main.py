@@ -40,6 +40,8 @@ from views import (authorizing, new, processingDialog, resultDialog, settings,
 
 from .base import *
 
+MSG_ALL = "（全て）"
+IDX_ALL = 0
 
 class MainView(BaseView):
 	def __init__(self):
@@ -65,11 +67,11 @@ class MainView(BaseView):
 		self.initialized = True
 
 	def initializeVariables(self):
-		self.jobs = []
-		self.pages = []
-		self.selectedPages = []
-		self.texts = []
-		self.cursors = []
+		self.jobs = [None]
+		self.pages = [[]]
+		self.selectedPages = [-1]
+		self.texts = [""]
+		self.cursors = [0]
 
 	def installControls(self):
 		tabCtrl = self.creator.tabCtrl(_("ページ切替"),sizerFlag=wx.ALL|wx.EXPAND, proportion=1, margin=5)
@@ -80,10 +82,11 @@ class MainView(BaseView):
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("認識結果"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
 		self.jobCtrl, dummy = page.listCtrl(_("認識済みファイル"), self.itemSelected)
 		self.jobCtrl.AppendColumn(_("ファイル名"))
+		self.jobCtrl.Append([MSG_ALL])
 		self.jobCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
 		self.jobCtrlIdentifier = "jobCtrl"
 		self.menu.keymap.Set(self.jobCtrlIdentifier, self.jobCtrl)
-		self.pageCtrl, dummy = page.combobox(_("ページ選択"), [], self.itemSelected)
+		self.pageCtrl, dummy = page.combobox(_("ページ選択"), [MSG_ALL], self.itemSelected)
 		self.pageCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
 		self.pageCtrlIdentifier = "pageCtrl"
 		self.menu.keymap.Set(self.pageCtrlIdentifier, self.pageCtrl)
@@ -109,10 +112,10 @@ class MainView(BaseView):
 		for job in ret:
 			fileName = job.getFileName()
 			self.log.debug("New job: %s" % fileName)
-			self.jobs.append(fileName)
-			self.jobCtrl.Append((fileName,))
+			self.jobCtrl.Append([fileName])
 			self.pages.append([])
-			self.texts.append(self.getJobText(job))
+			text = self.getJobText(job)
+			self.texts.append(text)
 			self.cursors.append(0)
 			self.selectedPages.append(-1)
 			items = job.getItems()
@@ -120,8 +123,8 @@ class MainView(BaseView):
 				self.log.debug("This job contains only one item.")
 				continue
 			self.selectedPages[-1] = 0
-			self.texts[-1] = []
-			self.cursors[-1] = []
+			self.texts[-1] = [text]
+			self.cursors[-1] = [0]
 			self.log.debug("This job contains %d items." % len(items))
 			for item in items:
 				self.pages[-1].append(item)
@@ -168,20 +171,17 @@ class MainView(BaseView):
 		hasMultiplePages = len(self.pages[jobIdx]) > 0
 		obj = event.GetEventObject()
 		if obj == self.jobCtrl:
-			self.log.debug("Job selection has changed.")
-			self.pageCtrl.Clear()
-			self.pageCtrl.Append(all)
-			for i in range(1, len(self.pages[jobIdx]) + 1):
-				self.pageCtrl.Append(_("%dページ") % i)
+			# ジョブが選択された
 			if hasMultiplePages:
+				self.pageCtrl.Clear()
+				self.pageCtrl.Append(MSG_ALL)
+				for i in range(1, len(self.pages[jobIdx])):
+					self.pageCtrl.Append(_("%dページ") % i)
 				self.pageCtrl.SetSelection(self.selectedPages[jobIdx])
-				self.text.SetValue(self.texts[jobIdx][self.pageCtrl.GetSelection()])
+				self.pageCtrl.Enable()
 			else:
-				self.text.SetValue(self.texts[jobIdx])
-			self.pageCtrl.Enable(hasMultiplePages)
-		elif obj == self.pageCtrl:
-			self.log.debug("Item selection has changed.")
-			self.selectedPages[jobIdx] = self.pageCtrl.GetSelection()
+				self.pageCtrl.Disable()
+			self.updateText()
 
 	def onTimerEvent(self, event):
 		self.update()
