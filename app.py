@@ -1,6 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 # Soc Main
 
+import tempfile
 import proxyUtil
 import AppBase
 import CredentialManager
@@ -26,6 +27,7 @@ class Main(AppBase.MainBase):
 
 	def initialize(self):
 		"""アプリを初期化する。"""
+		self.tmpDir = tempfile.TemporaryDirectory()
 		# プロキシの設定を適用
 		self.proxyEnviron = proxyUtil.virtualProxyEnviron()
 		self.setProxyEnviron()
@@ -37,8 +39,6 @@ class Main(AppBase.MainBase):
 		if self.config.getboolean("general", "update"):
 			globalVars.update.update(True)
 		self.SetDefaultEncoding()
-		if not os.path.exists(self.getTmpDir()):
-			os.mkdir(self.getTmpDir())
 		#popplerにパスを通す
 		os.environ["PATH"] += os.pathsep + os.getcwd() + "/poppler/bin"
 		#managerの開始
@@ -71,7 +71,7 @@ class Main(AppBase.MainBase):
 		return
 
 	def getTmpDir(self):
-		return self.config.getstring("ocr", "tmpdir", os.path.join(os.environ["TEMP"], "soc"), None)
+		return self.tmpDir.name
 
 	def OnExit(self):
 		#設定の保存やリソースの開放など、終了前に行いたい処理があれば記述できる
@@ -79,10 +79,8 @@ class Main(AppBase.MainBase):
 
 		# managerを止める
 		globalVars.manager.stop()
-
-		if os.path.exists(self.getTmpDir()):
-			util.allDelete(self.getTmpDir())
-
+		#一時ディレクトリを削除する
+		self.tmpDir.cleanup()
 		# プロキシの設定を元に戻す
 		if self.proxyEnviron != None: self.proxyEnviron.unset_environ()
 

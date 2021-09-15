@@ -1,4 +1,5 @@
 from enum import Enum,auto
+import enum
 
 class job(Enum):
 	CREATED = auto()
@@ -11,6 +12,7 @@ class job(Enum):
 	CANCELED = auto()
 
 class engine(Enum):
+	INITIALIZED = auto()
 	STARTED = auto()
 	STOPED = auto()
 
@@ -26,3 +28,7 @@ class item(enum):
 	CONVERTED = auto()
 	PROCESS_STARTED = auto()
 	PROCESSED = auto()
+
+class converter(enum):
+	STARTED = auto()
+	STOPED = auto()
