@@ -5,8 +5,10 @@ import pyocr
 from PIL import Image
 
 class tesseractEngine(engineBase):
-	def __init__(self, mode):
+	def __init__(self):
 		super().__init__("tesseract")
+
+	def _init(self, mode):
 		self.mode = mode
 		tools = pyocr.get_available_tools()
 		self.tesseract = tools[0]
@@ -16,7 +18,7 @@ class tesseractEngine(engineBase):
 
 	def _recognize(self, item):
 		text = self.tesseract.image_to_string(
-			Image.open(item.getFileName()),
+			Image.open(item.getPath()),
 			lang = self.mode,
 			builder = pyocr.builders.TextBuilder()
 		)

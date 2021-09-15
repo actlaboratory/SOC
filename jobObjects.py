@@ -26,7 +26,7 @@ class job():
 			self._name = os.path.basename(path)
 		else:
 			self._name = "job-%d" % self.id
-		self.onEvent = lambda event, job = None, item = None, source = None, engine = None: None
+		self.onEvent = None
 		self.convertQueue = queue.Queue()
 		self.processQueue = queue.Queue()
 		self.processedItem = []
@@ -81,28 +81,6 @@ class job():
 		self.raiseStatusFlag(jobStatus.SOURCE_END)
 		self.onEvent(events.job.SOURCE_END, job = self)
 
-	def getFormat(self):
-		if not hasattr(self, "format"):
-			self._register_format()
-		return self.format
-
-	def _register_format(self):
-		ext = os.path.splitext(self.getFileName())[1][1:]
-		format = constants.EXT_TO_FORMAT.get(ext.lower(), constants.FORMAT_UNKNOWN)
-		if format == constants.FORMAT_PDF_UNKNOWN:
-			# 埋め込みテキストの含まれるPDFであるか判定
-			pipeServer = namedPipe.Server(constants.PIPE_NAME)
-			pipeServer.start()
-			subprocess.run(("pdftotext", self.getFileName(), pipeServer.getFullName()))
-			list = pipeServer.getNewMessageList()
-			pipeServer.exit()
-			text = list[0]
-			if re.search(r'[^\f\n\r]', text) == None:
-				format = constants.FORMAT_PDF_TEXT
-			else:
-				format = constants.FORMAT_PDF_IMAGE
-		self.format = format
-
 	def getAllItemText(self):
 		text = ""
 		for item in self.items:
@@ -121,26 +99,44 @@ class job():
 		return self.status
 
 class item:
-	def __init__(self, fileName):
-		self.fileName = fileName
+	def __init__(self, path):
+		self.path = path
 		self.done = False
+
+	def getPath(self):
+		return self.path
+
+	def getFormat(self):
+		if not hasattr(self, "format"):
+			self._register_format()
+		return self.format
+
+	def _register_format(self):
+		ext = os.path.splitext(self.getPath())[1][1:]
+		format = constants.EXT_TO_FORMAT.get(ext.lower(), constants.FORMAT_UNKNOWN)
+		if format == constants.FORMAT_PDF_UNKNOWN:
+			# 埋め込みテキストの含まれるPDFであるか判定
+			pipeServer = namedPipe.Server(constants.PIPE_NAME)
+			pipeServer.start()
+			subprocess.run(("pdftotext", self.getPath(), pipeServer.getFullName()))
+			list = pipeServer.getNewMessageList()
+			pipeServer.exit()
+			text = list[0]
+			if re.search(r'[^\f\n\r]', text) == None:
+				format = constants.FORMAT_PDF_TEXT
+			else:
+				format = constants.FORMAT_PDF_IMAGE
+		self.format = format
 
 	def setText(self, text):
 		self.text = text
 		self.done = True
 
 	def getText(self):
-		text = self.text
-		if text[-1] != "\n":
-			text += "\n"
-		return text
-
-	def getFileName(self):
-		return self.fileName
+		return self.text
 
 	def isDone(self):
 		return self.done
-
 
 class jobStatus(IntFlag):
 	SOURCE_END = auto()

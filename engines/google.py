@@ -12,6 +12,8 @@ from .base import engineBase
 class googleEngine(engineBase):
 	def __init__(self):
 		super().__init__("google")
+
+	def _init(self):
 		self.credential = CredentialManager.CredentialManager(True)
 		self.credential.Authorize()
 		print("authorize success")
@@ -21,7 +23,7 @@ class googleEngine(engineBase):
 
 	def _recognize(self, item):
 		service = discovery.build("drive", "v3", credentials=self.credential.credential)
-		with open(item.getFileName(), mode = "rb") as f:
+		with open(item.getPath(), mode = "rb") as f:
 			self.log.info("uploading...")
 			media_body = MediaIoBaseUpload(f, mimetype="application/vnd.google-apps.document", resumable=True)
 			req_body = {
