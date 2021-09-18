@@ -6,6 +6,9 @@ from sources.constants import sourceStatus
 from engines.constants import engineStatus
 import time
 import winsound
+import events
+import converter
+import jobObjects
 
 nextTask_id = 1
 
@@ -15,61 +18,61 @@ class task(threading.Thread):
 		super().__init__()
 		self.source = source
 		self.engine = engine
+		self.source.setOnEvent(self.onEvent)
+		self.engine.setOnEvent(self.onEvent)
+		self.converter = converter.converter(engine.getSupportedFormats())
+		self.converter.setOnEvent(self.onEvent)
+		self.higherOnEvent = None
 		self.jobs = []
 		self.id = nextTask_id
 		nextTask_id += 1
 		self.log = getLogger("%s.task-%d" % (constants.APP_NAME, self.id))
-		self.log.debug("initialized")
+		self.log.info("initialized")
 		self.status = taskStatus(0)
 
-	def run(self):
-		self.raiseStatusFlag(taskStatus.STARTED)
-		self.log.debug("initializing modules...")
+	def setOnEvent(self, callback):
+		assert callable(callback)
+		self.higherOnEvent = callback
+
+	def onEvent(self, event, job = None, item = None, source = None, engine = None, converter = None):
+		self.log.debug("called onEvent with", str(event))
+		if event == events.job.CREATED:
+			self.registJob(job)
+		elif event == events.source.END:
+			self.converter.endJob()
+			self.engine.endSource()
+			self.log.info("Notified the end of the source")
+		self.higherOnEvent(event, engine = engine, source = source, job = job, item = item, converter = converter, task = self)
+
+	def startSource(self):
 		self.source.initialize()
+		self.log.debug("source initialized")
 		self.source.start()
-		self.engine.setCallbackOnAfterRecognize(self.onAfterRecognize)
+
+	def registJob(self, job:jobObjects.job):
+		job.setOnEvent(self.onEvent)
+		self.jobs.append(job)
+		self.converter.addJob(job)
+		self.engine.addJob(job)
+		self.log.debug("registered job-", job.getID())
+
+	def startEngine(self):
+		self.engine.initialize()
+		self.log.debug("engine initialized")
 		self.engine.start()
-		self.log.info("Ocr started")
-		time.sleep(1)
-		while True:
-			if not self.source.getStatus() & sourceStatus.RUNNING:
-				if self.source.empty():
-					break
-			if self.source.empty():
-				time.sleep(0.1)
-				continue
-			job = self.source.getNextJob()
-			self.jobs.append(job)
-			self.log.debug("job received")
-			self.engine.put(job)
-			time.sleep(0.01)
-		self.engine.notifyStopSource()
-		while not self.engine.getStatus() & engineStatus.FINISHED:
-			time.sleep(0.01)
-		self.log.debug("Ocr done!")
-		self.raiseStatusFlag(taskStatus.DONE)
+
+	def startConverter(self):
+		self.converter.start()
+		self.log.debug("converter started")
 
 	def getJobs(self):
 		return self.jobs
-
-	def getProcessedJobs(self):
-		return self.jobs
-
-	def getAllText(self):
-		text = ""
-		for job in self.getProcessedJobs():
-			text += job.getAllItemText()
-		return text
 
 	def getEngineStatus(self):
 		return self.engine.getStatus()
 
 	def getSourceStatus(self):
 		return self.source.getStatus()
-
-	def onAfterRecognize(self, job):
-		self.log.info("processed job received")
-		winsound.Beep(1000, 200)
 
 	def getID(self):
 		return self.id
@@ -89,4 +92,3 @@ class task(threading.Thread):
 class taskStatus(IntFlag):
 	STARTED = auto()
 	DONE = auto()
-
