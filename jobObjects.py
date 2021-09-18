@@ -83,9 +83,12 @@ class job():
 
 	def getAllItemText(self):
 		text = ""
-		for item in self.items:
+		for item in self.processedItem:
 			text += item.getText()
 		return text
+
+	def getProcessedItems(self):
+		return self.processedItem
 
 	def raiseStatusFlag(self, flag):
 		assert isinstance(flag, jobStatus)
@@ -97,6 +100,9 @@ class job():
 
 	def getStatus(self):
 		return self.status
+
+	def getID(self):
+		return self._id
 
 class item:
 	def __init__(self, path):
