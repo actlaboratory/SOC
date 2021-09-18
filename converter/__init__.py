@@ -36,8 +36,8 @@ class converter(threading.Thread):
 			job = self.jobQueue.get()
 			self._convertJob(job)
 		self.lowerStatusFlag(converterStatus.RUNNING)
+		self.raiseStatusFlag(converterStatus.DONE)
 		self.onEvent(events.converter.STOPED, converter = self)
-
 
 	def _convertJob(self, job: jobObjects.job):
 		while not job.getStatus() & jobStatus.CONVERT_COMPLETE:
@@ -60,6 +60,12 @@ class converter(threading.Thread):
 				if (converter.getConvertableFormats() & format) & (self.engineSupportedFormats & format):
 					c = converter(item)
 					return c.convert(job, format)
+
+	def addJob(self, job):
+		self.jobQueue.put(job)
+
+	def endJob(self):
+		self.raiseStatusFlag(converterStatus.JOB_END)
 
 	def raiseStatusFlag(self, flag):
 		assert isinstance(flag, converterStatus)

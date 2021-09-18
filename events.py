@@ -1,5 +1,4 @@
 from enum import Enum,auto
-import enum
 
 class job(Enum):
 	CREATED = auto()
