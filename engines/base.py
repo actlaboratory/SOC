@@ -28,6 +28,9 @@ class engineBase(threading.Thread):
 		assert callable(callBack)
 		self.onEvent = callBack
 
+	def initable(self):
+		return True
+
 	def initialize(self, *args, **kwargs):
 		self._init(*args, **kwargs)
 		self.onEvent(events.engine.INITIALIZED, engine = self)
@@ -66,11 +69,14 @@ class engineBase(threading.Thread):
 	def _recognize(self, item):
 		raise NotImplementedError()
 
-	def sourceEnd(self):
+	def endSource(self):
 		self.raiseStatusFlag(engineStatus.SOURCE_END)
 
 	def getSupportedFormats(self):
 		return 0
+
+	def addJob(self, job):
+		self.jobQueue.put(job)
 
 	def raiseStatusFlag(self, flag):
 		assert isinstance(flag, engineStatus)

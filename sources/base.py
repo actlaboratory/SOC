@@ -16,6 +16,9 @@ class sourceBase(threading.Thread):
 		super().__init__()
 		self.onEvent = None
 
+	def initable(self):
+		return True
+
 	def _init(self):
 		return
 
@@ -26,7 +29,7 @@ class sourceBase(threading.Thread):
 	def initialize(self):
 		self._init()
 		self.onEvent(events.source.INITIALIZED, source = self)
-		self.log.info("initialized")
+		self.log.debug("initialized")
 
 	def run(self):
 		self.log.info("started")
@@ -35,6 +38,7 @@ class sourceBase(threading.Thread):
 		self._run()
 		self.lowerStatusFlag(sourceStatus.RUNNING)
 		self.log.info("end")
+		self.terminate()
 		self.onEvent(events.source.END)
 		self.raiseStatusFlag(sourceStatus.DONE)
 
@@ -47,7 +51,7 @@ class sourceBase(threading.Thread):
 	def terminate(self):
 		"""ソースを閉じるときの処理"""
 		self._final()
-		self.onEvent(events.source.TERMINATED, source = self)
+
 
 	def _final(self):
 		return

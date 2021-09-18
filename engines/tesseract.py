@@ -5,11 +5,11 @@ import pyocr
 from PIL import Image
 
 class tesseractEngine(engineBase):
-	def __init__(self):
+	def __init__(self, mode):
 		super().__init__("tesseract")
-
-	def _init(self, mode):
 		self.mode = mode
+
+	def _init(self):
 		tools = pyocr.get_available_tools()
 		self.tesseract = tools[0]
 
