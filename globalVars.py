@@ -4,12 +4,11 @@
 
 
 import ocrManager
-from app import Main
 """
 """
 
 
-app:Main
+app = None
 update = None
 manager:ocrManager.manager
 

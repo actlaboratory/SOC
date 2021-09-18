@@ -15,19 +15,19 @@ class engine(Enum):
 	STARTED = auto()
 	STOPED = auto()
 
-class source(enum):
+class source(Enum):
 	INITIALIZED = auto()
 	STARTED = auto()
 	END = auto()
 	TERMINATED = auto()
 
-class item(enum):
+class item(Enum):
 	ADDED = auto()
 	CONVERT_STARTED = auto()
 	CONVERTED = auto()
 	PROCESS_STARTED = auto()
 	PROCESSED = auto()
 
-class converter(enum):
+class converter(Enum):
 	STARTED = auto()
 	STOPED = auto()
