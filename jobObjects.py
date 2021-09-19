@@ -27,6 +27,8 @@ class job():
 		else:
 			self._name = "job-%d" % self.id
 		self.onEvent = None
+		self.log = getLogger("%s.job-%s" % (constants.APP_NAME, self.getID()))
+		self.log.info("created job named %s" % (self.getName()))
 		self.convertQueue = queue.Queue()
 		self.processQueue = queue.Queue()
 		self.processedItem = []
@@ -60,6 +62,7 @@ class job():
 		self.onEvent(events.item.CONVERTED, job = self, item = item)
 		if self.convertQueue.empty() & (self.getStatus() & jobStatus.SOURCE_END):
 			self.raiseStatusFlag(jobStatus.CONVERT_COMPLETE)
+			self.log.info("convert completed")
 			self.onEvent(events.job.CONVERT_COMPLETED, job = self)
 
 	def getProcessItem(self):
@@ -73,8 +76,11 @@ class job():
 	def addProcessedItem(self, item):
 		self.processedItem.append(item)
 		self.onEvent(events.item.PROCESSED, job = self, item = item)
-		if self.processQueue.empty() & (self.getStatus() & jobStatus.CONVERT_COMPLETE):
+		self.log.debug("item processed")
+		print(self.getStatus() & jobStatus.CONVERT_COMPLETE)
+		if self.processQueue.empty() & bool(self.getStatus() & jobStatus.CONVERT_COMPLETE):
 			self.raiseStatusFlag(jobStatus.PROCESS_COMPLETE)
+			self.log.debug("process completed")
 			self.onEvent(events.job.PROCESS_COMPLETED, job = self)
 
 	def endSource(self):
