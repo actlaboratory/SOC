@@ -1,5 +1,6 @@
 from logging import getLogger
 import globalVars
+import os
 import uuid
 
 class converterBase():
