@@ -95,6 +95,7 @@ class MainView(BaseView):
 		self.menu.keymap.Set(self.pageCtrlIdentifier, self.pageCtrl)
 		self.pageCtrl.Disable()
 		self.text, dummy = page.inputbox(_("認識結果"), style=wx.TE_READONLY|wx.TE_MULTILINE)
+		self.text.Disable()
 
 	def update(self):
 		self.log.debug("Fetching new jobs...")
@@ -167,6 +168,7 @@ class MainView(BaseView):
 		return self.jobs.index(job)
 
 	def itemSelected(self, event):
+		self.text.Enable()
 		jobIdx = self.jobCtrl.GetFocusedItem()
 		hasMultiplePages = len(self.pages[jobIdx]) > 0
 		obj = event.GetEventObject()
