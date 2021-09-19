@@ -77,7 +77,6 @@ class job():
 		self.processedItem.append(item)
 		self.onEvent(events.item.PROCESSED, job = self, item = item)
 		self.log.debug("item processed")
-		print(self.getStatus() & jobStatus.CONVERT_COMPLETE)
 		if self.processQueue.empty() & bool(self.getStatus() & jobStatus.CONVERT_COMPLETE):
 			self.raiseStatusFlag(jobStatus.PROCESS_COMPLETE)
 			self.log.debug("process completed")

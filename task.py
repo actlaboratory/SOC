@@ -54,7 +54,7 @@ class task(threading.Thread):
 		self.jobs.append(job)
 		self.converter.addJob(job)
 		self.engine.addJob(job)
-		self.log.debug("registered job-", job.getID())
+		self.log.debug("registered job-%d" % job.getID())
 
 	def startEngine(self):
 		self.engine.initialize()
