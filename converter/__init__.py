@@ -41,14 +41,16 @@ class converter(threading.Thread):
 
 	def _convertJob(self, job: jobObjects.job):
 		while not job.getStatus() & jobStatus.CONVERT_COMPLETE:
+			time.sleep(0.01)
 			item = job.getConvertItem()
+			if not item:
+				continue
 			converted_item = self._convertItem(item)
 			if type(converted_item) == jobObjects.item:
 				job.addConvertedItem(converted_item)
 			elif type(converted_item) == list:
 				for itm in converted_item:
 					job.addConvertedItem(itm)
-			time.sleep(0.01)
 
 	def _convertItem(self, item):
 		if item.getFormat() & self.engineSupportedFormats:
