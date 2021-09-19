@@ -11,7 +11,6 @@ class EventReceiver:
 		self.mainView: views.main.MainView = mainView
 		self.log = logging.getLogger("%s.%s" % (constants.LOG_PREFIX, "eventReceiver"))
 		self.callbacks = {
-			events.job.PROCESS_COMPLETED: self.test,
 			# event: function,
 		}
 
@@ -26,7 +25,3 @@ class EventReceiver:
 		else:
 			self.log.debug("Processing event: %s" % event)
 			func(task, job, item, source, engine, converter)
-
-	def test(self, task, job, item, source, engine, converter):
-		import winsound
-		winsound.Beep(800, 100)
