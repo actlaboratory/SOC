@@ -73,7 +73,7 @@ class job():
 	def addProcessedItem(self, item):
 		self.processedItem.append(item)
 		self.onEvent(events.item.PROCESSED, job = self, item = item)
-		if self.processQueue.empty() & (self.getStatus() & jobStatus.CONVERT_COMPLETED):
+		if self.processQueue.empty() & (self.getStatus() & jobStatus.CONVERT_COMPLETE):
 			self.raiseStatusFlag(jobStatus.PROCESS_COMPLETE)
 			self.onEvent(events.job.PROCESS_COMPLETED, job = self)
 
