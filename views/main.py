@@ -22,6 +22,7 @@ import clipboardHelper
 import constants
 import dtwain
 import errorCodes
+import eventReceiver
 import globalVars
 import keymap
 import menuItemsStore
@@ -49,6 +50,8 @@ class MainView(BaseView):
 		self.log.debug("created")
 		self.app=globalVars.app
 		self.events=Events(self,self.identifier)
+		evtReceiver = eventReceiver.EventReceiver(self)
+		globalVars.manager.setOnEvent(evtReceiver.onEvent)
 		title=constants.APP_NAME
 		super().Initialize(
 			title,
@@ -92,12 +95,6 @@ class MainView(BaseView):
 		self.menu.keymap.Set(self.pageCtrlIdentifier, self.pageCtrl)
 		self.pageCtrl.Disable()
 		self.text, dummy = page.inputbox(_("認識結果"), style=wx.TE_READONLY|wx.TE_MULTILINE)
-		self.update()
-
-		self.evtHandler = wx.EvtHandler()
-		self.evtHandler.Bind(wx.EVT_TIMER, self.onTimerEvent)
-		self.timer = wx.Timer(self.evtHandler)
-		self.timer.Start(300)
 
 	def update(self):
 		self.log.debug("Fetching new jobs...")
@@ -182,9 +179,6 @@ class MainView(BaseView):
 			else:
 				self.pageCtrl.Disable()
 			self.updateText()
-
-	def onTimerEvent(self, event):
-		self.update()
 
 	def onContextMenu(self, event):
 		menu = wx.Menu()
@@ -307,13 +301,3 @@ class Events(BaseEvents):
 			text = self.oDialog.map[item]["text"]
 			with clipboardHelper.Clipboard() as c:
 				c.set_unicode_text(text)
-
-	def OnExit(self,event):
-		# タイマーを止める
-		try:
-			self.hMainView.timer.Stop()
-			self.hMainView.timer.Destroy()
-		except:
-			pass
-
-		event.Skip()
