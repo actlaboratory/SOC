@@ -24,7 +24,7 @@ class manager():
 		self.higherOnEvent = callBack
 
 	def onEvent(self, event, task, job = None, item = None, source = None, engine = None, converter = None):
-		self.log.debug("called onEvent with ", event)
+		self.log.debug("called onEvent with %s" % (event))
 		if event == events.source.END:
 			if self.runningSourceIndex < len(self.tasks) -1:
 				self.tasks[self.runningSourceIndex+1].startSource()

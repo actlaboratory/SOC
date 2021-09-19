@@ -35,7 +35,7 @@ class task(threading.Thread):
 		self.higherOnEvent = callback
 
 	def onEvent(self, event, job = None, item = None, source = None, engine = None, converter = None):
-		self.log.debug("called onEvent with", str(event))
+		self.log.debug("called onEvent with %s" % (str(event)))
 		if event == events.job.CREATED:
 			self.registJob(job)
 		elif event == events.source.END:
