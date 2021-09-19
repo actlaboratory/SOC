@@ -11,7 +11,8 @@ class EventReceiver:
 		self.mainView: views.main.MainView = mainView
 		self.log = logging.getLogger("%s.%s" % (constants.LOG_PREFIX, "eventReceiver"))
 		self.callbacks = {
-			# event: function,
+			events.job.CREATED: self.onJobCreated,
+			events.item.PROCESSED: self.onItemProcessed,
 		}
 
 	def onEvent(self, event, task, job=None, item=None, source=None, engine=None, converter=None):
@@ -25,3 +26,30 @@ class EventReceiver:
 		else:
 			self.log.debug("Processing event: %s" % event)
 			func(task, job, item, source, engine, converter)
+
+	def onJobCreated(self, task, job, item, source, engine, converter):
+		# job
+		self.mainView.jobs.append(job)
+		self.mainView.jobCtrl.Append([job.getName()])
+		# page
+		self.mainView.pages.append([])
+		self.mainView.selectedPages.append(-1)
+		# text
+		self.mainView.texts.append(["",])
+		# cursor
+		self.mainView.cursors.append([0])
+
+	def onItemProcessed(self, task, job, item, source, engine, converter):
+		jobIdx = self.mainView.getJobIdx(job)
+		# page
+		self.mainView.pages[jobIdx].append(item)
+		if jobIdx == self.mainView.jobCtrl.GetFocusedItem():
+			self.mainView.pageCtrl.Enable()
+			self.mainView.pageCtrl.Append(_("%dページ") % (self.mainView.pageCtrl.GetCount()))
+		# text
+		text = item.getText()
+		self.mainView.texts[jobIdx].append(text)
+		self.mainView.texts[jobIdx][0] += text
+		self.mainView.texts[0] += text
+		# cursor
+		self.mainView.cursors[jobIdx].append(0)

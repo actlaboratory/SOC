@@ -153,15 +153,18 @@ class MainView(BaseView):
 		jobIdx = self.jobCtrl.GetFocusedItem()
 		if jobIdx < 0:
 			return
-		if len(self.pages[jobIdx]) > 0:
+		if jobIdx == 0:
+			text = self.texts[jobIdx]
+			cursor = self.cursors[jobIdx]
+		else:
 			pageIdx = self.pageCtrl.GetSelection()
 			text = self.texts[jobIdx][pageIdx]
 			cursor = self.cursors[jobIdx][pageIdx]
-		else:
-			text = self.texts[jobIdx]
-			cursor = self.cursors[jobIdx]
 		self.text.SetValue(text)
 		self.text.SetInsertionPoint(cursor)
+
+	def getJobIdx(self, job):
+		return self.jobs.index(job)
 
 	def itemSelected(self, event):
 		jobIdx = self.jobCtrl.GetFocusedItem()
@@ -178,6 +181,11 @@ class MainView(BaseView):
 				self.pageCtrl.Enable()
 			else:
 				self.pageCtrl.Disable()
+				self.pageCtrl.Clear()
+				self.pageCtrl.Append(MSG_ALL)
+			self.updateText()
+		elif obj == self.pageCtrl:
+			# ページが選択された
 			self.updateText()
 
 	def onContextMenu(self, event):
