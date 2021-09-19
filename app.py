@@ -76,7 +76,7 @@ class Main(AppBase.MainBase):
 		#ビューへのアクセスや終了の抑制はできないので注意。
 
 		# managerを止める
-		globalVars.manager.stop()
+		globalVars.manager = None
 		#一時ディレクトリを削除する
 		self.tmpDir.cleanup()
 		# プロキシの設定を元に戻す

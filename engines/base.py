@@ -43,6 +43,7 @@ class engineBase(threading.Thread):
 		self.onEvent(events.engine.STARTED, engine = self)
 		self.raiseStatusFlag(engineStatus.RUNNING)
 		self._run()
+		self.log.debug("thread finished")
 		self.lowerStatusFlag(engineStatus.RUNNING)
 		self.raiseStatusFlag(engineStatus.DONE)
 		self.onEvent(events.engine.STOPED, engine = self)
