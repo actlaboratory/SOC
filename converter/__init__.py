@@ -61,7 +61,7 @@ class converter(threading.Thread):
 			for format in constants.IMAGE_FORMAT_LIST:
 				if (converter.getConvertableFormats() & format) & (self.engineSupportedFormats & format):
 					c = converter(item)
-					return c.convert(job, format)
+					return c.convert(format)
 
 	def addJob(self, job):
 		self.jobQueue.put(job)
