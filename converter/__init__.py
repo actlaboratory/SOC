@@ -1,11 +1,11 @@
 import queue
 from . import pillow
 from .pdf2image import pdf2image
-import constants
 import jobObjects
 from jobObjects import jobStatus
 import threading
 from .constants import converterStatus
+import constants
 import globalVars
 import events
 import time
