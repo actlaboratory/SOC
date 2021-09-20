@@ -145,6 +145,7 @@ class MainView(BaseView):
 		baseMenu = BaseMenu(self.selectorIdentifier)
 		baseMenu.RegisterMenuCommand(menu, [
 			"COPY_TEXT",
+			"SAVE",
 		])
 		event.GetEventObject().PopupMenu(menu, event)
 
@@ -210,6 +211,19 @@ class Events(BaseEvents):
 			d = new.Dialog()
 			d.Initialize()
 			d.Show()
+		if selected == menuItemsStore.getRef("SAVE"):
+			if self.parent.jobCtrl.GetFocusedItem() < 0:
+				return
+			text = self.parent.getText()
+			d = wx.FileDialog(self.parent.hFrame, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT, wildcard=_("テキストファイル(*.txt)") + "|*.txt|" + _("全てのファイル(*.*)") + "|*.*")
+			if d.ShowModal() == wx.ID_CANCEL:
+				return
+			path = d.GetPath()
+			try:
+				with open(path, "w") as f:
+					f.write(text)
+			except IOError as e:
+				errorDialog(_("保存に失敗しました。詳細: %s") % (e))
 		if selected == menuItemsStore.getRef("EXIT"):
 			self.Exit()
 		if selected == menuItemsStore.getRef("DELETE"):

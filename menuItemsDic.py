@@ -21,4 +21,5 @@ dic={
 	"UPDATE": _("最新バージョンを確認"),
 	# for Context Menu
 	"COPY_TEXT": _("本文のコピー(&C)"),
+	"SAVE": _("表示中のテキストをファイルに保存(&S)"),
 }
