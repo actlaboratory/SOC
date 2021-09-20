@@ -32,7 +32,7 @@ class EventReceiver:
 		self.mainView.jobs.append(job)
 		self.mainView.jobCtrl.Append([job.getName()])
 		# page
-		self.mainView.pages.append([])
+		self.mainView.pages.append([None])
 		self.mainView.selectedPages.append(0)
 		# text
 		self.mainView.texts.append(["",])
