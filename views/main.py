@@ -97,25 +97,6 @@ class MainView(BaseView):
 		self.text, dummy = page.inputbox(_("認識結果"), style=wx.TE_READONLY|wx.TE_MULTILINE)
 		self.text.Disable()
 
-	def getAllJobs(self):
-		jobs = []
-		for task in globalVars.manager.getTasks():
-			for job in task.getProcessedJobs():
-				jobs.append(job)
-		return jobs
-
-	def getAllText(self):
-		ret = []
-		for i in self.getAllJobs():
-			ret.append(self.getJobText(i))
-		return "".join(ret)
-
-	def getJobText(self, job):
-		ret = []
-		for i in job.getItems():
-			ret.append(i.getText())
-		return "".join(ret)
-
 	def updateText(self):
 		jobIdx = self.jobCtrl.GetFocusedItem()
 		if jobIdx < 0:
