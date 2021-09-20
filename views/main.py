@@ -72,7 +72,7 @@ class MainView(BaseView):
 	def initializeVariables(self):
 		self.jobs = [None]
 		self.pages = [[]]
-		self.selectedPages = [-1]
+		self.selectedPages = [0]
 		self.texts = [""]
 		self.cursors = [0]
 
@@ -96,40 +96,6 @@ class MainView(BaseView):
 		self.pageCtrl.Disable()
 		self.text, dummy = page.inputbox(_("認識結果"), style=wx.TE_READONLY|wx.TE_MULTILINE)
 		self.text.Disable()
-
-	def update(self):
-		self.log.debug("Fetching new jobs...")
-		jobs = self.getAllJobs()
-		if not self.initialized:
-			# 初回のみ実行
-			ret = jobs
-		else:
-			# タイマーでのみ実行
-			ret = jobs[len(self.jobs):]
-		self.log.debug("%d jobs retrieved." % len(ret))
-		for job in ret:
-			fileName = job.getFileName()
-			self.log.debug("New job: %s" % fileName)
-			self.jobCtrl.Append([fileName])
-			self.pages.append([])
-			text = self.getJobText(job)
-			self.texts.append(text)
-			self.cursors.append(0)
-			self.selectedPages.append(-1)
-			items = job.getItems()
-			if len(items) < 2:
-				self.log.debug("This job contains only one item.")
-				continue
-			self.selectedPages[-1] = 0
-			self.texts[-1] = [text]
-			self.cursors[-1] = [0]
-			self.log.debug("This job contains %d items." % len(items))
-			for item in items:
-				self.pages[-1].append(item)
-				self.cursors[-1].append(0)
-				self.texts[-1].append(item.getText())
-		self.updateText()
-		self.jobs = copy.deepcopy(jobs)
 
 	def getAllJobs(self):
 		jobs = []
@@ -188,6 +154,7 @@ class MainView(BaseView):
 			self.updateText()
 		elif obj == self.pageCtrl:
 			# ページが選択された
+			self.selectedPages[jobIdx] = self.pageCtrl.GetSelection()
 			self.updateText()
 
 	def onContextMenu(self, event):
