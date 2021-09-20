@@ -83,16 +83,15 @@ class MainView(BaseView):
 
 
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("認識結果"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
+		self.selectorIdentifier = "selector"
 		self.jobCtrl, dummy = page.listCtrl(_("認識済みファイル"), self.itemSelected)
 		self.jobCtrl.AppendColumn(_("ファイル名"))
 		self.jobCtrl.Append([MSG_ALL])
 		self.jobCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
-		self.jobCtrlIdentifier = "jobCtrl"
-		self.menu.keymap.Set(self.jobCtrlIdentifier, self.jobCtrl)
+		self.menu.keymap.Set(self.selectorIdentifier, self.jobCtrl)
 		self.pageCtrl, dummy = page.combobox(_("ページ選択"), [MSG_ALL], self.itemSelected)
 		self.pageCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
-		self.pageCtrlIdentifier = "pageCtrl"
-		self.menu.keymap.Set(self.pageCtrlIdentifier, self.pageCtrl)
+		self.menu.keymap.Set(self.selectorIdentifier, self.pageCtrl)
 		self.pageCtrl.Disable()
 		self.text, dummy = page.inputbox(_("認識結果"), style=wx.TE_READONLY|wx.TE_MULTILINE)
 		self.text.Disable()
@@ -139,13 +138,24 @@ class MainView(BaseView):
 			self.updateText()
 
 	def onContextMenu(self, event):
+		if self.jobCtrl.GetFocusedItem() < 0:
+			return
 		menu = wx.Menu()
-		menu.Bind(wx.EVT_MENU, globalVars.app.hMainView.events.OnMenuSelect)
-		baseMenu = BaseMenu(self.treeIdentifier)
+		menu.Bind(wx.EVT_MENU, self.events.OnMenuSelect)
+		baseMenu = BaseMenu(self.selectorIdentifier)
 		baseMenu.RegisterMenuCommand(menu, [
 			"COPY_TEXT",
 		])
-		self.tree.PopupMenu(menu, event)
+		event.GetEventObject().PopupMenu(menu, event)
+
+	def getText(self):
+		jobIdx = self.jobCtrl.GetFocusedItem()
+		if jobIdx < 0:
+			return ""
+		elif jobIdx == 0:
+			return self.texts[0]
+		else:
+			return self.texts[jobIdx][self.parent.pageCtrl.GetSelection()]
 
 class Menu(BaseMenu):
 	def Apply(self,target):
@@ -255,7 +265,8 @@ class Events(BaseEvents):
 			dialog.Initialize(stub())
 			dialog.Show()
 		if selected == menuItemsStore.getRef("COPY_TEXT"):
-			item = self.oDialog.tree.GetFocusedItem()
-			text = self.oDialog.map[item]["text"]
+			if self.parent.jobCtrl.GetFocusedItem() < 0:
+				return
+			text = self.parent.getText()
 			with clipboardHelper.Clipboard() as c:
 				c.set_unicode_text(text)
