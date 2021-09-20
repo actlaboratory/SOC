@@ -44,8 +44,10 @@ class EventReceiver:
 		# page
 		self.mainView.pages[jobIdx].append(item)
 		if jobIdx == self.mainView.jobCtrl.GetFocusedItem():
-			self.mainView.pageCtrl.Enable()
 			self.mainView.pageCtrl.Append(_("%dページ") % (self.mainView.pageCtrl.GetCount()))
+			if self.mainView.pageCtrl.GetSelection() < 0:
+				self.mainView.pageCtrl.SetSelection(0)
+			self.mainView.pageCtrl.Enable()
 		# text
 		text = item.getText()
 		self.mainView.texts[jobIdx].append(text)

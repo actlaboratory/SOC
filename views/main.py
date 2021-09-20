@@ -117,7 +117,7 @@ class MainView(BaseView):
 	def itemSelected(self, event):
 		self.text.Enable()
 		jobIdx = self.jobCtrl.GetFocusedItem()
-		hasMultiplePages = len(self.pages[jobIdx]) > 0
+		hasMultiplePages = len(self.pages[jobIdx]) > 1
 		obj = event.GetEventObject()
 		if obj == self.jobCtrl:
 			# ジョブが選択された
