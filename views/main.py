@@ -172,6 +172,9 @@ class MainView(BaseView):
 	def setCount(self, index, processed, total):
 		self.statusList.SetItem(index, 3, "%d/%d" % (processed, total))
 
+	def getJobIdIndex(self, id):
+		return self.jobIds.index(id)
+
 	def onContextMenu(self, event):
 		if self.jobCtrl.GetFocusedItem() < 0:
 			return
