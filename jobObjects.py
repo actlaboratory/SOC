@@ -46,6 +46,7 @@ class job():
 		self.onEvent(events.job.NAME_CHANGED, job = self)
 
 	def addCreatedItem(self, item):
+		self.log.debug("item added")
 		self.convertQueue.put(item)
 		self.onEvent(events.item.ADDED, job = self, item = item)
 
@@ -152,4 +153,5 @@ class item:
 class jobStatus(IntFlag):
 	SOURCE_END = auto()
 	CONVERT_COMPLETE = auto()
+
 	PROCESS_COMPLETE = auto()
