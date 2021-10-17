@@ -13,6 +13,7 @@ class EventReceiver:
 		self.callbacks = {
 			events.job.CREATED: self.onJobCreated,
 			events.item.PROCESSED: self.onItemProcessed,
+			events.job.PROCESS_COMPLETED: self.onJobProcessed,
 		}
 
 	def onEvent(self, event, task, job=None, item=None, source=None, engine=None, converter=None):
@@ -57,3 +58,9 @@ class EventReceiver:
 		self.mainView.texts[0] += text
 		# cursor
 		self.mainView.cursors[jobIdx].append(0)
+
+	def onJobProcessed(self, task, job, item, source, engine, converter):
+		index = self.mainView.getJobIdIndex(job.getID())
+		status = _("完了")
+		self.mainView.jobStatuses[index] = status
+		self.mainView.statusList.SetItem(index, 1, status)
