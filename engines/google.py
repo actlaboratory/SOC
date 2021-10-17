@@ -27,7 +27,7 @@ class googleEngine(engineBase):
 			self.log.info("uploading...")
 			media_body = MediaIoBaseUpload(f, mimetype="application/vnd.google-apps.document", resumable=True)
 			req_body = {
-				"name": os.path.basename(item.getFileName()),
+				"name": os.path.basename(item.getPath()),
 				"mimeType":"application/vnd.google-apps.document"
 			}
 			file = service.files().create(
