@@ -68,6 +68,9 @@ class task(threading.Thread):
 	def getJobs(self):
 		return self.jobs
 
+	def getEngine(self):
+		return self.engine
+
 	def getEngineStatus(self):
 		return self.engine.getStatus()
 
