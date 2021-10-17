@@ -83,11 +83,12 @@ class MainView(BaseView):
 		self.statusList, dummy = page.listCtrl(_("状況"))
 		self.statusList.AppendColumn(_("項目"))
 		self.statusList.AppendColumn(_("状態"))
-		self.statusList.Append([_("処理済み"), "0/0"])
+		self.statusList.Append([_("処理済み"), "0/3"])
 		self.statusList.Append([_("ファイル変換"), _("停止中")])
-		self.statusList.Append([_("Google OCR"), _("停止中")])
-		self.statusList.Append([_("Tesseract OCR"), _("停止中")])
-		self.statusList.Append([_("スキャナ"), _("停止中")])
+		self.statusList.Append([_("Google OCR"), _("「test.pdf」を処理中")])
+		self.statusList.Append([_("Tesseract OCR"), _("「test2.pdf」を処理中")])
+		self.statusList.Append([_("スキャナ"), _("画像を読み込み中")])
+
 
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("認識結果"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
 		self.selectorIdentifier = "selector"
@@ -143,18 +144,6 @@ class MainView(BaseView):
 			# ページが選択された
 			self.selectedPages[jobIdx] = self.pageCtrl.GetSelection()
 			self.updateText()
-
-	def increaseTotalCount(self):
-		lst = self.statusList.GetItemText(0, 1).split("/")
-		lst = [int(i) for i in lst]
-		lst[1] += 1
-		self.statusList.SetItem(0, 1, "%d/%d" % tuple(lst))
-
-	def increaseProcessedCount(self):
-		lst = self.statusList.GetItemText(0, 1).split("/")
-		lst = [int(i) for i in lst]
-		lst[0] += 1
-		self.statusList.SetItem(0, 1, "%d/%d" % tuple(lst))
 
 	def onContextMenu(self, event):
 		if self.jobCtrl.GetFocusedItem() < 0:
