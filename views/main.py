@@ -77,6 +77,7 @@ class MainView(BaseView):
 		self.selectedPages = [0]
 		self.texts = [""]
 		self.cursors = [0]
+		self.jobIds = []
 		self.jobNames = []
 		self.jobStatuses = []
 		self.ocrEngines = []
@@ -151,10 +152,11 @@ class MainView(BaseView):
 	def addJob(self, job, engine):
 		global nextJobIndex
 		name = job.getName()
-		status = _("待機中")
+		status = _("準備中")
 		engine = engine.getName()
 		processedCount = 0
 		totalCount = 0
+		self.jobIds.insert(nextJobIndex, job.getID())
 		self.statusList.InsertItem(nextJobIndex, "")
 		self.jobNames.insert(nextJobIndex, name)
 		self.statusList.SetItem(nextJobIndex, 0, name)
