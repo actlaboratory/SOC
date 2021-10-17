@@ -28,6 +28,8 @@ class EventReceiver:
 			func(task, job, item, source, engine, converter)
 
 	def onJobCreated(self, task, job, item, source, engine, converter):
+		engine = task.getEngine()
+		self.mainView.addJob(job, engine)
 		# job
 		self.mainView.jobs.append(job)
 		self.mainView.jobCtrl.Append([job.getName()])

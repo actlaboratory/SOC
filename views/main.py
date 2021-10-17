@@ -44,6 +44,8 @@ from .base import *
 MSG_ALL = "（全て）"
 IDX_ALL = 0
 
+nextJobIndex = 0
+
 class MainView(BaseView):
 	def __init__(self):
 		super().__init__("mainView")
@@ -75,12 +77,21 @@ class MainView(BaseView):
 		self.selectedPages = [0]
 		self.texts = [""]
 		self.cursors = [0]
+		self.jobNames = []
+		self.jobStatuses = []
+		self.ocrEngines = []
+		self.processedCounts = []
+		self.totalCounts = []
 
 	def installControls(self):
 		tabCtrl = self.creator.tabCtrl(_("ページ切替"),sizerFlag=wx.ALL|wx.EXPAND, proportion=1, margin=5)
 
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("進行状況"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
-
+		self.statusList, dummy = page.listCtrl(_("状況"))
+		self.statusList.AppendColumn(_("名前"))
+		self.statusList.AppendColumn(_("状態"))
+		self.statusList.AppendColumn(_("OCRエンジン"))
+		self.statusList.AppendColumn(_("認識済みページ数"))
 
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("認識結果"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
 		self.selectorIdentifier = "selector"
@@ -136,6 +147,28 @@ class MainView(BaseView):
 			# ページが選択された
 			self.selectedPages[jobIdx] = self.pageCtrl.GetSelection()
 			self.updateText()
+
+	def addJob(self, job, engine):
+		global nextJobIndex
+		name = job.getName()
+		status = _("待機中")
+		engine = engine.getName()
+		processedCount = 0
+		totalCount = 0
+		self.statusList.InsertItem(nextJobIndex, "")
+		self.jobNames.insert(nextJobIndex, name)
+		self.statusList.SetItem(nextJobIndex, 0, name)
+		self.jobStatuses.insert(nextJobIndex, status)
+		self.statusList.SetItem(nextJobIndex, 1, status)
+		self.ocrEngines.insert(nextJobIndex, engine)
+		self.statusList.SetItem(nextJobIndex, 2, engine)
+		self.processedCounts.insert(nextJobIndex, processedCount)
+		self.totalCounts.insert(nextJobIndex, totalCount)
+		self.setCount(nextJobIndex, processedCount, totalCount)
+		nextJobIndex += 1
+
+	def setCount(self, index, processed, total):
+		self.statusList.SetItem(index, 3, "%d/%d" % (processed, total))
 
 	def onContextMenu(self, event):
 		if self.jobCtrl.GetFocusedItem() < 0:
