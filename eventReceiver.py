@@ -13,7 +13,6 @@ class EventReceiver:
 		self.callbacks = {
 			events.job.CREATED: self.onJobCreated,
 			events.item.PROCESSED: self.onItemProcessed,
-			events.job.PROCESS_COMPLETED: self.onJobProcessed,
 		}
 
 	def onEvent(self, event, task, job=None, item=None, source=None, engine=None, converter=None):
@@ -29,7 +28,6 @@ class EventReceiver:
 			func(task, job, item, source, engine, converter)
 
 	def onJobCreated(self, task, job, item, source, engine, converter):
-		self.mainView.increaseTotalCount()
 		# job
 		self.mainView.jobs.append(job)
 		self.mainView.jobCtrl.Append([job.getName()])
@@ -57,6 +55,3 @@ class EventReceiver:
 		self.mainView.texts[0] += text
 		# cursor
 		self.mainView.cursors[jobIdx].append(0)
-
-	def onJobProcessed(self, task, job, item, source, engine, converter):
-		self.mainView.increaseProcessedCount()
