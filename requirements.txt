@@ -2,7 +2,7 @@
 pywin32
 winpaths
 pdf2image
-google-api-python-client
+google-api-python-client == 1.10
 PyInstaller
 requests
 requests_oauthlib
