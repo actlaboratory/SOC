@@ -16,6 +16,8 @@ class googleEngine(engineBase):
 
 	def _init(self):
 		self.credential = CredentialManager.CredentialManager(True)
+		if not self.credential.isOK():
+			self.log.error("credential not authorized")
 		self.credential.Authorize()
 		print("authorize success")
 
