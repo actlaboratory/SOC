@@ -80,14 +80,6 @@ class MainView(BaseView):
 		tabCtrl = self.creator.tabCtrl(_("ページ切替"),sizerFlag=wx.ALL|wx.EXPAND, proportion=1, margin=5)
 
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("進行状況"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
-		self.statusList, dummy = page.listCtrl(_("状況"))
-		self.statusList.AppendColumn(_("項目"))
-		self.statusList.AppendColumn(_("状態"))
-		self.statusList.Append([_("処理済み"), "0/3"])
-		self.statusList.Append([_("ファイル変換"), _("停止中")])
-		self.statusList.Append([_("Google OCR"), _("「test.pdf」を処理中")])
-		self.statusList.Append([_("Tesseract OCR"), _("「test2.pdf」を処理中")])
-		self.statusList.Append([_("スキャナ"), _("画像を読み込み中")])
 
 
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("認識結果"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
