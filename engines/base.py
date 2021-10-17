@@ -17,12 +17,19 @@ class engineBase(threading.Thread):
 
 	def __init__(self, identifier):
 		self.identifier = identifier
+		self._name = None
 		self.log = getLogger("%s.%s" % (constants.APP_NAME, self.identifier))
 		super().__init__()
 		self.log.info("created")
 		self.status = engineStatus(0)
 		self.onEvent = None
 		self.jobQueue = queue.Queue()
+
+	def getName(self):
+		name = self._name
+		if name is None:
+			raise NotImplementedError
+		return name
 
 	def setOnEvent(self, callBack):
 		assert callable(callBack)

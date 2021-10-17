@@ -12,6 +12,7 @@ from .base import engineBase
 class googleEngine(engineBase):
 	def __init__(self):
 		super().__init__("google")
+		self._name = "Google"
 
 	def _init(self):
 		self.credential = CredentialManager.CredentialManager(True)
