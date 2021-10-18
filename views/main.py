@@ -166,11 +166,22 @@ class MainView(BaseView):
 		self.statusList.SetItem(nextJobIndex, 2, engine)
 		self.processedCounts.insert(nextJobIndex, processedCount)
 		self.totalCounts.insert(nextJobIndex, totalCount)
-		self.setCount(nextJobIndex, processedCount, totalCount)
+		self.statusList.SetItem(nextJobIndex, 3, "%d/%d" % (processedCount, totalCount))
 		nextJobIndex += 1
 
-	def setCount(self, index, processed, total):
-		self.statusList.SetItem(index, 3, "%d/%d" % (processed, total))
+	def setProcessedCount(self, index, processed):
+		self.processedCounts[index] = processed
+		self.statusList.SetItem(index, 3, "%d/%d" % (self.processedCounts[index], self.totalCounts[index]))
+
+	def getProcessedCount(self, index):
+		return self.processedCounts[index]
+
+	def setTotalCount(self, index, total):
+		self.totalCounts[index] = total
+		self.statusList.SetItem(index, 3, "%d/%d" % (self.processedCounts[index], self.totalCounts[index]))
+
+	def getTotalCount(self, index):
+		return self.totalCounts[index]
 
 	def getJobIdIndex(self, id):
 		return self.jobIds.index(id)
