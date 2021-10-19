@@ -14,8 +14,10 @@ class EventReceiver:
 			events.job.CREATED: self.onJobCreated,
 			events.item.PROCESSED: self.onItemProcessed,
 			events.job.PROCESS_COMPLETED: self.onJobProcessed,
+			events.item.ADDED: self.onItemAdded,
 			events.item.CONVERTED: self.onItemConverted,
 		}
+		self.counts = {}
 
 	def onEvent(self, event, task, job=None, item=None, source=None, engine=None, converter=None):
 		self.log.debug("event: %s" % event)
@@ -68,6 +70,17 @@ class EventReceiver:
 		self.mainView.jobStatuses[index] = status
 		self.mainView.statusList.SetItem(index, 1, status)
 
-	def onItemConverted(self, task, job, item, source, engine, converter):
-		index = self.mainView.getJobIdIndex(job.getID())
+	def onItemAdded(self, task, job, item, source, engine, converter):
+		id = job.getID()
+		index = self.mainView.getJobIdIndex(id)
 		self.mainView.setTotalCount(index, self.mainView.getTotalCount(index) + 1)
+		self.counts[id] = self.counts.get(id, 0) + 1
+
+	def onItemConverted(self, task, job, item, source, engine, converter):
+		id = job.getID()
+		index = self.mainView.getJobIdIndex(id)
+		tmp = self.counts[id] - 1
+		if tmp < 0:
+			self.mainView.setTotalCount(index, self.mainView.getTotalCount(index) + 1)
+			return
+		self.counts[id] = tmp
