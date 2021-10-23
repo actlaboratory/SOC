@@ -11,7 +11,7 @@ from .base import engineBase
 
 
 class googleEngine(engineBase):
-	_name = "google"
+	_engineName = "google"
 
 	def __init__(self):
 		super().__init__("google")

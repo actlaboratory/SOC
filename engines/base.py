@@ -14,7 +14,7 @@ from jobObjects import jobStatus
 
 class engineBase(threading.Thread):
 	"""すべてのエンジンクラスが継承する基本クラス。"""
-	_name = None
+	_engineName = None
 
 	def __init__(self, identifier):
 		self.identifier = identifier
@@ -26,7 +26,7 @@ class engineBase(threading.Thread):
 		self.jobQueue = queue.Queue()
 
 	def getName(self):
-		name = self._name
+		name = self._engineName
 		if name is None:
 			raise NotImplementedError
 		return name
