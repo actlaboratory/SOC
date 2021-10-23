@@ -14,10 +14,10 @@ from jobObjects import jobStatus
 
 class engineBase(threading.Thread):
 	"""すべてのエンジンクラスが継承する基本クラス。"""
+	_name = None
 
 	def __init__(self, identifier):
 		self.identifier = identifier
-		self._name = None
 		self.log = getLogger("%s.%s" % (constants.APP_NAME, self.identifier))
 		super().__init__()
 		self.log.info("created")
@@ -96,4 +96,3 @@ class engineBase(threading.Thread):
 
 	def getStatus(self):
 		return self.status
-

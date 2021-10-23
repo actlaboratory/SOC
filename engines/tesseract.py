@@ -5,9 +5,10 @@ import pyocr
 from PIL import Image
 
 class tesseractEngine(engineBase):
+	_name = "tesseract"
+
 	def __init__(self, mode):
 		super().__init__("tesseract")
-		self._name = "Tesseract"
 		self.mode = mode
 
 	def _init(self):

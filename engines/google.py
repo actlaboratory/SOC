@@ -9,17 +9,18 @@ from googleapiclient import errors
 import io
 from .base import engineBase
 
+
 class googleEngine(engineBase):
+	_name = "google"
+
 	def __init__(self):
 		super().__init__("google")
-		self._name = "Google"
 
 	def _init(self):
 		self.credential = CredentialManager.CredentialManager(True)
 		if not self.credential.isOK():
 			self.log.error("credential not authorized")
 		self.credential.Authorize()
-		print("authorize success")
 
 	def getSupportedFormats(self):
 		return constants.FORMAT_JPEG | constants.FORMAT_PNG | constants.FORMAT_GIF|constants.FORMAT_PDF_IMAGE
@@ -48,3 +49,4 @@ class googleEngine(engineBase):
 			status, done = downloader.next_chunk()
 		service.files().delete(fileId=ID).execute()
 		item.setText(stream.getvalue().decode("utf-8"))
+
