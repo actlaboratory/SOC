@@ -2,6 +2,8 @@ from pdf2image import convert_from_path
 from .base import converterBase
 from jobObjects import item
 import constants
+import os
+
 
 class pdf2image(converterBase):
 	_SUPPORTED_FORMATS = constants.FORMAT_PDF_ALL
@@ -9,7 +11,7 @@ class pdf2image(converterBase):
 
 	def convert(self, target_format):
 		itm_list = []
-		images = convert_from_path(self.item.getPath(),dpi=400)
+		images = convert_from_path(self.item.getPath(),fmt="png",thread_count=os.cpu_count()-1,dpi=400)
 		for image in images:
 			if target_format == constants.FORMAT_BMP:
 				path = self.getTmpFilePath(".bmp")
