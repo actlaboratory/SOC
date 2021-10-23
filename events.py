@@ -13,6 +13,8 @@ class job(Enum):
 class engine(Enum):
 	INITIALIZED = auto()
 	STARTED = auto()
+	JOBPROCESS_STARTED = auto()
+	JOBPROCESS_COMPLETE = auto()
 	STOPED = auto()
 
 class source(Enum):

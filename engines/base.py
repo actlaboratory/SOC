@@ -66,6 +66,7 @@ class engineBase(threading.Thread):
 			self._processJob(job)
 
 	def _processJob(self, job:jobObjects.job):
+		self.onEvent(events.engine.JOBPROCESS_STARTED, engine = self, job = job)
 		while not job.getStatus() & jobStatus.PROCESS_COMPLETE:
 			time.sleep(0.01)
 			item = job.getProcessItem()
@@ -73,6 +74,7 @@ class engineBase(threading.Thread):
 				continue
 			self._recognize(item)
 			job.addProcessedItem(item)
+		self.onEvent(events.engine.JOBPROCESS_COMPLETE, engine = self, job = job)
 
 	def _recognize(self, item):
 		raise NotImplementedError()
