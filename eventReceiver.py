@@ -16,6 +16,7 @@ class EventReceiver:
 			events.job.PROCESS_COMPLETED: self.onJobProcessed,
 			events.item.ADDED: self.onItemAdded,
 			events.item.CONVERTED: self.onItemConverted,
+			events.engine.JOBPROCESS_STARTED: self.onJobProcessStarted,
 		}
 		self.counts = {}
 
@@ -84,3 +85,9 @@ class EventReceiver:
 			self.mainView.setTotalCount(index, self.mainView.getTotalCount(index) + 1)
 			return
 		self.counts[id] = tmp
+
+	def onJobProcessStarted(self, task, job, item, source, engine, converter):
+		index = self.mainView.getJobIdIndex(job.getID())
+		status = _("認識中")
+		self.mainView.jobStatuses[index] = status
+		self.mainView.statusList.SetItem(index, 1, status)
