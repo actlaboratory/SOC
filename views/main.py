@@ -91,8 +91,8 @@ class MainView(BaseView):
 		self.statusList, dummy = page.listCtrl(_("状況"))
 		self.statusList.AppendColumn(_("名前"))
 		self.statusList.AppendColumn(_("状態"))
-		self.statusList.AppendColumn(_("OCRエンジン"))
 		self.statusList.AppendColumn(_("認識済みページ数"))
+		self.statusList.AppendColumn(_("OCRエンジン"))
 
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("認識結果"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
 		self.selectorIdentifier = "selector"
@@ -162,23 +162,23 @@ class MainView(BaseView):
 		self.statusList.SetItem(nextJobIndex, 0, name)
 		self.jobStatuses.insert(nextJobIndex, status)
 		self.statusList.SetItem(nextJobIndex, 1, status)
-		self.ocrEngines.insert(nextJobIndex, engine)
-		self.statusList.SetItem(nextJobIndex, 2, engine)
 		self.processedCounts.insert(nextJobIndex, processedCount)
 		self.totalCounts.insert(nextJobIndex, totalCount)
-		self.statusList.SetItem(nextJobIndex, 3, "%d/%d" % (processedCount, totalCount))
+		self.statusList.SetItem(nextJobIndex, 2, "%d/%d" % (processedCount, totalCount))
+		self.ocrEngines.insert(nextJobIndex, engine)
+		self.statusList.SetItem(nextJobIndex, 3, engine)
 		nextJobIndex += 1
 
 	def setProcessedCount(self, index, processed):
 		self.processedCounts[index] = processed
-		self.statusList.SetItem(index, 3, "%d/%d" % (self.processedCounts[index], self.totalCounts[index]))
+		self.statusList.SetItem(index, 2, "%d/%d" % (self.processedCounts[index], self.totalCounts[index]))
 
 	def getProcessedCount(self, index):
 		return self.processedCounts[index]
 
 	def setTotalCount(self, index, total):
 		self.totalCounts[index] = total
-		self.statusList.SetItem(index, 3, "%d/%d" % (self.processedCounts[index], self.totalCounts[index]))
+		self.statusList.SetItem(index, 2, "%d/%d" % (self.processedCounts[index], self.totalCounts[index]))
 
 	def getTotalCount(self, index):
 		return self.totalCounts[index]
