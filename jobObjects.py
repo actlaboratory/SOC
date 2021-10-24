@@ -55,6 +55,9 @@ class job():
 			self.onEvent(events.job.CONVERTQUEUE_EMPTY, job = self)
 			return None
 		item = self.convertQueue.get()
+		if self.getStatus() & jobStatus.CONVERT_STARTED:
+			self.onEvent(events.job.CONVERT_STARTED, job = self)
+			self.raiseStatusFlag(jobStatus.CONVERT_STARTED)
 		self.onEvent(events.item.CONVERT_STARTED, job = self, item = item)
 		return item
 
@@ -155,6 +158,7 @@ class item:
 
 class jobStatus(IntFlag):
 	SOURCE_END = auto()
+	CONVERT_STARTED = auto()
 	CONVERT_COMPLETE = auto()
 	PROCESS_STARTED = auto()
 	PROCESS_COMPLETE = auto()
