@@ -47,6 +47,8 @@ class Main(AppBase.MainBase):
 		if self.config.getboolean(self.hMainView.identifier,"maximized",False):
 			self.hMainView.hFrame.Maximize()
 		self.hMainView.Show()
+		if len(sys.argv) < 2:
+			return True
 		dialog = views.new.Dialog()
 		dialog.Initialize(sys.argv[1:])
 		dialog.Show()
