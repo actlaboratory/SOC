@@ -7,12 +7,13 @@ defaultKeymap={}
 
 defaultKeymap["mainView"]={
 	"OPEN": "ctrl+O",
+	"NEW": "ctrl+n",
 	"EXIT": "ctrl+X",
 }
 defaultKeymap["fileList"] = {
 	"DELETE": "DELETE",
 	"PAST": "ctrl+V",
 }
-defaultKeymap["resultTree"] = {
+defaultKeymap["selector"] = {
 	"COPY_TEXT": "CTRL+C",
 }

@@ -1,68 +1,70 @@
-import errorCodes
-import threading
 import time
 import queue
-from logging import getLogger
+from logging import exception, getLogger
 import constants
 from sources.constants import sourceStatus
 from engines.constants import engineStatus
-import winsound
+from task import taskStatus
+import events
+import wx
 
-class manager(threading.Thread):
-	def __init__(self, engine, source):
+class manager():
+	def __init__(self):
 		super().__init__()
-		self.jobs = []
-		self.engine = engine
-		self.source = source
-		self.running = True
-		self._messageQueue = queue.Queue()
+		self.tasks = []
 		self.log = getLogger("%s.manager" % (constants.APP_NAME))
+		self.log.info("initialized")
+		self.runningSourceIndex = -1
+		self.runningEngineIndex = -1
+		self.runningConverterIndex = -1
+		self.higherOnEvent = None
 
-	def run(self):
-		self.log.debug("initializing modules...")
-		self.source.initialize()
-		self.source.start()
-		self.engine.setCallbackOnAfterRecognize(self.onAfterRecognize)
-		self.engine.start()
-		self.log.info("Ocr started")
-		time.sleep(1)
-		while True:
-			if not self.source.getStatus() & sourceStatus.RUNNING:
-				if self.source.empty():
-					break
-			if self.source.empty():
-				time.sleep(0.1)
-				continue
-			item = self.source.get_item()
-			self.jobs.append(item)
-			self.log.debug("job received")
-			self.engine.put(item)
-			time.sleep(0.01)
-		self.engine.notifyStopSource()
-		while not self.engine.getStatus() & engineStatus.FINISHED:
-			time.sleep(0.01)
-		self.log.debug("Ocr stoped")
-		self.running = False
-		return
+	def setOnEvent(self, callBack):
+		assert callable(callBack)
+		self.higherOnEvent = callBack
 
-	def onAfterRecognize(self, job):
-		self.log.info("processed job received")
-		winsound.Beep(1000, 200)
+	def onEvent(self, event, task, job = None, item = None, source = None, engine = None, converter = None):
+		self.log.debug("called onEvent with %s" % (event))
+		if event == events.source.END:
+			if self.runningSourceIndex < len(self.tasks) -1:
+				self.tasks[self.runningSourceIndex+1].startSource()
+				self.runningSourceIndex += 1
+			elif self.runningSourceIndex == len(self.tasks) -1:
+				self.runningSourceIndex = -1
+			else:
+				raise exception("タスクの管理でエラーが発生しました。", self.runningSourceIndex)
+		elif event == events.engine.STOPED:
+			if self.runningEngineIndex < len(self.tasks) -1:
+				self.tasks[self.runningEngineIndex+1].startEngine()
+				self.runningEngineIndex += 1
+			elif self.runningEngineIndex == len(self.tasks) -1:
+				self.runningEngineIndex = -1
+			else:
+				raise exception("タスクの管理でエラーが発生しました。", self.runningSourceIndex)
+		elif event == events.converter.STOPED:
+			if self.runningConverterIndex < len(self.tasks) -1:
+				self.tasks[self.runningConverterIndex+1].startEngine()
+				self.runningConverterIndex += 1
+			elif self.runningConverterIndex == len(self.tasks) -1:
+				self.runningConverterIndex = -1
+			else:
+				raise exception("タスクの管理でエラーが発生しました。", self.runningSourceIndex)
+		wx.CallAfter(self.higherOnEvent,event,task = task,job = job, item = item, engine = engine, source = source, converter = converter)
 
-	def getEngineStatus(self):
-		return self.engine.getStatus()
+	def addTask(self, task):
+		self.log.debug("added task-%d" % task.getID())
+		task.setOnEvent(self.onEvent)
+		self.tasks.append(task)
+		if self.runningSourceIndex == -1:
+			task.startSource()
+			self.runningSourceIndex = len(self.tasks) - 1
+		if self.runningEngineIndex == -1:
+			task.startEngine()
+			self.runningEngineIndex = len(self.tasks) - 1
+		if self.runningConverterIndex == -1:
+			task.startConverter()
+			self.runningConverterIndex = len(self.tasks) - 1
 
-	def getSourceStatus(self):
-		return self.source.getStatus()
+	def getTasks(self):
+		return self.tasks
 
-	def getProcessedJobs(self):
-		return self.jobs
-
-	def getAllText(self):
-		text = ""
-		for job in self.getProcessedJobs():
-			text += job.getAllItemText()
-		return text
-
-	def getJobs(self):
-		return self.jobs

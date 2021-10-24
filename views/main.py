@@ -5,6 +5,8 @@
 #Copyright (C) 2020 guredora <contact@guredora.com>
 
 import ctypes
+import copy
+from jobObjects import job
 import logging
 import os
 import pathlib
@@ -20,6 +22,7 @@ import clipboardHelper
 import constants
 import dtwain
 import errorCodes
+import eventReceiver
 import globalVars
 import keymap
 import menuItemsStore
@@ -33,11 +36,15 @@ from simpleDialog import *
 from sources import file, scanner
 
 from stub import stub
-from views import (authorizing, processingDialog, resultDialog, settings,
+from views import (authorizing, new, processingDialog, resultDialog, settings,
                    versionDialog, OcrDialog)
 
 from .base import *
 
+MSG_ALL = "（全て）"
+IDX_ALL = 0
+
+nextJobIndex = 0
 
 class MainView(BaseView):
 	def __init__(self):
@@ -45,6 +52,8 @@ class MainView(BaseView):
 		self.log.debug("created")
 		self.app=globalVars.app
 		self.events=Events(self,self.identifier)
+		evtReceiver = eventReceiver.EventReceiver(self)
+		globalVars.manager.setOnEvent(evtReceiver.onEvent)
 		title=constants.APP_NAME
 		super().Initialize(
 			title,
@@ -56,78 +65,147 @@ class MainView(BaseView):
 		)
 
 		self.InstallMenuEvent(Menu(self.identifier),self.events.OnMenuSelect)
-		self.engineSelection = {
-			_("google (インターネット)"): "google",
-			_("tesseract (ローカル"): "tesseract"
-		}
-		self.tesseractModeSelection = {
-			_("横書き通常"): "jpn",
-			_("横書き低負荷版"): "jpn_fast",
-			_("縦書き通常"): "jpn_vert",
-			_("縦書き低負荷版"): "jpn_vert_fast"
-		}
-		#タブコントロールの作成
-		creator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),wx.VERTICAL)
-		self.tab = creator.tabCtrl("ソース選択", event=None, style=wx.NB_NOPAGETHEME | wx.NB_MULTILINE, sizerFlag=wx.ALL, proportion=0, margin=20)
 
-		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,label=_("画像ファイルから読込"))
-		hCreator=views.ViewCreator.ViewCreator(self.viewMode,creator.GetPanel(),creator.GetSizer(),wx.HORIZONTAL,proportion=1)
-		vCreator=views.ViewCreator.ViewCreator(self.viewMode,hCreator.GetPanel(),hCreator.GetSizer(),wx.VERTICAL,style=wx.EXPAND)
+		self.initialized = False
+		self.initializeVariables()
+		self.installControls()
+		self.initialized = True
 
-		self.filebox, self.list = vCreator.listbox(_("ファイル一覧"), (), None,-1,0,(450,200),sizerFlag=wx.ALL,proportion=1,margin=10)
-		fileListKeymap = keymap.KeymapHandler(defaultKeymap.defaultKeymap)
-		acceleratorTable = fileListKeymap.GetTable("fileList")
-		self.filebox.SetAcceleratorTable(acceleratorTable)
-		self.filebox.SetDropTarget(DropTarget(self))	#D&Dの受け入れ
+	def initializeVariables(self):
+		self.jobs = [None]
+		self.pages = [[]]
+		self.selectedPages = [0]
+		self.texts = [""]
+		self.cursors = [0]
+		self.jobIds = []
+		self.jobNames = []
+		self.jobStatuses = []
+		self.ocrEngines = []
+		self.processedCounts = []
+		self.totalCounts = []
 
-		vCreator=views.ViewCreator.ViewCreator(self.viewMode,hCreator.GetPanel(),hCreator.GetSizer(),wx.VERTICAL,20)
-		self.open = vCreator.button(_("追加"), self.events.open)
-		self.delete = vCreator.button(_("削除"), self.events.onDelete)
+	def installControls(self):
+		tabCtrl = self.creator.tabCtrl(_("ページ切替"),sizerFlag=wx.ALL|wx.EXPAND, proportion=1, margin=5)
 
-		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,label=_("スキャナから読込"))
-		self.scannerList, self.scannerListStatic = creator.listCtrl(_("スキャナ一覧"), style = wx.LC_REPORT,sizerFlag=wx.EXPAND | wx.ALL)
-		self.scannerList.AppendColumn(_("名前"),width=550)
-		for scanner in dtwain.getSourceStringList():
-			self.scannerList.Append((scanner,))
+		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("進行状況"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
+		self.statusList, dummy = page.listCtrl(_("状況"))
+		self.statusList.AppendColumn(_("名前"))
+		self.statusList.AppendColumn(_("状態"))
+		self.statusList.AppendColumn(_("認識済みページ数"))
+		self.statusList.AppendColumn(_("OCRエンジン"))
 
-		self.isBlankPageDetect = creator.checkbox(_("白紙を検出する"))
-		self.isDuplex = creator.checkbox(_("利用可能な場合両面スキャンを使用する"))
-		settingAreaCreator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),views.ViewCreator.FlexGridSizer,10, 2)
-		self.engine, self.engineStatic = settingAreaCreator.combobox(_("OCRエンジン"), list(self.engineSelection.keys()), self.events.onEngineSelect, state = 0)
-		self.tesseract, self.tesseractStatic = settingAreaCreator.combobox(_("モード"), list(self.tesseractModeSelection.keys()), state = 0)
-		self.tesseract.Disable()
-		
-		buttonAreaCreator=views.ViewCreator.ViewCreator(self.viewMode,self.hPanel,self.creator.GetSizer(),wx.HORIZONTAL,20,style=wx.ALIGN_RIGHT)
-		self.startButton = buttonAreaCreator.button(_("開始"), self.events.onStart)
-		self.exit = buttonAreaCreator.button(_("終了"), self.events.Exit)
+		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("認識結果"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
+		self.selectorIdentifier = "selector"
+		self.jobCtrl, dummy = page.listCtrl(_("認識済みファイル"), self.itemSelected)
+		self.jobCtrl.AppendColumn(_("ファイル名"))
+		self.jobCtrl.Append([MSG_ALL])
+		self.jobCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
+		self.menu.keymap.Set(self.selectorIdentifier, self.jobCtrl)
+		self.pageCtrl, dummy = page.combobox(_("ページ選択"), [MSG_ALL], self.itemSelected)
+		self.pageCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
+		self.menu.keymap.Set(self.selectorIdentifier, self.pageCtrl)
+		self.pageCtrl.Disable()
+		self.text, dummy = page.inputbox(_("認識結果"), style=wx.TE_READONLY|wx.TE_MULTILINE)
+		self.text.Disable()
 
-# D&D受入関連
-class DropTarget(wx.DropTarget):
-	def __init__(self,parent):
-		super().__init__(wx.FileDataObject())
-		self.parent=parent			#mainViewオブジェクトが入る
+	def updateText(self):
+		jobIdx = self.jobCtrl.GetFocusedItem()
+		if jobIdx < 0:
+			return
+		if jobIdx == 0:
+			text = self.texts[jobIdx]
+			cursor = self.cursors[jobIdx]
+		else:
+			pageIdx = self.pageCtrl.GetSelection()
+			text = self.texts[jobIdx][pageIdx]
+			cursor = self.cursors[jobIdx][pageIdx]
+		self.text.SetValue(text)
+		self.text.SetInsertionPoint(cursor)
 
-	#マウスオーバー時に呼ばれる
-	#まだマウスを放していない
-	def OnDragOver(self,x,y,defResult):
-		return defResult
+	def getJobIdx(self, job):
+		return self.jobs.index(job)
 
-	#ドロップされずにマウスが外に出た
-	#戻り値不要
-	def OnLeave(self):
-		pass
+	def itemSelected(self, event):
+		self.text.Enable()
+		jobIdx = self.jobCtrl.GetFocusedItem()
+		hasMultiplePages = len(self.pages[jobIdx]) > 1
+		obj = event.GetEventObject()
+		if obj == self.jobCtrl:
+			# ジョブが選択された
+			if hasMultiplePages:
+				self.pageCtrl.Clear()
+				self.pageCtrl.Append(MSG_ALL)
+				for i in range(1, len(self.pages[jobIdx])):
+					self.pageCtrl.Append(_("%dページ") % i)
+				self.pageCtrl.SetSelection(self.selectedPages[jobIdx])
+				self.pageCtrl.Enable()
+			else:
+				self.pageCtrl.Disable()
+				self.pageCtrl.Clear()
+				self.pageCtrl.Append(MSG_ALL)
+			self.updateText()
+		elif obj == self.pageCtrl:
+			# ページが選択された
+			self.selectedPages[jobIdx] = self.pageCtrl.GetSelection()
+			self.updateText()
 
-	#マウスが放されたら呼ばれる
-	#現在データの受け入れが可能ならTrue
-	def OnDrop(self,x,y):
-		return True
+	def addJob(self, job, engine):
+		global nextJobIndex
+		name = job.getName()
+		status = _("準備中")
+		engine = engine.getName()
+		processedCount = 0
+		totalCount = 0
+		self.jobIds.insert(nextJobIndex, job.getID())
+		self.statusList.InsertItem(nextJobIndex, "")
+		self.jobNames.insert(nextJobIndex, name)
+		self.statusList.SetItem(nextJobIndex, 0, name)
+		self.jobStatuses.insert(nextJobIndex, status)
+		self.statusList.SetItem(nextJobIndex, 1, status)
+		self.processedCounts.insert(nextJobIndex, processedCount)
+		self.totalCounts.insert(nextJobIndex, totalCount)
+		self.statusList.SetItem(nextJobIndex, 2, "%d/%d" % (processedCount, totalCount))
+		self.ocrEngines.insert(nextJobIndex, engine)
+		self.statusList.SetItem(nextJobIndex, 3, engine)
+		nextJobIndex += 1
 
-	#データを受け入れ、結果を返す
-	def OnData(self,x,y,defResult):
-		self.GetData()
-		globalVars.app.addFileList(self.DataObject.GetFilenames())
-		return defResult		#推奨されたとおりに返しておく
+	def setProcessedCount(self, index, processed):
+		self.processedCounts[index] = processed
+		self.statusList.SetItem(index, 2, "%d/%d" % (self.processedCounts[index], self.totalCounts[index]))
 
+	def getProcessedCount(self, index):
+		return self.processedCounts[index]
+
+	def setTotalCount(self, index, total):
+		self.totalCounts[index] = total
+		self.statusList.SetItem(index, 2, "%d/%d" % (self.processedCounts[index], self.totalCounts[index]))
+
+	def getTotalCount(self, index):
+		return self.totalCounts[index]
+
+	def getJobIdIndex(self, id):
+		return self.jobIds.index(id)
+
+	def onContextMenu(self, event):
+		if self.jobCtrl.GetFocusedItem() < 0:
+			return
+		menu = wx.Menu()
+		menu.Bind(wx.EVT_MENU, self.events.OnMenuSelect)
+		baseMenu = BaseMenu(self.selectorIdentifier)
+		baseMenu.RegisterMenuCommand(menu, [
+			"COPY_TEXT",
+			"SAVE",
+		])
+		event.GetEventObject().PopupMenu(menu, event)
+
+	def getText(self):
+		jobIdx = self.jobCtrl.GetFocusedItem()
+		if jobIdx < 0:
+			return ""
+		elif jobIdx == 0:
+			return self.texts[0]
+		else:
+			return self.texts[jobIdx][self.parent.pageCtrl.GetSelection()]
 
 class Menu(BaseMenu):
 	def Apply(self,target):
@@ -137,11 +215,24 @@ class Menu(BaseMenu):
 		self.hSettingMenu=wx.Menu()
 		self.hHelpMenu = wx.Menu()
 		#ファイルメニューの中身
-		self.RegisterMenuCommand(self.hFileMenu, ["OPEN", "OPENVIEW", "EXIT"])
+		self.RegisterMenuCommand(self.hFileMenu, [
+			"NEW",
+			"OPEN",
+			"OPENVIEW",
+			"EXIT",
+		])
 		#設定メニューの中身
-		self.RegisterMenuCommand(self.hSettingMenu, ["GOOGLE", "SENDREGIST", "SETTINGS"])
+		self.RegisterMenuCommand(self.hSettingMenu, [
+			"GOOGLE",
+			"SENDREGIST",
+			"SETTINGS",
+		])
 		#ヘルプメニューの中身
-		self.RegisterMenuCommand(self.hHelpMenu, ["HOMEPAGE", "UPDATE", "ABOUT"])
+		self.RegisterMenuCommand(self.hHelpMenu, [
+			"HOMEPAGE",
+			"UPDATE",
+			"ABOUT",
+		])
 		#メニューバーの生成
 		self.hMenuBar.Append(self.hFileMenu, _("ファイル(&f)"))
 		self.hMenuBar.Append(self.hSettingMenu,_("設定(&s)"))
@@ -151,66 +242,6 @@ class Menu(BaseMenu):
 			self.hMenuBar.Enable(menuItemsStore.getRef("GOOGLE"), False)
 
 class Events(BaseEvents):
-	def onDelete(self, events=None):
-		index = self.parent.filebox.GetSelection()
-		if index == -1:
-			return
-		self.parent.filebox.Delete(index)
-		del globalVars.app.fileList[index]
-		self.parent.filebox.SetSelection(index-1)
-		return
-	def open(self, events=None):
-		dialog = wx.FileDialog(None, _("画像ファイルを選択"), style=wx.FD_OPEN|wx.FD_MULTIPLE, wildcard=_("画像ファイル(*.jpg;*.png;*.gif;*.pdf) | *.jpg;*.png;*.gif;*.pdf; | すべてのファイル(*.*) | *.*"))
-		if dialog.ShowModal() == wx.ID_CANCEL:
-			return
-		self.parent.app.addFileList(dialog.GetPaths())
-		return
-	def onEngineSelect(self, events):
-		selection = self.parent.engine.GetStringSelection()
-		if self.parent.engineSelection[selection] == "google":
-			self.parent.tesseract.Disable()
-		if self.parent.engineSelection[selection] == "tesseract":
-			self.parent.tesseract.Enable()
-		return
-
-	def onStart(self, Events):
-		sourceSelection = self.parent.tab.GetSelection()
-		if sourceSelection == 0 and self.parent.filebox.GetCount() == 0:
-			errorDialog(_("ファイルから変換をおこなうには最低ひとつの画像ファイルが追加されている必用があります。"))
-			return
-		if self.parent.engine.Selection == -1:
-			errorDialog(_("OCRエンジンを選択してください。"))
-			return
-		#エンジンの生成
-		if self.parent.engineSelection[self.parent.engine.GetStringSelection()] == "google":
-			e = google.googleEngine()
-			if e == errorCodes.NOT_AUTHORIZED:
-				errorDialog(_("googleのOCRエンジンを使用するにはお使いのgoogleアカウントを連携する必要があります。\n設定メニューよりン連携を行ってください。"))
-				return
-		elif self.parent.engineSelection[self.parent.engine.GetStringSelection()] == "tesseract":
-			if self.parent.tesseract.Selection == -1:
-				errorDialog(_("tesseract-ocrのモードが指定されていません。"))
-				return
-			e = tesseract.tesseractEngine(self.parent.tesseractModeSelection[self.parent.tesseract.GetStringSelection()])
-		#sourceオブジェクトの生成
-		if sourceSelection == 0:
-			source = file.fileSource(globalVars.app.fileList)
-		elif sourceSelection == 1:
-			scannerSelection = self.parent.scannerList.GetFocusedItem()
-			scannerName = self.parent.scannerList.GetItemText(scannerSelection)
-			source = scanner.scannerSource(scannerName, blankPageDetect = self.parent.isBlankPageDetect.GetValue(), isDuplex = self.parent.isDuplex.GetValue())
-		if qDialog(_("処理を開始します。よろしいですか？"), _("確認")) == wx.ID_NO:
-			return
-		manager = ocrManager.manager(e, source)
-		oDialog = OcrDialog.Dialog()
-		self.oDialog = oDialog
-		oDialog.Initialize(manager)
-		manager.start()
-		oDialog.Show()
-		globalVars.app.fileList.clear()
-		self.parent.filebox.Clear()
-		return
-
 	def Exit(self, event = None):
 		self.parent.hFrame.Close()
 
@@ -225,6 +256,23 @@ class Events(BaseEvents):
 
 		if selected == menuItemsStore.getRef("OPEN"):
 			self.open()
+		if selected == menuItemsStore.getRef("NEW"):
+			d = new.Dialog()
+			d.Initialize()
+			d.Show()
+		if selected == menuItemsStore.getRef("SAVE"):
+			if self.parent.jobCtrl.GetFocusedItem() < 0:
+				return
+			text = self.parent.getText()
+			d = wx.FileDialog(self.parent.hFrame, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT, wildcard=_("テキストファイル(*.txt)") + "|*.txt|" + _("全てのファイル(*.*)") + "|*.*")
+			if d.ShowModal() == wx.ID_CANCEL:
+				return
+			path = d.GetPath()
+			try:
+				with open(path, "w") as f:
+					f.write(text)
+			except IOError as e:
+				errorDialog(_("保存に失敗しました。詳細: %s") % (e))
 		if selected == menuItemsStore.getRef("EXIT"):
 			self.Exit()
 		if selected == menuItemsStore.getRef("DELETE"):
@@ -280,7 +328,8 @@ class Events(BaseEvents):
 			dialog.Initialize(stub())
 			dialog.Show()
 		if selected == menuItemsStore.getRef("COPY_TEXT"):
-			item = self.oDialog.tree.GetFocusedItem()
-			text = self.oDialog.map[item]["text"]
+			if self.parent.jobCtrl.GetFocusedItem() < 0:
+				return
+			text = self.parent.getText()
 			with clipboardHelper.Clipboard() as c:
 				c.set_unicode_text(text)

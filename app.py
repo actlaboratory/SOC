@@ -1,6 +1,7 @@
 ﻿# -*- coding: utf-8 -*-
 # Soc Main
 
+import tempfile
 import proxyUtil
 import AppBase
 import CredentialManager
@@ -17,6 +18,8 @@ import os
 import globalVars
 from sources.file import fileSource
 import threading
+import ocrManager
+import views.new
 
 class Main(AppBase.MainBase):
 	def __init__(self):
@@ -24,6 +27,7 @@ class Main(AppBase.MainBase):
 
 	def initialize(self):
 		"""アプリを初期化する。"""
+		self.tmpDir = tempfile.TemporaryDirectory()
 		# プロキシの設定を適用
 		self.proxyEnviron = proxyUtil.virtualProxyEnviron()
 		self.setProxyEnviron()
@@ -35,20 +39,18 @@ class Main(AppBase.MainBase):
 		if self.config.getboolean("general", "update"):
 			globalVars.update.update(True)
 		self.SetDefaultEncoding()
-		if not os.path.exists(self.getTmpDir()):
-			os.mkdir(self.getTmpDir())
 		#popplerにパスを通す
 		os.environ["PATH"] += os.pathsep + os.getcwd() + "/poppler/bin"
 		# メインビューを表示
 		from views import main
 		self.hMainView=main.MainView()
-		self.fileList = []
-		self.addFileList(sys.argv[1:])
 		if self.config.getboolean(self.hMainView.identifier,"maximized",False):
 			self.hMainView.hFrame.Maximize()
 		self.hMainView.Show()
+		dialog = views.new.Dialog()
+		dialog.Initialize(sys.argv[1:])
+		dialog.Show()
 		return True
-
 
 	def setProxyEnviron(self):
 		if self.config.getboolean("proxy", "usemanualsetting", False) == True:
@@ -63,39 +65,20 @@ class Main(AppBase.MainBase):
 
 	def setGlobalVars(self):
 		globalVars.update = update.update()
+		globalVars.manager = ocrManager.manager()
 		return
 
-	def addFileList(self, files):
-		error = False
-		add = False
-		for file in files:
-			suffix = os.path.splitext(file)[1][1:].lower()
-			if os.path.isdir(file):
-				error=True
-				continue
-			if suffix in constants.EXT_TO_FORMAT.keys():
-				if file in self.fileList:
-					continue
-				self.fileList.append(file)
-				self.hMainView.filebox.Append(os.path.basename(file))
-				add = True
-			else:
-				error = True
-		if error:
-			if add:
-				errorDialog(_("対応していないフォーマットのファイルは除外され、一部のファイルのみ追加されました。"))
-			else:
-				errorDialog(_("このフォーマットのファイルには対応していないため、追加できませんでした。"))
-
 	def getTmpDir(self):
-		return self.config.getstring("ocr", "tmpdir", os.path.join(os.environ["TEMP"], "soc"), None)
+		return self.tmpDir.name
 
 	def OnExit(self):
 		#設定の保存やリソースの開放など、終了前に行いたい処理があれば記述できる
 		#ビューへのアクセスや終了の抑制はできないので注意。
-		if os.path.exists(self.getTmpDir()):
-			util.allDelete(self.getTmpDir())
 
+		# managerを止める
+		globalVars.manager = None
+		#一時ディレクトリを削除する
+		self.tmpDir.cleanup()
 		# プロキシの設定を元に戻す
 		if self.proxyEnviron != None: self.proxyEnviron.unset_environ()
 

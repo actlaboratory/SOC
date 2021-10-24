@@ -1,9 +1,6 @@
 from enum import IntFlag, auto
 
 class engineStatus(IntFlag):
+	SOURCE_END = auto()
 	RUNNING = auto()
-	CONVERTER_PROCESSING = auto()
-	FINISHED = auto()
-	EXECUTING = auto()
-	SOURCESTOPED = auto()
-	
+	DONE = auto()

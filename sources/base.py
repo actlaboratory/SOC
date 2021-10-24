@@ -4,6 +4,8 @@ from logging import getLogger
 import constants
 from sources.constants import sourceStatus
 import queue
+import time
+import events
 
 class sourceBase(threading.Thread):
 	def __init__(self, identifier):
@@ -11,37 +13,48 @@ class sourceBase(threading.Thread):
 		self.log=getLogger("%s.%s" % (constants.LOG_PREFIX,identifier))
 		self.log.debug("created")
 		self.status = sourceStatus(0)
-		self.messageQueue = queue.Queue()
 		super().__init__()
-		self.raiseStatusFlag(sourceStatus.RUNNING)
+		self.onEvent = None
+
+	def initable(self):
+		return True
+
+	def _init(self):
+		return
+
+	def setOnEvent(self, callback):
+		assert callable(callback)
+		self.onEvent = callback
 
 	def initialize(self):
-		return
-
-	def _internal_get_item(self):
-		raise NotImplementedError()
-
-	def get_item(self):
-		self.log.info("The item was sent to manager")
-		return self._internal_get_item()
-
-	def empty(self):
-		raise NotImplementedError()
+		self._init()
+		self.onEvent(events.source.INITIALIZED, source = self)
+		self.log.debug("initialized")
 
 	def run(self):
+		self.log.info("started")
+		self.onEvent(events.source.STARTED, source = self)
+		self.raiseStatusFlag(sourceStatus.RUNNING)
+		self._run()
+		self.lowerStatusFlag(sourceStatus.RUNNING)
+		self.log.info("end")
+		self.terminate()
+		self.onEvent(events.source.END)
+		self.raiseStatusFlag(sourceStatus.DONE)
+
+	def _run(self):
 		return
 
-	def _showMessage(self, text):
-		result = queue.Queue()
-		data = (text, result)
-		self.messageQueue.put(data)
-		while not result.empty():
-			time.sleep(0.01)
-		return result.get()
+	def onJobCreated(self, job):
+		self.onEvent(events.job.CREATED, job = job, source = self)
 
 	def terminate(self):
 		"""ソースを閉じるときの処理"""
-		return None#必要な場合はオーバーライドする。
+		self._final()
+
+
+	def _final(self):
+		return
 
 	def raiseStatusFlag(self, flag):
 		assert isinstance(flag, sourceStatus)

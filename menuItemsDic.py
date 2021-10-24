@@ -10,6 +10,7 @@ def getValueString(ref_id):
 
 dic={
 	"OPEN": _("変換ファイルの追加(&o)"),
+	"NEW": _("新しく文字認識を開始(&N)"),
 	"EXIT": _("終了(&x)"),
 	"GOOGLE": _("Googleと連携する(&g)"),
 	"SENDREGIST": _("送るメニューにショートカットを作成(&s)"),
@@ -20,4 +21,5 @@ dic={
 	"UPDATE": _("最新バージョンを確認"),
 	# for Context Menu
 	"COPY_TEXT": _("本文のコピー(&C)"),
+	"SAVE": _("表示中のテキストをファイルに保存(&S)"),
 }
