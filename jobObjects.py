@@ -71,6 +71,9 @@ class job():
 			self.onEvent(events.job.PROCESSQUEUE_EMPTY, job = self)
 			return None
 		item = self.processQueue.get()
+		if not self.getStatus() & jobStatus.PROCESS_STARTED:
+			self.onEvent(events.job.PROCESS_STARTED, job = self)
+			self.raiseStatusFlag(jobStatus.PROCESS_STARTED)
 		self.onEvent(events.item.PROCESS_STARTED, job = self, item = item)
 		return item
 
@@ -153,5 +156,5 @@ class item:
 class jobStatus(IntFlag):
 	SOURCE_END = auto()
 	CONVERT_COMPLETE = auto()
-
+	PROCESS_STARTED = auto()
 	PROCESS_COMPLETE = auto()

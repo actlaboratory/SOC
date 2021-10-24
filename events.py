@@ -6,7 +6,9 @@ class job(Enum):
 	PROCESSQUEUE_EMPTY = auto()
 	NAME_CHANGED = auto()
 	SOURCE_END = auto()
+	CONVERT_STARTED = auto()
 	CONVERT_COMPLETED = auto()
+	PROCESS_STARTED = auto()
 	PROCESS_COMPLETED = auto()
 	CANCELED = auto()
 
