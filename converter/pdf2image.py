@@ -3,6 +3,7 @@ from .base import converterBase
 from jobObjects import item
 import constants
 import os
+import globalVars
 
 
 class pdf2image(converterBase):
@@ -11,7 +12,7 @@ class pdf2image(converterBase):
 
 	def convert(self, target_format):
 		itm_list = []
-		images = convert_from_path(self.item.getPath(),fmt="png",thread_count=os.cpu_count()-1,dpi=400)
+		images = convert_from_path(self.item.getPath(),fmt="png",thread_count=os.cpu_count()-1,output_folder=globalVars.app.getTmpDir(),dpi=400)
 		for image in images:
 			if target_format == constants.FORMAT_BMP:
 				path = self.getTmpFilePath(".bmp")
@@ -25,6 +26,7 @@ class pdf2image(converterBase):
 				path = self.getTmpFilePath(".jpg")
 			image.save(path)
 			itm_list.append(item(path))
+			image.close()
 		self.log.info("pdf converted")
 		return itm_list
 
