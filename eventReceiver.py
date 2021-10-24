@@ -16,7 +16,9 @@ class EventReceiver:
 			events.job.PROCESS_COMPLETED: self.onJobProcessed,
 			events.item.ADDED: self.onItemAdded,
 			events.item.CONVERTED: self.onItemConverted,
-			events.engine.JOBPROCESS_STARTED: self.onJobProcessStarted,
+			events.job.PROCESS_STARTED: self.onJobProcessStarted,
+			events.job.CONVERT_STARTED: self.onJobConversionStarted,
+			events.job.CONVERT_COMPLETED: self.onJobConverted,
 		}
 		self.counts = {}
 
@@ -88,6 +90,24 @@ class EventReceiver:
 
 	def onJobProcessStarted(self, task, job, item, source, engine, converter):
 		index = self.mainView.getJobIdIndex(job.getID())
+		if self.mainView.getJobStatus(index) != _("認識待ち"):
+			return
 		status = _("認識中")
+		self.mainView.jobStatuses[index] = status
+		self.mainView.statusList.SetItem(index, 1, status)
+
+	def onJobConversionStarted(self, task, job, item, source, engine, converter):
+		index = self.mainView.getJobIdIndex(job.getID())
+		if self.mainView.getJobStatus(index) != _("待機中"):
+			return
+		status = _("準備中")
+		self.mainView.jobStatuses[index] = status
+		self.mainView.statusList.SetItem(index, 1, status)
+
+	def onJobConverted(self, task, job, item, source, engine, converter):
+		index = self.mainView.getJobIdIndex(job.getID())
+		if self.mainView.getJobStatus(index) != _("準備中"):
+			return
+		status = _("認識待ち")
 		self.mainView.jobStatuses[index] = status
 		self.mainView.statusList.SetItem(index, 1, status)

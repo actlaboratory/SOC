@@ -186,6 +186,9 @@ class MainView(BaseView):
 	def getJobIdIndex(self, id):
 		return self.jobIds.index(id)
 
+	def getJobStatus(self, index):
+		return self.jobStatuses[index]
+
 	def onContextMenu(self, event):
 		if self.jobCtrl.GetFocusedItem() < 0:
 			return
