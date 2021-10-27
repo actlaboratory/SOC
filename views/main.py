@@ -235,9 +235,9 @@ class Menu(BaseMenu):
 			"ABOUT",
 		])
 		#メニューバーの生成
-		self.hMenuBar.Append(self.hFileMenu, _("ファイル(&f)"))
-		self.hMenuBar.Append(self.hSettingMenu,_("設定(&s)"))
-		self.hMenuBar.Append(self.hHelpMenu, _("ヘルプ(&h)"))
+		self.hMenuBar.Append(self.hFileMenu, _("ファイル(&F)"))
+		self.hMenuBar.Append(self.hSettingMenu,_("設定(&S)"))
+		self.hMenuBar.Append(self.hHelpMenu, _("ヘルプ(&H)"))
 		target.SetMenuBar(self.hMenuBar)
 		if globalVars.app.credentialManager.isOK():
 			self.hMenuBar.Enable(menuItemsStore.getRef("GOOGLE"), False)
