@@ -220,8 +220,6 @@ class Menu(BaseMenu):
 		#ファイルメニューの中身
 		self.RegisterMenuCommand(self.hFileMenu, [
 			"NEW",
-			"OPEN",
-			"OPENVIEW",
 			"EXIT",
 		])
 		#設定メニューの中身
@@ -257,8 +255,6 @@ class Events(BaseEvents):
 
 		selected=event.GetId()#メニュー識別しの数値が出る
 
-		if selected == menuItemsStore.getRef("OPEN"):
-			self.open()
 		if selected == menuItemsStore.getRef("NEW"):
 			d = new.Dialog()
 			d.Initialize()
@@ -325,11 +321,6 @@ class Events(BaseEvents):
 
 		if selected == menuItemsStore.getRef("UPDATE"):
 			globalVars.update.update()
-		if selected == menuItemsStore.getRef("OPENVIEW"):
-			dialog = OcrDialog.Dialog()
-			self.oDialog = dialog
-			dialog.Initialize(stub())
-			dialog.Show()
 		if selected == menuItemsStore.getRef("COPY_TEXT"):
 			if self.parent.jobCtrl.GetFocusedItem() < 0:
 				return

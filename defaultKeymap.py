@@ -6,7 +6,6 @@
 defaultKeymap={}
 
 defaultKeymap["mainView"]={
-	"OPEN": "ctrl+O",
 	"NEW": "ctrl+n",
 	"EXIT": "ctrl+X",
 }
