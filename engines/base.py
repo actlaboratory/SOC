@@ -11,6 +11,7 @@ from .constants import engineStatus
 import events
 import jobObjects
 from jobObjects import jobStatus
+import askEvent
 
 class engineBase(threading.Thread):
 	"""すべてのエンジンクラスが継承する基本クラス。"""
@@ -24,6 +25,7 @@ class engineBase(threading.Thread):
 		self.status = engineStatus(0)
 		self.onEvent = None
 		self.jobQueue = queue.Queue()
+		self.onAskEvent = None
 
 	def getName(self):
 		name = self._engineName
@@ -34,6 +36,10 @@ class engineBase(threading.Thread):
 	def setOnEvent(self, callBack):
 		assert callable(callBack)
 		self.onEvent = callBack
+
+	def setOnAskEvent(self, callback):
+		assert callable(callback)
+		self.onAskEvent = callback
 
 	def initable(self):
 		return True
@@ -88,6 +94,12 @@ class engineBase(threading.Thread):
 	def addJob(self, job):
 		self.jobQueue.put(job)
 
+	def ask(self, askEvent):
+		event = askEvent()
+		self.onAskEvent(event)
+		result = event.getResult()
+		return result
+
 	def raiseStatusFlag(self, flag):
 		assert isinstance(flag, engineStatus)
 		self.status |= flag
@@ -98,3 +110,6 @@ class engineBase(threading.Thread):
 
 	def getStatus(self):
 		return self.status
+
+class engineAskEvent(askEvent.askEventBase):
+	pass
