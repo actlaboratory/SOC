@@ -6,6 +6,7 @@ from sources.constants import sourceStatus
 import queue
 import time
 import events
+import askEvent
 
 class sourceBase(threading.Thread):
 	def __init__(self, identifier):
@@ -15,6 +16,12 @@ class sourceBase(threading.Thread):
 		self.status = sourceStatus(0)
 		super().__init__()
 		self.onEvent = None
+		self.onAskEvent = None
+
+
+	def setOnAskEvent(self, callback):
+		assert callable(callback)
+		self.onAskEvent = callback
 
 	def initable(self):
 		return True
@@ -56,6 +63,12 @@ class sourceBase(threading.Thread):
 	def _final(self):
 		return
 
+	def ask(self, askEvent):
+		event = askEvent()
+		self.onAskEvent(event)
+		result = event.getResult()
+		return result
+
 	def raiseStatusFlag(self, flag):
 		assert isinstance(flag, sourceStatus)
 		self.status |= flag
@@ -67,3 +80,5 @@ class sourceBase(threading.Thread):
 	def getStatus(self):
 		return self.status
 
+class sourceAskEvent(askEvent.askEventBase):
+	pass
