@@ -65,6 +65,8 @@ class MainView(BaseView):
 		)
 
 		self.InstallMenuEvent(Menu(self.identifier),self.events.OnMenuSelect)
+		self.menu.Enable(menuItemsStore.getRef("COPY_TEXT"), False)
+		self.menu.Enable(menuItemsStore.getRef("SAVE"), False)
 
 		self.initialized = False
 		self.initializeVariables()
@@ -126,6 +128,8 @@ class MainView(BaseView):
 		return self.jobs.index(job)
 
 	def itemSelected(self, event):
+		self.menu.Enable(menuItemsStore.getRef("COPY_TEXT"), True)
+		self.menu.Enable(menuItemsStore.getRef("SAVE"), True)
 		self.text.Enable()
 		jobIdx = self.jobCtrl.GetFocusedItem()
 		hasMultiplePages = len(self.pages[jobIdx]) > 1
@@ -220,6 +224,8 @@ class Menu(BaseMenu):
 		#ファイルメニューの中身
 		self.RegisterMenuCommand(self.hFileMenu, [
 			"NEW",
+			"COPY_TEXT",
+			"SAVE",
 			"EXIT",
 		])
 		#設定メニューの中身

@@ -7,6 +7,7 @@ defaultKeymap={}
 
 defaultKeymap["mainView"]={
 	"NEW": "ctrl+n",
+	"SAVE": "ctrl+s",
 	"EXIT": "ctrl+X",
 }
 defaultKeymap["fileList"] = {
