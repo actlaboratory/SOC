@@ -90,26 +90,27 @@ class MainView(BaseView):
 		tabCtrl = self.creator.tabCtrl(_("ページ切替"),sizerFlag=wx.ALL|wx.EXPAND, proportion=1, margin=5)
 
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("進行状況"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
-		self.statusList, dummy = page.listCtrl(_("状況"))
+		self.statusList, dummy = page.listCtrl(_("状況"), textLayout=None, sizerFlag=wx.EXPAND, proportion=1)
 		self.statusList.AppendColumn(_("名前"))
 		self.statusList.AppendColumn(_("状態"))
 		self.statusList.AppendColumn(_("認識済みページ数"))
 		self.statusList.AppendColumn(_("OCRエンジン"))
 
-		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("認識結果"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
+		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.HORIZONTAL,label=_("認識結果"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
+		creator = views.ViewCreator.ViewCreator(self.viewMode, page.GetPanel(), page.GetSizer(), orient=wx.VERTICAL, proportion=1, style=wx.EXPAND)
 		self.selectorIdentifier = "selector"
-		self.jobCtrl, dummy = page.listCtrl(_("認識済みファイル"), self.itemSelected)
+		self.jobCtrl, dummy = creator.listCtrl(_("認識済みファイル"), self.itemFocused, proportion=1, sizerFlag=wx.EXPAND)
 		self.jobCtrl.AppendColumn(_("ファイル名"))
 		self.jobCtrl.Append([MSG_ALL])
 		self.jobCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
 		self.menu.keymap.Set(self.selectorIdentifier, self.jobCtrl)
-		self.pageCtrl, dummy = page.listCtrl(_("ページ選択"), self.itemSelected)
+		self.pageCtrl, dummy = creator.listCtrl(_("ページ選択"), self.itemFocused, proportion=1, sizerFlag=wx.EXPAND)
 		self.pageCtrl.AppendColumn(_("ページ"))
 		self.pageCtrl.Append([MSG_ALL])
 		self.pageCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
 		self.menu.keymap.Set(self.selectorIdentifier, self.pageCtrl)
 		self.pageCtrl.Disable()
-		self.text, dummy = page.inputbox(_("認識結果"), style=wx.TE_READONLY|wx.TE_MULTILINE)
+		self.text, dummy = page.inputbox(_("認識結果"), style=wx.TE_READONLY|wx.TE_MULTILINE, proportion=1, sizerFlag=wx.EXPAND)
 		self.text.Disable()
 
 	def updateText(self):
@@ -129,7 +130,7 @@ class MainView(BaseView):
 	def getJobIdx(self, job):
 		return self.jobs.index(job)
 
-	def itemSelected(self, event):
+	def itemFocused(self, event):
 		self.menu.Enable(menuItemsStore.getRef("COPY_TEXT"), True)
 		self.menu.Enable(menuItemsStore.getRef("SAVE"), True)
 		self.text.Enable()
