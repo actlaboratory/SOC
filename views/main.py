@@ -103,7 +103,9 @@ class MainView(BaseView):
 		self.jobCtrl.Append([MSG_ALL])
 		self.jobCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
 		self.menu.keymap.Set(self.selectorIdentifier, self.jobCtrl)
-		self.pageCtrl, dummy = page.combobox(_("ページ選択"), [MSG_ALL], self.itemSelected)
+		self.pageCtrl, dummy = page.listCtrl(_("ページ選択"), self.itemSelected)
+		self.pageCtrl.AppendColumn(_("ページ"))
+		self.pageCtrl.Append([MSG_ALL])
 		self.pageCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
 		self.menu.keymap.Set(self.selectorIdentifier, self.pageCtrl)
 		self.pageCtrl.Disable()
@@ -118,7 +120,7 @@ class MainView(BaseView):
 			text = self.texts[jobIdx]
 			cursor = self.cursors[jobIdx]
 		else:
-			pageIdx = self.pageCtrl.GetSelection()
+			pageIdx = self.pageCtrl.GetFocusedItem()
 			text = self.texts[jobIdx][pageIdx]
 			cursor = self.cursors[jobIdx][pageIdx]
 		self.text.SetValue(text)
@@ -137,20 +139,21 @@ class MainView(BaseView):
 		if obj == self.jobCtrl:
 			# ジョブが選択された
 			if hasMultiplePages:
-				self.pageCtrl.Clear()
-				self.pageCtrl.Append(MSG_ALL)
+				self.pageCtrl.DeleteAllItems()
+				self.pageCtrl.Append([MSG_ALL])
 				for i in range(1, len(self.pages[jobIdx])):
-					self.pageCtrl.Append(_("%dページ") % i)
-				self.pageCtrl.SetSelection(self.selectedPages[jobIdx])
+					self.pageCtrl.Append([_("%dページ") % i])
+				self.pageCtrl.Focus(self.selectedPages[jobIdx])
+				self.pageCtrl.Select(self.selectedPages[jobIdx])
 				self.pageCtrl.Enable()
 			else:
 				self.pageCtrl.Disable()
-				self.pageCtrl.Clear()
-				self.pageCtrl.Append(MSG_ALL)
+				self.pageCtrl.DeleteAllItems()
+				self.pageCtrl.Append([MSG_ALL])
 			self.updateText()
 		elif obj == self.pageCtrl:
 			# ページが選択された
-			self.selectedPages[jobIdx] = self.pageCtrl.GetSelection()
+			self.selectedPages[jobIdx] = self.pageCtrl.GetFocusedItem()
 			self.updateText()
 
 	def addJob(self, job, engine):
@@ -212,7 +215,7 @@ class MainView(BaseView):
 		elif jobIdx == 0:
 			return self.texts[0]
 		else:
-			return self.texts[jobIdx][self.parent.pageCtrl.GetSelection()]
+			return self.texts[jobIdx][self.pageCtrl.GetFocusedItem()]
 
 class Menu(BaseMenu):
 	def Apply(self,target):
