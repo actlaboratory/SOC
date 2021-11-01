@@ -85,6 +85,8 @@ class MainView(BaseView):
 		self.ocrEngines = []
 		self.processedCounts = []
 		self.totalCounts = []
+		self.currentJob = -1
+		self.currentPage = -1
 
 	def installControls(self):
 		tabCtrl = self.creator.tabCtrl(_("ページ切替"),sizerFlag=wx.ALL|wx.EXPAND, proportion=1, margin=5)
@@ -131,6 +133,13 @@ class MainView(BaseView):
 		return self.jobs.index(job)
 
 	def itemFocused(self, event):
+		cursor = self.text.GetInsertionPoint()
+		if self.currentJob >= 0:
+			if type(self.cursors[self.currentJob]) == list:
+				if self.currentPage >= 0:
+					self.cursors[self.currentJob][self.currentPage] = cursor
+			else:
+				self.cursors[self.currentJob] = cursor
 		self.menu.Enable(menuItemsStore.getRef("COPY_TEXT"), True)
 		self.menu.Enable(menuItemsStore.getRef("SAVE"), True)
 		self.text.Enable()
@@ -156,6 +165,8 @@ class MainView(BaseView):
 			# ページが選択された
 			self.selectedPages[jobIdx] = self.pageCtrl.GetFocusedItem()
 			self.updateText()
+		self.currentJob = self.jobCtrl.GetFocusedItem()
+		self.currentPage = self.pageCtrl.GetFocusedItem()
 
 	def addJob(self, job, engine):
 		global nextJobIndex
