@@ -3,6 +3,7 @@ import queue
 class askEventBase:
 	_message = ""
 	_selection_to_result = {}
+	_title = ""
 
 	def __init__(self, obj):
 		self.eventObject = obj
@@ -24,3 +25,6 @@ class askEventBase:
 		result = self._result_queue.get(wait)
 		return result
 
+
+	def getTitle)self):
+		return self._title
