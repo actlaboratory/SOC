@@ -36,6 +36,11 @@ class task(threading.Thread):
 		assert callable(callback)
 		self.higherOnEvent = callback
 
+
+	def setOnAskEvent(self, callback):
+		assert callable(callback)
+		self.higherOnAskEvent = callback
+
 	def onEvent(self, event, job = None, item = None, source = None, engine = None, converter = None):
 		self.log.debug("called onEvent with %s" % (str(event)))
 		if event == events.job.CREATED:
