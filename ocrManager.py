@@ -56,8 +56,8 @@ class manager():
 		assert callable(callback)
 		self.higherOnAskEvent = callback
 
-	def onAskEvent(self, askEvent):
-		wx.CallAfter(self.higherOnAskEvent, askEvent)
+	def onAskEvent(self, askEvent, task):
+		wx.CallAfter(self.higherOnAskEvent, askEvent, task)
 
 	def addTask(self, task):
 		self.log.debug("added task-%d" % task.getID())

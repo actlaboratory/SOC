@@ -47,7 +47,7 @@ class task(threading.Thread):
 		self.higherOnEvent(event, engine = engine, source = source, job = job, item = item, converter = converter, task = self)
 
 	def onAskEvent(self, askEvent):
-		self.higherOnAskEvent(askEvent)
+		self.higherOnAskEvent(askEvent, self)
 
 	def startSource(self):
 		self.source.initialize()
