@@ -1,7 +1,7 @@
 import queue
 
 class askEventBase:
-	_message = "message"
+	_message = ""
 	_selection_to_result = {}
 
 	def __init__(self, obj):

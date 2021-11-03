@@ -64,7 +64,7 @@ class sourceBase(threading.Thread):
 		return
 
 	def ask(self, askEvent):
-		event = askEvent()
+		event = askEvent(self)
 		self.onAskEvent(event)
 		result = event.getResult()
 		return result

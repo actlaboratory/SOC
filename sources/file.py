@@ -1,4 +1,4 @@
-from .base import sourceBase
+from .base import sourceBase, sourceAskEvent
 import jobObjects
 import errorCodes
 from .constants import sourceStatus
@@ -17,5 +17,13 @@ class fileSource(sourceBase):
 			item = jobObjects.item(file)
 			job.addCreatedItem(item)
 			job.endSource()
+			self.ask(testAskEvent)
 		return
+
+class testAskEvent(sourceAskEvent):
+	_TEST_OK = 1
+	_message = "ファイルを追加しました。"
+	_selection_to_result = {
+		"ok": _TEST_OK
+	}
 
