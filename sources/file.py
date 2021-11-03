@@ -22,6 +22,7 @@ class fileSource(sourceBase):
 
 class testAskEvent(sourceAskEvent):
 	_TEST_OK = 1
+	_title = "ファイル読み込み"
 	_message = "ファイルを追加しました。"
 	_selection_to_result = {
 		"ok": _TEST_OK
