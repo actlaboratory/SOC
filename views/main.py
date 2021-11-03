@@ -23,6 +23,7 @@ import constants
 import dtwain
 import errorCodes
 import eventReceiver
+import askEventReceiver
 import globalVars
 import keymap
 import menuItemsStore
@@ -54,6 +55,8 @@ class MainView(BaseView):
 		self.events=Events(self,self.identifier)
 		evtReceiver = eventReceiver.EventReceiver(self)
 		globalVars.manager.setOnEvent(evtReceiver.onEvent)
+		askEvtReceiver = askEventReceiver.AskEventReceiver()
+		globalVars.manager.setOnAskEvent(askEvtReceiver.onEvent)
 		title=constants.APP_NAME
 		super().Initialize(
 			title,
