@@ -8,15 +8,16 @@ from logging import getLogger
 from views.baseDialog import *
 
 class Dialog(BaseDialog):
-	def __init__(self, message, selections):
+	def __init__(self, title, message, selections):
 		super().__init__("askDialog")
+		self.title = title
 		self.message = message
 		self.selections = selections
 		self.result = None
 
 	def Initialize(self):
 		self.log.debug("created")
-		super().Initialize(self.app.hMainView.hFrame,_("確認"))
+		super().Initialize(self.app.hMainView.hFrame,self.title)
 		self.InstallControls()
 		return True
 
