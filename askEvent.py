@@ -26,5 +26,5 @@ class askEventBase:
 		return result
 
 
-	def getTitle)self):
+	def getTitle(self):
 		return self._title
