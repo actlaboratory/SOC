@@ -25,7 +25,7 @@ class job():
 		if path:
 			self._name = os.path.basename(path)
 		else:
-			self._name = "job-%d" % self.id
+			self._name = "job-%d" % self._id
 		self.onEvent = None
 		self.log = getLogger("%s.job-%s" % (constants.APP_NAME, self.getID()))
 		self.log.info("created job named %s" % (self.getName()))
@@ -51,11 +51,8 @@ class job():
 		self.onEvent(events.item.ADDED, job = self, item = item)
 
 	def getConvertItem(self):
-		if self.convertQueue.empty():
-			self.onEvent(events.job.CONVERTQUEUE_EMPTY, job = self)
-			return None
-		item = self.convertQueue.get()
-		if self.getStatus() & jobStatus.CONVERT_STARTED:
+		item = self.convertQueue.get(block=True)
+		if not self.getStatus() & jobStatus.CONVERT_STARTED:
 			self.onEvent(events.job.CONVERT_STARTED, job = self)
 			self.raiseStatusFlag(jobStatus.CONVERT_STARTED)
 		self.onEvent(events.item.CONVERT_STARTED, job = self, item = item)
@@ -64,16 +61,9 @@ class job():
 	def addConvertedItem(self, item):
 		self.processQueue.put(item)
 		self.onEvent(events.item.CONVERTED, job = self, item = item)
-		if self.convertQueue.empty() & (self.getStatus() & jobStatus.SOURCE_END):
-			self.raiseStatusFlag(jobStatus.CONVERT_COMPLETE)
-			self.log.info("convert completed")
-			self.onEvent(events.job.CONVERT_COMPLETED, job = self)
 
 	def getProcessItem(self):
-		if self.processQueue.empty():
-			self.onEvent(events.job.PROCESSQUEUE_EMPTY, job = self)
-			return None
-		item = self.processQueue.get()
+		item = self.processQueue.get(block=True)
 		if not self.getStatus() & jobStatus.PROCESS_STARTED:
 			self.onEvent(events.job.PROCESS_STARTED, job = self)
 			self.raiseStatusFlag(jobStatus.PROCESS_STARTED)
@@ -84,14 +74,22 @@ class job():
 		self.processedItem.append(item)
 		self.onEvent(events.item.PROCESSED, job = self, item = item)
 		self.log.debug("item processed")
-		if self.processQueue.empty() & bool(self.getStatus() & jobStatus.CONVERT_COMPLETE):
-			self.raiseStatusFlag(jobStatus.PROCESS_COMPLETE)
-			self.log.debug("process completed")
-			self.onEvent(events.job.PROCESS_COMPLETED, job = self)
 
 	def endSource(self):
+		self.convertQueue.put(None)
 		self.raiseStatusFlag(jobStatus.SOURCE_END)
 		self.onEvent(events.job.SOURCE_END, job = self)
+
+	def endConvert(self):
+		self.processQueue.put(None)
+		self.raiseStatusFlag(jobStatus.CONVERT_COMPLETE)
+		self.log.info("convert completed")
+		self.onEvent(events.job.CONVERT_COMPLETED, job = self)
+
+	def endEngine(self):
+		self.raiseStatusFlag(jobStatus.PROCESS_COMPLETE)
+		self.log.debug("process completed")
+		self.onEvent(events.job.PROCESS_COMPLETED, job = self)
 
 	def getAllItemText(self):
 		text = ""
@@ -104,6 +102,7 @@ class job():
 
 	def raiseStatusFlag(self, flag):
 		assert isinstance(flag, jobStatus)
+		self.log.debug("raised %s" % (	flag))
 		self.status |= flag
 
 	def lowerStatusFlag(self, flag):
