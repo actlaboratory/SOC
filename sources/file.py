@@ -17,14 +17,4 @@ class fileSource(sourceBase):
 			item = jobObjects.item(file)
 			job.addCreatedItem(item)
 			job.endSource()
-			self.ask(testAskEvent)
 		return
-
-class testAskEvent(sourceAskEvent):
-	_TEST_OK = 1
-	_title = "ファイル読み込み"
-	_message = "ファイルを追加しました。"
-	_selection_to_result = {
-		"ok": _TEST_OK
-	}
-
