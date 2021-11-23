@@ -1,14 +1,11 @@
 from .base import sourceBase
-from jobObjects import job
 import globalVars
 import time
 import os
 import shutil
 import dtwain
-import queue
 import errorCodes
-import wx
-import tempfile
+import jobObjects
 
 class scannerSource(sourceBase):
 	def __init__(self, scannerName, resolution = 300, blankPageDetect = False, isDuplex = False):
@@ -21,9 +18,7 @@ class scannerSource(sourceBase):
 		self.running = True
 		self.initialized = False
 		#self.dtwain_source.raiseDeviceOffline()
-		self.temp_dir = tempfile.TemporaryDirectory()
-		self.image_tmp = self.temp_dir.name
-		self._fileQueue = queue.Queue()
+		self.image_tmp = globalVars.app.getTmpDir()
 
 	def dtwain_initialize(self):
 		self.dtwain = dtwain.dtwain(True)
@@ -43,19 +38,21 @@ class scannerSource(sourceBase):
 		self._pageCount = 0
 		self.initialized = True
 
-	def run(self):
+	def _run(self):
 		self.dtwain_initialize()
+		job = jobObjects.job()
+		self.onJobCreated(job)
 		while True:
 			if not self.dtwain_source.isFeederEnabled():
-				self._scan()
+				self._scan(job)
 			if self._isScannerEmpty():
-				if self._showMessage(_("スキャナに紙がセットされていません。スキャンを継続しますか？")) == wx.ID_NO:
-					break
-			self._scan()
+				break
+			self._scan(job)
 			time.sleep(0.01)
+		job.endSource()
 		self.running = False
 
-	def _scan(self):
+	def _scan(self, job:jobObjects.job):
 		fileNameList = []
 		for i in range(2):
 			self._pageCount += 1
@@ -64,34 +61,12 @@ class scannerSource(sourceBase):
 		self.dtwain_source.acquireFile(fileNameList, dtwain.DTWAIN_PNG)
 		for name in fileNameList:
 			if os.path.exists(name):
-				self._fileQueue.put(job(name))
+				job.addCreatedItem(jobObjects.item(name))
 
 	def _isScannerEmpty(self):
 		if not self.dtwain_source.isFeederLoaded():
 			return True
 		return False
 
-	def _internal_get_item(self):
-		return self._fileQueue.get()
-
-	def getStatus(self):
-		status = 0
-		if self.running:
-			status |= errorCodes.STATUS_SOURCE_LOADING
-		else:
-			if self._fileQueue.empty():
-				status |= errorCodes.STATUS_SOURCE_EMPTY
-		if not self._fileQueue.empty():
-			status |= errorCodes.STATUS_SOURCE_QUEUED
-		return status
-
-	def getStatusString(self):
-		if not self.initialized:
-			return _("開始中")
-		if self.dtwain_source.isAcquiring():
-			return _("スキャン中...")
-		else:
-			return _("大気中...")
-
-	def terminate(self):
-		self.temp_dir.cleanup()
+	def _final(self):
+		self.dtwain_source.close()

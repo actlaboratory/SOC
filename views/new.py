@@ -127,7 +127,7 @@ class Dialog(BaseDialog):
 		if sourceStr == _("ファイル"):
 			source = file.fileSource(self.files)
 		elif sourceStr == _("スキャナ"):
-			source = scanner.scannerSource(self.scannerList.GetItemText(self.scannerList.GetFocusedItem()), blankPageDetect=self.blankPageDetect, isDuplex=self.duplex)
+			source = scanner.scannerSource(self.scannerList.GetItemText(self.scannerList.GetFocusedItem()), blankPageDetect=self.blankPageDetect.GetValue(), isDuplex=self.duplex.GetValue())
 		# engine
 		engineStr = self.engineSelection[self.engine.GetValue()]
 		if engineStr == "google":
