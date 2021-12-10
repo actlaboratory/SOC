@@ -23,8 +23,3 @@ class converterBase():
 	def convert(self, target_format):
 		raise NotImplementedError()
 
-	def getTmpFilePath(self, ext):
-		basePath = os.path.join(globalVars.app.getTmpDir(), str(uuid.uuid4()))
-		return basePath+ext
-
-

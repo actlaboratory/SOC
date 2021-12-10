@@ -47,9 +47,11 @@ class converter(threading.Thread):
 				break
 			converted_item = self._convertItem(item)
 			if type(converted_item) == jobObjects.item:
+				pillow.convertGrayScale(converted_item)
 				job.addConvertedItem(converted_item)
 			elif type(converted_item) == list:
 				for itm in converted_item:
+					pillow.convertGrayScale(itm)
 					job.addConvertedItem(itm)
 		job.endConvert()
 

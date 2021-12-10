@@ -128,6 +128,15 @@ class item:
 			self._register_format()
 		return self.format
 
+	def hasGrayScaleFile(self):
+		return hasattr(self, "grayScaledPath")
+
+	def setGrayScaleFile(self, path):
+		self.grayScaledPath = path
+
+	def getGrayScaleFile(self):
+		return self.grayScaledPath
+
 	def _register_format(self):
 		ext = os.path.splitext(self.getPath())[1][1:]
 		format = constants.EXT_TO_FORMAT.get(ext.lower(), constants.FORMAT_UNKNOWN)
