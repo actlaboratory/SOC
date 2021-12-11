@@ -8,7 +8,7 @@ import errorCodes
 import jobObjects
 
 class scannerSource(sourceBase):
-	def __init__(self, scannerName, resolution = 300, blankPageDetect = False, isDuplex = False):
+	def __init__(self, scannerName, resolution = 400, blankPageDetect = False, isDuplex = False):
 		super().__init__("scannerSource")
 		self.scannerName = scannerName
 		self.resolution = resolution
