@@ -1,4 +1,4 @@
-from .base import sourceBase
+from .base import sourceBase, sourceAskEvent
 import globalVars
 import time
 import os
@@ -40,6 +40,15 @@ class scannerSource(sourceBase):
 
 	def _run(self):
 		self.dtwain_initialize()
+		while True:
+			time.sleep(0.01)
+			self._scan_until_empty()
+			res = self.ask(scanContinue)
+			if res == scanContinue._SCAN_NOT_CONTINUE:
+				break
+		self.running = False
+
+	def _scan_until_empty(self):
 		job = jobObjects.job()
 		self.onJobCreated(job)
 		while True:
@@ -50,7 +59,7 @@ class scannerSource(sourceBase):
 			self._scan(job)
 			time.sleep(0.01)
 		job.endSource()
-		self.running = False
+		self.log.info("scanner empty")
 
 	def _scan(self, job:jobObjects.job):
 		fileNameList = []
@@ -70,3 +79,13 @@ class scannerSource(sourceBase):
 
 	def _final(self):
 		self.dtwain_source.close()
+
+class scanContinue(sourceAskEvent):
+	_SCAN_CONTINUE = 1
+	_SCAN_NOT_CONTINUE = 2
+	_title = _("スキャン")
+	_message = _("スキャナに紙がセットされていません。スキャンを続行しますか？")
+	_selection_to_result = {
+		_("はい"): _SCAN_CONTINUE,
+		_("いいえ"): _SCAN_NOT_CONTINUE
+	}
