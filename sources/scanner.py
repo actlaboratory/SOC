@@ -49,6 +49,7 @@ class scannerSource(sourceBase):
 		self.running = False
 
 	def _scan_until_empty(self):
+		if self._isScannerEmpty():return
 		job = jobObjects.job()
 		self.onJobCreated(job)
 		while True:
