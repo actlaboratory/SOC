@@ -45,8 +45,11 @@ class scannerSource(sourceBase):
 		while True:
 			time.sleep(0.01)
 			if res == scanContinue._SCAN_CONTINUE_NEW_FILE:
+				if job_created:
+					job.endSource()
 				job = jobObjects.job()
 				self.onJobCreated(job)
+				job_created = True
 			self._scan_until_empty(job)
 			
 			res = self.ask(scanContinue)
@@ -88,6 +91,7 @@ class scannerSource(sourceBase):
 
 	def _final(self):
 		self.dtwain_source.close()
+
 
 class scanContinue(sourceAskEvent):
 	_SCAN_CONTINUE = 1
