@@ -1,3 +1,4 @@
+from askEvent import askEventBase
 from .base import sourceBase, sourceAskEvent
 import globalVars
 import time
@@ -39,6 +40,34 @@ class scannerSource(sourceBase):
 		self.initialized = True
 
 	def _run(self):
+		self.dtwain_initialize()
+		if self.dtwain_source.isFeederEnabled():
+			self.log.info("using feeder enable scanner")
+			self._scan_feeder_enabled()
+		else:
+			self.log.info("using feeder disable scanner")
+			self._scan_feeder_disabled()
+		self.running = False
+
+	def _scan_feeder_disabled(self):
+		job = jobObjects.job()
+		self.onJobCreated(job)
+		while True:
+			self._scan(job)
+			res = self.ask(scanContinueNotFeeder)
+			if res == scanContinueNotFeeder._SCAN_NOT_CONTINUE:
+				break
+			elif res == scanContinueNotFeeder._SCAN_CONTINUE_NEW_FILE:
+				job.endSource()
+				job = jobObjects.job()
+				self.onJobCreated(job)
+				continue
+			elif res == scanContinueNotFeeder._SCAN_CONTINUE:
+				continue
+		job.endSource()
+		self.log.info("scan completed")
+
+	def _old_run(self):
 		self.dtwain_initialize()
 		job_created = False
 		res = scanContinue._SCAN_CONTINUE_NEW_FILE
@@ -98,9 +127,12 @@ class scanContinue(sourceAskEvent):
 	_SCAN_CONTINUE_NEW_FILE = 2
 	_SCAN_NOT_CONTINUE = 3
 	_title = _("スキャン")
-	_message = _("スキャンが終了しました。続けてスキャンを行いますか？")
+	_message = _("スキャナの紙がなくなりました。新しい髪をセットして続けてスキャンを行いますか？")
 	_selection_to_result = {
-		_("続ける"): _SCAN_CONTINUE,
+		_("現在のファイルに追記して続ける"): _SCAN_CONTINUE,
 		_("別ファイルで続ける"): _SCAN_CONTINUE_NEW_FILE,
 		_("終了"): _SCAN_NOT_CONTINUE
 	}
+
+class scanContinueNotFeeder(scanContinue):
+	_message = _("スキャンが終了しました。続けてスキャンを行いますか？")
