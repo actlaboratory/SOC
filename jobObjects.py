@@ -25,7 +25,7 @@ class job():
 		if path:
 			self._name = os.path.basename(path)
 		else:
-			self._name = "job-%d" % self._id
+			self._name = "file-%d" % self._id
 		self.onEvent = None
 		self.log = getLogger("%s.job-%s" % (constants.APP_NAME, self.getID()))
 		self.log.info("created job named %s" % (self.getName()))
