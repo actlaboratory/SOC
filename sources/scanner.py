@@ -89,6 +89,7 @@ class scannerSource(sourceBase):
 				self.onJobCreated(job)
 				job_created = True
 			self._scan(job)
+		if job_created:job.endSource()
 		self.log.info("scanned all paper with feeder.")
 
 	def _scan(self, job:jobObjects.job):
