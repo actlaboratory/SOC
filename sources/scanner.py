@@ -53,6 +53,7 @@ class scannerSource(sourceBase):
 		job = jobObjects.job()
 		self.onJobCreated(job)
 		while True:
+			time.sleep(0.01)
 			self._scan(job)
 			res = self.ask(scanContinueNotFeeder)
 			if res == scanContinueNotFeeder._SCAN_NOT_CONTINUE:
@@ -67,40 +68,28 @@ class scannerSource(sourceBase):
 		job.endSource()
 		self.log.info("scan completed")
 
-	def _old_run(self):
-		self.dtwain_initialize()
+	def _scan_feeder_enabled(self):
 		job_created = False
-		res = scanContinue._SCAN_CONTINUE_NEW_FILE
 		while True:
-			time.sleep(0.01)
-			if res == scanContinue._SCAN_CONTINUE_NEW_FILE:
+			if self._isScannerEmpty():
 				if job_created:
-					job.endSource()
+					res = self.ask(scanContinue)
+					if res == scanContinue._SCAN_NOT_CONTINUE:break
+					elif res == scanContinue._SCAN_CONTINUE:continue
+					elif res == scanContinue._SCAN_CONTINUE_NEW_FILE:
+						job.endSource()
+						job = jobObjects.job()
+						self.onJobCreated(job)
+				else:
+					res = self.ask(scannerNoPaper)
+					if res == scannerNoPaper._CANCEL:break
+				continue
+			if not job_created:
 				job = jobObjects.job()
 				self.onJobCreated(job)
 				job_created = True
-			self._scan_until_empty(job)
-			
-			res = self.ask(scanContinue)
-			if res == scanContinue._SCAN_NOT_CONTINUE:
-				break
-		job.endSource()
-		self.running = False
-
-	def _scan_until_empty(self, job):
-		"""スキャンした回数を返します。"""
-		scan_count = 0
-		while True:
-			if not self.dtwain_source.isFeederEnabled():
-				self._scan(job)
-				scan_count += 1
-			if self._isScannerEmpty():
-				break
 			self._scan(job)
-			scan_count += 1
-			time.sleep(0.01)
-		self.log.info("scanner empty")
-		return scan_count
+		self.log.info("scanned all paper with feeder.")
 
 	def _scan(self, job:jobObjects.job):
 		fileNameList = []
@@ -121,12 +110,13 @@ class scannerSource(sourceBase):
 	def _final(self):
 		self.dtwain_source.close()
 
+class scannerAskEvent(sourceAskEvent):
+	_title = _("スキャナ")
 
-class scanContinue(sourceAskEvent):
+class scanContinue(scannerAskEvent):
 	_SCAN_CONTINUE = 1
 	_SCAN_CONTINUE_NEW_FILE = 2
 	_SCAN_NOT_CONTINUE = 3
-	_title = _("スキャン")
 	_message = _("スキャナの紙がなくなりました。新しい髪をセットして続けてスキャンを行いますか？")
 	_selection_to_result = {
 		_("現在のファイルに追記して続ける"): _SCAN_CONTINUE,
@@ -136,3 +126,12 @@ class scanContinue(sourceAskEvent):
 
 class scanContinueNotFeeder(scanContinue):
 	_message = _("スキャンが終了しました。続けてスキャンを行いますか？")
+
+class scannerNoPaper(scannerAskEvent):
+	_OK = 1
+	_CANCEL = 2
+	_message = _("スキャナに紙がセットされていません。紙をセットしなおしてOKボタンを押してください。")
+	_selection_to_result = {
+		_("OK"): _OK,
+		_("キャンセル"): _CANCEL
+	}
