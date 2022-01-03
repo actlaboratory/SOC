@@ -119,7 +119,7 @@ class scanContinue(scannerAskEvent):
 	_SCAN_NOT_CONTINUE = 3
 	_message = _("スキャナの紙がなくなりました。新しい髪をセットして続けてスキャンを行いますか？")
 	_selection_to_result = {
-		_("現在のファイルに追記して続ける"): _SCAN_CONTINUE,
+		_("現在のファイルに追記"): _SCAN_CONTINUE,
 		_("別ファイルで続ける"): _SCAN_CONTINUE_NEW_FILE,
 		_("終了"): _SCAN_NOT_CONTINUE
 	}

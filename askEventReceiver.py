@@ -8,7 +8,7 @@ import winsound
 # 文字数制限
 L_TITLE = 50
 L_MESSAGE = 100
-L_BUTTON = 14
+L_BUTTON = 30
 
 class AskEventReceiver:
 	def onEvent(self, event, task):
