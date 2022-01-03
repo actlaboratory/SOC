@@ -3,6 +3,7 @@
 import StringUtil
 import views.ask
 import wx
+import winsound
 
 # 文字数制限
 L_TITLE = 50
@@ -20,6 +21,7 @@ class AskEventReceiver:
 		selections = event.getSelections()
 		d = views.ask.Dialog(title, message, selections)
 		d.Initialize()
+		winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
 		d.Show()
 		ret = d.getData()
 		event.setResult(ret)
