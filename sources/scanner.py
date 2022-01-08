@@ -1,17 +1,15 @@
-from .base import sourceBase
-from jobObjects import job
+from askEvent import askEventBase
+from .base import sourceBase, sourceAskEvent
 import globalVars
 import time
 import os
 import shutil
 import dtwain
-import queue
 import errorCodes
-import wx
-import tempfile
+import jobObjects
 
 class scannerSource(sourceBase):
-	def __init__(self, scannerName, resolution = 300, blankPageDetect = False, isDuplex = False):
+	def __init__(self, scannerName, resolution = 400, blankPageDetect = False, isDuplex = False):
 		super().__init__("scannerSource")
 		self.scannerName = scannerName
 		self.resolution = resolution
@@ -21,9 +19,7 @@ class scannerSource(sourceBase):
 		self.running = True
 		self.initialized = False
 		#self.dtwain_source.raiseDeviceOffline()
-		self.temp_dir = tempfile.TemporaryDirectory()
-		self.image_tmp = self.temp_dir.name
-		self._fileQueue = queue.Queue()
+		self.image_tmp = globalVars.app.getTmpDir()
 
 	def dtwain_initialize(self):
 		self.dtwain = dtwain.dtwain(True)
@@ -43,19 +39,60 @@ class scannerSource(sourceBase):
 		self._pageCount = 0
 		self.initialized = True
 
-	def run(self):
+	def _run(self):
 		self.dtwain_initialize()
-		while True:
-			if not self.dtwain_source.isFeederEnabled():
-				self._scan()
-			if self._isScannerEmpty():
-				if self._showMessage(_("スキャナに紙がセットされていません。スキャンを継続しますか？")) == wx.ID_NO:
-					break
-			self._scan()
-			time.sleep(0.01)
+		if self.dtwain_source.isFeederEnabled():
+			self.log.info("using feeder enable scanner")
+			self._scan_feeder_enabled()
+		else:
+			self.log.info("using feeder disable scanner")
+			self._scan_feeder_disabled()
 		self.running = False
 
-	def _scan(self):
+	def _scan_feeder_disabled(self):
+		job = jobObjects.job()
+		self.onJobCreated(job)
+		while True:
+			time.sleep(0.01)
+			self._scan(job)
+			res = self.ask(scanContinueNotFeeder)
+			if res == scanContinueNotFeeder._SCAN_NOT_CONTINUE:
+				break
+			elif res == scanContinueNotFeeder._SCAN_CONTINUE_NEW_FILE:
+				job.endSource()
+				job = jobObjects.job()
+				self.onJobCreated(job)
+				continue
+			elif res == scanContinueNotFeeder._SCAN_CONTINUE:
+				continue
+		job.endSource()
+		self.log.info("scan completed")
+
+	def _scan_feeder_enabled(self):
+		job_created = False
+		while True:
+			if self._isScannerEmpty():
+				if job_created:
+					res = self.ask(scanContinue)
+					if res == scanContinue._SCAN_NOT_CONTINUE:break
+					elif res == scanContinue._SCAN_CONTINUE:continue
+					elif res == scanContinue._SCAN_CONTINUE_NEW_FILE:
+						job.endSource()
+						job = jobObjects.job()
+						self.onJobCreated(job)
+				else:
+					res = self.ask(scannerNoPaper)
+					if res == scannerNoPaper._CANCEL:break
+				continue
+			if not job_created:
+				job = jobObjects.job()
+				self.onJobCreated(job)
+				job_created = True
+			self._scan(job)
+		if job_created:job.endSource()
+		self.log.info("scanned all paper with feeder.")
+
+	def _scan(self, job:jobObjects.job):
 		fileNameList = []
 		for i in range(2):
 			self._pageCount += 1
@@ -64,34 +101,38 @@ class scannerSource(sourceBase):
 		self.dtwain_source.acquireFile(fileNameList, dtwain.DTWAIN_PNG)
 		for name in fileNameList:
 			if os.path.exists(name):
-				self._fileQueue.put(job(name))
+				job.addCreatedItem(jobObjects.item(name))
 
 	def _isScannerEmpty(self):
 		if not self.dtwain_source.isFeederLoaded():
 			return True
 		return False
 
-	def _internal_get_item(self):
-		return self._fileQueue.get()
+	def _final(self):
+		self.dtwain_source.close()
 
-	def getStatus(self):
-		status = 0
-		if self.running:
-			status |= errorCodes.STATUS_SOURCE_LOADING
-		else:
-			if self._fileQueue.empty():
-				status |= errorCodes.STATUS_SOURCE_EMPTY
-		if not self._fileQueue.empty():
-			status |= errorCodes.STATUS_SOURCE_QUEUED
-		return status
+class scannerAskEvent(sourceAskEvent):
+	_title = _("スキャナ")
 
-	def getStatusString(self):
-		if not self.initialized:
-			return _("開始中")
-		if self.dtwain_source.isAcquiring():
-			return _("スキャン中...")
-		else:
-			return _("大気中...")
+class scanContinue(scannerAskEvent):
+	_SCAN_CONTINUE = 1
+	_SCAN_CONTINUE_NEW_FILE = 2
+	_SCAN_NOT_CONTINUE = 3
+	_message = _("スキャナの紙がなくなりました。新しい髪をセットして続けてスキャンを行いますか？")
+	_selection_to_result = {
+		_("現在のファイルに追記"): _SCAN_CONTINUE,
+		_("別ファイルで続ける"): _SCAN_CONTINUE_NEW_FILE,
+		_("終了"): _SCAN_NOT_CONTINUE
+	}
 
-	def terminate(self):
-		self.temp_dir.cleanup()
+class scanContinueNotFeeder(scanContinue):
+	_message = _("スキャンが終了しました。続けてスキャンを行いますか？")
+
+class scannerNoPaper(scannerAskEvent):
+	_OK = 1
+	_CANCEL = 2
+	_message = _("スキャナに紙がセットされていません。紙をセットしなおしてOKボタンを押してください。")
+	_selection_to_result = {
+		_("OK"): _OK,
+		_("キャンセル"): _CANCEL
+	}

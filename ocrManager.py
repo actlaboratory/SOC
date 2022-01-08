@@ -18,6 +18,7 @@ class manager():
 		self.runningEngineIndex = -1
 		self.runningConverterIndex = -1
 		self.higherOnEvent = None
+		self.higherOnAskEvent = None
 
 	def setOnEvent(self, callBack):
 		assert callable(callBack)
@@ -51,9 +52,17 @@ class manager():
 				raise exception("タスクの管理でエラーが発生しました。", self.runningSourceIndex)
 		wx.CallAfter(self.higherOnEvent,event,task = task,job = job, item = item, engine = engine, source = source, converter = converter)
 
+	def setOnAskEvent(self, callback):
+		assert callable(callback)
+		self.higherOnAskEvent = callback
+
+	def onAskEvent(self, askEvent, task):
+		wx.CallAfter(self.higherOnAskEvent, askEvent, task)
+
 	def addTask(self, task):
 		self.log.debug("added task-%d" % task.getID())
 		task.setOnEvent(self.onEvent)
+		task.setOnAskEvent(self.onAskEvent)
 		self.tasks.append(task)
 		if self.runningSourceIndex == -1:
 			task.startSource()

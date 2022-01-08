@@ -8,7 +8,7 @@ from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient import errors
 import io
 from .base import engineBase
-
+import jobObjects
 
 class googleEngine(engineBase):
 	_engineName = "google"
@@ -26,8 +26,11 @@ class googleEngine(engineBase):
 	def getSupportedFormats(self):
 		return constants.FORMAT_JPEG | constants.FORMAT_PNG | constants.FORMAT_GIF|constants.FORMAT_PDF_IMAGE
 
-	def _recognize(self, item):
-		with open(item.getPath(), mode = "rb") as f:
+	def _recognize(self, item:jobObjects.item):
+		filePath = item.getPath()
+		if item.hasGrayScaleFile():
+			filePath = item.getGrayScaleFile()
+		with open(filePath, mode = "rb") as f:
 			self.log.info("uploading...")
 			media_body = MediaIoBaseUpload(f, mimetype="application/vnd.google-apps.document", resumable=True)
 			req_body = {

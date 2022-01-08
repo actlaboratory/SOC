@@ -19,7 +19,9 @@ class task(threading.Thread):
 		self.source = source
 		self.engine = engine
 		self.source.setOnEvent(self.onEvent)
+		self.source.setOnAskEvent(self.onAskEvent)
 		self.engine.setOnEvent(self.onEvent)
+		self.engine.setOnAskEvent(self.onAskEvent)
 		self.converter = converter.converter(engine.getSupportedFormats())
 		self.converter.setOnEvent(self.onEvent)
 		self.higherOnEvent = None
@@ -34,6 +36,11 @@ class task(threading.Thread):
 		assert callable(callback)
 		self.higherOnEvent = callback
 
+
+	def setOnAskEvent(self, callback):
+		assert callable(callback)
+		self.higherOnAskEvent = callback
+
 	def onEvent(self, event, job = None, item = None, source = None, engine = None, converter = None):
 		self.log.debug("called onEvent with %s" % (str(event)))
 		if event == events.job.CREATED:
@@ -43,6 +50,9 @@ class task(threading.Thread):
 			self.engine.endSource()
 			self.log.info("Notified the end of the source")
 		self.higherOnEvent(event, engine = engine, source = source, job = job, item = item, converter = converter, task = self)
+
+	def onAskEvent(self, askEvent):
+		self.higherOnAskEvent(askEvent, self)
 
 	def startSource(self):
 		self.source.initialize()

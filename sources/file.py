@@ -1,4 +1,4 @@
-from .base import sourceBase
+from .base import sourceBase, sourceAskEvent
 import jobObjects
 import errorCodes
 from .constants import sourceStatus
@@ -18,4 +18,3 @@ class fileSource(sourceBase):
 			job.addCreatedItem(item)
 			job.endSource()
 		return
-

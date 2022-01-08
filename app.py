@@ -19,7 +19,7 @@ import globalVars
 from sources.file import fileSource
 import threading
 import ocrManager
-import views.new
+
 
 class Main(AppBase.MainBase):
 	def __init__(self):
@@ -49,6 +49,7 @@ class Main(AppBase.MainBase):
 		self.hMainView.Show()
 		if len(sys.argv) < 2:
 			return True
+		import views.new
 		dialog = views.new.Dialog()
 		dialog.Initialize(sys.argv[1:])
 		dialog.Show()

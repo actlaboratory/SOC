@@ -40,17 +40,20 @@ class converter(threading.Thread):
 		self.onEvent(events.converter.STOPED, converter = self)
 
 	def _convertJob(self, job: jobObjects.job):
-		while not job.getStatus() & jobStatus.CONVERT_COMPLETE:
+		while True:
 			time.sleep(0.01)
 			item = job.getConvertItem()
-			if not item:
-				continue
+			if item == None:
+				break
 			converted_item = self._convertItem(item)
 			if type(converted_item) == jobObjects.item:
+				pillow.convertGrayScale(converted_item)
 				job.addConvertedItem(converted_item)
 			elif type(converted_item) == list:
 				for itm in converted_item:
+					pillow.convertGrayScale(itm)
 					job.addConvertedItem(itm)
+		job.endConvert()
 
 	def _convertItem(self, item):
 		if item.getFormat() & self.engineSupportedFormats:
