@@ -6,7 +6,7 @@ google-api-python-client == 1.10
 PyInstaller
 requests
 requests_oauthlib
-pillow == 7.1.2
+pillow == 9.0.0
 https://github.com/actlaboratory/diff_archiver/archive/v1.0.1.zip
 https://github.com/actlaboratory/dtwain-python/archive/0.1.0.zip
 https://github.com/actlaboratory/named-pipe/archive/v1.0.5.zip
