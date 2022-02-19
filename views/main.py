@@ -21,6 +21,7 @@ import clipboard
 import clipboardHelper
 import constants
 import dtwain
+import update
 import errorCodes
 import eventReceiver
 import askEventReceiver
@@ -344,7 +345,7 @@ class Events(BaseEvents):
 			versionDialog.versionDialog()
 
 		if selected == menuItemsStore.getRef("UPDATE"):
-			globalVars.update.update()
+			update.checkUpdate()
 		if selected == menuItemsStore.getRef("COPY_TEXT"):
 			if self.parent.jobCtrl.GetFocusedItem() < 0:
 				return
