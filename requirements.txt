@@ -1,9 +1,9 @@
-﻿wxPython
+﻿wxPython==4.1
 pywin32
 winpaths
 pdf2image
 google-api-python-client == 1.10
-PyInstaller
+PyInstaller==5.3
 requests
 requests_oauthlib
 pillow == 7.1.2
