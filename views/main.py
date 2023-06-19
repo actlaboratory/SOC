@@ -28,7 +28,6 @@ import askEventReceiver
 import globalVars
 import keymap
 import menuItemsStore
-import ocrManager
 import pdfUtil
 import pywintypes
 import win32com.client
