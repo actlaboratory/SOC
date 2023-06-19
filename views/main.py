@@ -1,45 +1,30 @@
 ﻿# -*- coding: utf-8 -*-
 #main view
 #Copyright (C) 2019 Yukio Nozawa <personal@nyanchangames.com>
-#Copyright (C) 2019-2020 yamahubuki <itiro.ishino@gmail.com>
+#Copyright (C) 2019-2023 yamahubuki <itiro.ishino@gmail.com>
 #Copyright (C) 2020 guredora <contact@guredora.com>
 
-import ctypes
-import copy
-from jobObjects import job
-import logging
-import os
-import pathlib
-import re
-import sys
-import threading
-import time
-import webbrowser
-from logging import getLogger
 
+import os
+import sys
+import webbrowser
+import win32com.client
+import wx
+
+import askEventReceiver
 import clipboard
 import clipboardHelper
 import constants
-import dtwain
-import update
 import errorCodes
 import eventReceiver
-import askEventReceiver
 import globalVars
 import keymap
 import menuItemsStore
-import pdfUtil
-import pywintypes
-import win32com.client
-import wx
-from engines import google, tesseract
-from simpleDialog import *
-from sources import file, scanner
+import update
 
-from stub import stub
+from simpleDialog import *
 from views import (authorizing, new, processingDialog, resultDialog, settings,
                    versionDialog, OcrDialog)
-
 from .base import *
 
 MSG_ALL = "（全て）"
@@ -51,15 +36,13 @@ class MainView(BaseView):
 	def __init__(self):
 		super().__init__("mainView")
 		self.log.debug("created")
-		self.app=globalVars.app
 		self.events=Events(self,self.identifier)
 		evtReceiver = eventReceiver.EventReceiver(self)
 		globalVars.manager.setOnEvent(evtReceiver.onEvent)
 		askEvtReceiver = askEventReceiver.AskEventReceiver()
 		globalVars.manager.setOnAskEvent(askEvtReceiver.onEvent)
-		title=constants.APP_NAME
 		super().Initialize(
-			title,
+			constants.APP_NAME,
 			660,
 			700,
 			self.app.config.getint(self.identifier,"positionX"),
@@ -82,25 +65,27 @@ class MainView(BaseView):
 		self.selectedPages = [0]
 		self.texts = [""]
 		self.cursors = [0]
+
 		self.jobIds = []
-		self.jobNames = []
 		self.jobStatuses = []
-		self.ocrEngines = []
 		self.processedCounts = []
 		self.totalCounts = []
 		self.currentJob = -1
 		self.currentPage = -1
 
 	def installControls(self):
-		tabCtrl = self.creator.tabCtrl(_("ページ切替"),sizerFlag=wx.ALL|wx.EXPAND, proportion=1, margin=5)
+		tabCtrl = self.creator.tabCtrl(_("ページ切替"),sizerFlag=wx.ALL|wx.EXPAND, proportion=1, margin=0)
 
-		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("進行状況"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
+		# 進行状況ページ
+		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("進行状況"),style=wx.ALL|wx.EXPAND,proportion=1,margin=0)
 		self.statusList, dummy = page.listCtrl(_("状況"), textLayout=None, sizerFlag=wx.EXPAND, proportion=1)
 		self.statusList.AppendColumn(_("名前"))
 		self.statusList.AppendColumn(_("状態"))
 		self.statusList.AppendColumn(_("認識済みページ数"))
 		self.statusList.AppendColumn(_("OCRエンジン"))
+		page.GetPanel().Layout()
 
+		# 認識結果ページ
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.HORIZONTAL,label=_("認識結果"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
 		creator = views.ViewCreator.ViewCreator(self.viewMode, page.GetPanel(), page.GetSizer(), orient=wx.VERTICAL, proportion=1, style=wx.EXPAND)
 		self.selectorIdentifier = "selector"
@@ -109,14 +94,20 @@ class MainView(BaseView):
 		self.jobCtrl.Append([MSG_ALL])
 		self.jobCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
 		self.menu.keymap.Set(self.selectorIdentifier, self.jobCtrl)
+
 		self.pageCtrl, dummy = creator.listCtrl(_("ページ選択"), self.itemFocused, proportion=1, sizerFlag=wx.EXPAND)
 		self.pageCtrl.AppendColumn(_("ページ"))
 		self.pageCtrl.Append([MSG_ALL])
 		self.pageCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
 		self.menu.keymap.Set(self.selectorIdentifier, self.pageCtrl)
 		self.pageCtrl.Disable()
-		self.text, dummy = page.inputbox(_("認識結果"), style=wx.TE_READONLY|wx.TE_MULTILINE, proportion=1, sizerFlag=wx.EXPAND)
+
+		creator = views.ViewCreator.ViewCreator(self.viewMode, page.GetPanel(), page.GetSizer(), orient=wx.VERTICAL, proportion=1, style=wx.EXPAND)
+		self.text, dummy = creator.inputbox(_("認識結果"), style=wx.TE_READONLY|wx.TE_MULTILINE, proportion=1, sizerFlag=wx.EXPAND)
 		self.text.Disable()
+
+		page.GetPanel().Layout()
+
 
 	def updateText(self):
 		jobIdx = self.jobCtrl.GetFocusedItem()
@@ -175,20 +166,17 @@ class MainView(BaseView):
 		global nextJobIndex
 		name = job.getName()
 		status = _("準備中")
-		engine = engine.getName()
 		processedCount = 0
 		totalCount = 0
 		self.jobIds.insert(nextJobIndex, job.getID())
 		self.statusList.InsertItem(nextJobIndex, "")
-		self.jobNames.insert(nextJobIndex, name)
 		self.statusList.SetItem(nextJobIndex, 0, name)
 		self.jobStatuses.insert(nextJobIndex, status)
 		self.statusList.SetItem(nextJobIndex, 1, status)
 		self.processedCounts.insert(nextJobIndex, processedCount)
 		self.totalCounts.insert(nextJobIndex, totalCount)
 		self.statusList.SetItem(nextJobIndex, 2, "%d/%d" % (processedCount, totalCount))
-		self.ocrEngines.insert(nextJobIndex, engine)
-		self.statusList.SetItem(nextJobIndex, 3, engine)
+		self.statusList.SetItem(nextJobIndex, 3, engine.getName())
 		nextJobIndex += 1
 
 	def setProcessedCount(self, index, processed):
