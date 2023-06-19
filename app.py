@@ -1,24 +1,25 @@
 ﻿# -*- coding: utf-8 -*-
 # Soc Main
 
-import tempfile
-import proxyUtil
-import AppBase
-import CredentialManager
-import sys
 import locale
 import _locale
-import update
-import constants
-import pathlib
-import errorCodes
-from simpleDialog import *
-import util
 import os
-import globalVars
-from sources.file import fileSource
+import proxyUtil
+import pathlib
+import sys
 import threading
-import ocrManager
+import tempfile
+
+import AppBase
+import constants
+import CredentialManager
+import errorCodes
+import globalVars
+import update
+import util
+
+from simpleDialog import *
+from sources.file import fileSource
 
 
 class Main(AppBase.MainBase):
@@ -68,6 +69,7 @@ class Main(AppBase.MainBase):
 
 	def setGlobalVars(self):
 		globalVars.update = update.update()
+		import ocrManager
 		globalVars.manager = ocrManager.manager()
 		return
 
