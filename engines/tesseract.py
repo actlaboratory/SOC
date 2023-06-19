@@ -1,15 +1,17 @@
-from .base import engineBase
-import errorCodes
-import constants
+# tesseract OCR engine
+
 import pyocr
+
+import constants
+import globalVars
+import views.engines.tesseractSettingsDialog
+
+from .base import engineBase
 from PIL import Image
 
 class tesseractEngine(engineBase):
-	_engineName = "tesseract"
-
-	def __init__(self, mode):
+	def __init__(self, ):
 		super().__init__("tesseract")
-		self.mode = mode
 
 	def _init(self):
 		tools = pyocr.get_available_tools()
@@ -19,9 +21,19 @@ class tesseractEngine(engineBase):
 		return constants.FORMAT_JPEG | constants.FORMAT_PNG | constants.FORMAT_BMP
 
 	def _recognize(self, item):
+		lang = globalVars.app.config.getstring("tesseract", "mode", "jpn", self.tesseract.tool.get_available_languages())
+		self.log.info("lang=%s" % lang)
 		text = self.tesseract.image_to_string(
 			Image.open(item.getPath()),
-			lang = self.mode,
+			lang = lang,
 			builder = pyocr.builders.TextBuilder()
 		)
 		item.setText(text)
+
+	@classmethod
+	def getName(cls):
+		return _("tesseract (ローカル)")
+
+	@classmethod
+	def getSettingDialog(cls):
+		return views.engines.tesseractSettingsDialog.Dialog

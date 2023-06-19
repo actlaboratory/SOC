@@ -11,8 +11,6 @@ from .base import engineBase
 import jobObjects
 
 class googleEngine(engineBase):
-	_engineName = "google"
-
 	def __init__(self):
 		super().__init__("google")
 
@@ -52,4 +50,8 @@ class googleEngine(engineBase):
 			status, done = downloader.next_chunk()
 		self.service.files().delete(fileId=ID).execute()
 		item.setText(stream.getvalue().decode("utf-8"))
+
+	@classmethod
+	def getName(cls):
+		return _("Google(インターネット)")
 

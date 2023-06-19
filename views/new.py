@@ -1,33 +1,26 @@
 ﻿# -*- coding: utf-8 -*-
 # Add New dialog
 
+import dtwain
 import os
 import wx
-import globalVars
+
+import engines
 import defaultKeymap
+import globalVars
 import keymap
-import dtwain
+import task
 import views.ViewCreator
+
 from logging import getLogger
 from views.baseDialog import *
 from sources import file, scanner
 from engines import google, tesseract
-import task
 from simpleDialog import errorDialog
 
 class Dialog(BaseDialog):
 	def __init__(self):
-		super().__init__("addNewDialog")
-		self.engineSelection = {
-			_("google (インターネット)"): "google",
-			_("tesseract (ローカル"): "tesseract"
-		}
-		self.tesseractModeSelection = {
-			_("横書き通常"): "jpn",
-			_("横書き低負荷版"): "jpn_fast",
-			_("縦書き通常"): "jpn_vert",
-			_("縦書き低負荷版"): "jpn_vert_fast"
-		}
+		super().__init__("jobCreateDialog")
 		self.files = []
 
 	def Initialize(self, files=[]):
@@ -66,14 +59,17 @@ class Dialog(BaseDialog):
 
 		self.blankPageDetect = creator.checkbox(_("白紙を検出する"))
 		self.duplex = creator.checkbox(_("利用可能な場合両面スキャンを使用する"))
+
 		settingAreaCreator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.creator.GetSizer(),views.ViewCreator.FlexGridSizer,10, 2)
-		self.engine, self.engineStatic = settingAreaCreator.combobox(_("OCRエンジン"), list(self.engineSelection.keys()), self.onEngineSelect, state = 0)
-		self.tesseract, self.tesseractStatic = settingAreaCreator.combobox(_("モード"), list(self.tesseractModeSelection.keys()), state = 0)
-		self.tesseract.Disable()
-		
+		self.engine, self.engineStatic = settingAreaCreator.combobox(_("OCRエンジン"), [i.getName() for i in engines.getEngines()], self.onEngineSelect, state = 0)
+		settingAreaCreator.AddEmptyCell()
+		self.engineConfigButton = settingAreaCreator.button(_("エンジンの設定(&S)"), self.onEngineSetting, sizerFlag=wx.ALIGN_RIGHT|wx.ALL)
+
 		buttonAreaCreator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.creator.GetSizer(),wx.HORIZONTAL,20,style=wx.ALIGN_RIGHT)
 		self.startButton = buttonAreaCreator.okbutton(_("開始"), self.onStart)
 		self.cancelButton = buttonAreaCreator.cancelbutton(_("キャンセル"))
+
+		self.onEngineSelect()	# 初期状態反映のため一度実行
 
 	def open(self, event=None):
 		dialog = wx.FileDialog(None, _("画像ファイルを選択"), style=wx.FD_OPEN|wx.FD_MULTIPLE, wildcard=_("画像ファイル(*.jpg;*.png;*.gif;*.pdf) | *.jpg;*.png;*.gif;*.pdf; | すべてのファイル(*.*) | *.*"))
@@ -113,12 +109,8 @@ class Dialog(BaseDialog):
 		self.filebox.SetSelection(index-1)
 		return
 
-	def onEngineSelect(self, event):
-		selection = self.engine.GetStringSelection()
-		if self.engineSelection[selection] == "google":
-			self.tesseract.Disable()
-		if self.engineSelection[selection] == "tesseract":
-			self.tesseract.Enable()
+	def onEngineSelect(self, event=None):
+		self.engineConfigButton.Enable(engines.getEngines()[self.engine.GetSelection()].getSettingDialog() != None)
 		return
 
 	def onStart(self, event):
@@ -129,14 +121,17 @@ class Dialog(BaseDialog):
 		elif sourceStr == _("スキャナ"):
 			source = scanner.scannerSource(self.scannerList.GetItemText(self.scannerList.GetFocusedItem()), blankPageDetect=self.blankPageDetect.GetValue(), isDuplex=self.duplex.GetValue())
 		# engine
-		engineStr = self.engineSelection[self.engine.GetValue()]
-		if engineStr == "google":
-			engine = google.googleEngine()
-		elif engineStr == "tesseract":
-			engine = tesseract.tesseractEngine(self.tesseractModeSelection[self.tesseract.GetValue()])
+		engine = engines.getEngines()[self.engine.GetSelection()]()
+
 		# task
 		globalVars.manager.addTask(task.task(source, engine))
 		event.Skip()
+
+	def onEngineSetting(self, event):
+		d = engines.getEngines()[self.engine.GetSelection()].getSettingDialog()()
+		d.Initialize(self.wnd)
+		d.Show()
+
 
 # D&D受入関連
 class DropTarget(wx.DropTarget):

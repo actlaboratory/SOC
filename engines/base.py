@@ -14,8 +14,11 @@ from jobObjects import jobStatus
 import askEvent
 
 class engineBase(threading.Thread):
-	"""すべてのエンジンクラスが継承する基本クラス。"""
-	_engineName = None
+	"""
+		すべてのエンジンクラスが継承する基本クラス。
+		初期化時の引数はなしとすること。本Baseクラスのコンストラクタの引数と異なるので注意
+	"""
+
 
 	def __init__(self, identifier):
 		self.identifier = identifier
@@ -27,11 +30,20 @@ class engineBase(threading.Thread):
 		self.jobQueue = queue.Queue()
 		self.onAskEvent = None
 
-	def getName(self):
-		name = self._engineName
-		if name is None:
-			raise NotImplementedError
-		return name
+	@classmethod
+	def getName(cls):
+		"""
+			ユーザーに見せる名前を返す
+		"""
+		raise NotImplementedError
+
+	@classmethod
+	def getSettingDialog(cls):
+		"""
+			ユーザーがエンジンの詳細設定を行うために利用できるDialogを返す
+			ダイアログはviews.engines以下に格納すること。
+		"""
+		return None
 
 	def setOnEvent(self, callBack):
 		assert callable(callBack)
