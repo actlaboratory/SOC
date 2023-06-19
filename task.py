@@ -25,6 +25,7 @@ class task(threading.Thread):
 		self.converter = converter.converter(engine.getSupportedFormats())
 		self.converter.setOnEvent(self.onEvent)
 		self.higherOnEvent = None
+		self.higherOnAskEvent = None
 		self.jobs = []
 		self.id = nextTask_id
 		nextTask_id += 1
