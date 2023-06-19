@@ -3,13 +3,16 @@
 #Copyright (C) 20XX anonimous <anonimous@sample.com>
 
 
-import ocrManager
 """
 """
 
 
 app = None
+
 update = None
-manager:ocrManager.manager
+
+# ocrManager.manager
+manager = None
 
 dtwain = None
+
