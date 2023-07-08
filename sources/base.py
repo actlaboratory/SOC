@@ -17,7 +17,7 @@ class sourceBase(threading.Thread):
 		super().__init__()
 		self.onEvent = None
 		self.onAskEvent = None
-
+		self.engine = None
 
 	def setOnAskEvent(self, callback):
 		assert callable(callback)
@@ -33,7 +33,8 @@ class sourceBase(threading.Thread):
 		assert callable(callback)
 		self.onEvent = callback
 
-	def initialize(self):
+	def initialize(self, engine):
+		self.engine=engine
 		self._init()
 		self.onEvent(events.source.INITIALIZED, source = self)
 		self.log.debug("initialized")

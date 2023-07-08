@@ -4,8 +4,6 @@ from logging import getLogger
 import constants
 from sources.constants import sourceStatus
 from engines.constants import engineStatus
-import time
-import winsound
 import events
 import converter
 import jobObjects
@@ -56,7 +54,7 @@ class task(threading.Thread):
 		self.higherOnAskEvent(askEvent, self)
 
 	def startSource(self):
-		self.source.initialize()
+		self.source.initialize(self.engine)
 		self.log.debug("source initialized")
 		self.source.start()
 
@@ -65,7 +63,7 @@ class task(threading.Thread):
 		self.jobs.append(job)
 		self.converter.addJob(job)
 		self.engine.addJob(job)
-		self.log.debug("registered job-%d" % job.getID())
+		self.log.debug("registered job-%d" % job.getId())
 
 	def startEngine(self):
 		self.engine.initialize()
