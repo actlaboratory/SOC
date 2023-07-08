@@ -21,7 +21,7 @@ class tesseractEngine(engineBase):
 		return constants.FORMAT_JPEG | constants.FORMAT_PNG | constants.FORMAT_BMP
 
 	def _recognize(self, item):
-		lang = globalVars.app.config.getstring("tesseract", "mode", "jpn", self.tesseract.tool.get_available_languages())
+		lang = globalVars.app.config.getstring("tesseract", "mode", "jpn", self.tesseract.get_available_languages())
 		self.log.info("lang=%s" % lang)
 		text = self.tesseract.image_to_string(
 			Image.open(item.getPath()),
