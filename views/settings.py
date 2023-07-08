@@ -31,7 +31,6 @@ class settingsDialog(BaseDialog):
 		super().Initialize(self.app.hMainView.hFrame,_("設定"))
 		self.InstallControls()
 		self.loadSettings()
-		self.switch()
 		return True
 
 	def InstallControls(self):
@@ -109,8 +108,7 @@ class settingsDialog(BaseDialog):
 			self.autoUpdate.SetValue(False)
 		timeout = globalVars.app.config.getint("general", "timeout", 3)
 		self.timeout.SetValue(str(timeout))
-		tmpdir = globalVars.app.tmpdir
-		self.tmpEdit.SetValue(tmpdir)
+		self.tmpEdit.SetValue(globalVars.app.getTmpDir())
 		savesourcedir = globalVars.app.config.getboolean("ocr", "saveSourceDir")
 		self.saveSelect.SetValue(savesourcedir)
 		savedir = globalVars.app.config.getstring("ocr", "savedir", "")
