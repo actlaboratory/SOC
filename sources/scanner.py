@@ -50,7 +50,7 @@ class scannerSource(sourceBase):
 		self.running = False
 
 	def _scan_feeder_disabled(self):
-		job = jobObjects.job()
+		job = jobObjects.job(None, True, self, self.engine)
 		self.onJobCreated(job)
 		while True:
 			time.sleep(0.01)
@@ -60,7 +60,7 @@ class scannerSource(sourceBase):
 				break
 			elif res == scanContinueNotFeeder._SCAN_CONTINUE_NEW_FILE:
 				job.endSource()
-				job = jobObjects.job()
+				job = jobObjects.job(None, True, self, self.engine)
 				self.onJobCreated(job)
 				continue
 			elif res == scanContinueNotFeeder._SCAN_CONTINUE:
@@ -78,14 +78,14 @@ class scannerSource(sourceBase):
 					elif res == scanContinue._SCAN_CONTINUE:continue
 					elif res == scanContinue._SCAN_CONTINUE_NEW_FILE:
 						job.endSource()
-						job = jobObjects.job()
+						job = jobObjects.job(None, True, self, self.engine)
 						self.onJobCreated(job)
 				else:
 					res = self.ask(scannerNoPaper)
 					if res == scannerNoPaper._CANCEL:break
 				continue
 			if not job_created:
-				job = jobObjects.job()
+				job = jobObjects.job(None, True, self, self.engine)
 				self.onJobCreated(job)
 				job_created = True
 			self._scan(job)

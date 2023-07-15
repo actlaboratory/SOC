@@ -16,23 +16,26 @@ from logging import getLogger
 next_job_id = 1
 
 class job():
-	def __init__(self, path = None, temp = True):
+	def __init__(self, path, temp, source, engine):
 		global next_job_id
 		self._path = path
 		self._id = next_job_id
 		next_job_id += 1
 		self._temp = temp
+		self._source = source
+		self._engine = engine
 		if path:
 			self._name = os.path.basename(path)
 		else:
 			self._name = "file-%d" % self._id
 		self.onEvent = None
-		self.log = getLogger("%s.job-%s" % (constants.APP_NAME, self.getID()))
+		self.log = getLogger("%s.job-%s" % (constants.APP_NAME, self.getId()))
 		self.log.info("created job named %s" % (self.getName()))
 		self.convertQueue = queue.Queue()
 		self.processQueue = queue.Queue()
 		self.processedItem = []
 		self.status = jobStatus(0)
+		self.totalCount = 0
 
 	def setOnEvent(self, callback):
 		assert callable(callback)
@@ -61,6 +64,7 @@ class job():
 	def addConvertedItem(self, item):
 		self.processQueue.put(item)
 		self.onEvent(events.item.CONVERTED, job = self, item = item)
+		self.totalCount += 1
 
 	def getProcessItem(self):
 		item = self.processQueue.get(block=True)
@@ -100,20 +104,109 @@ class job():
 	def getProcessedItems(self):
 		return self.processedItem
 
+	def getProcessedCount(self):
+		return len(self.processedItem)
+
+	def getTotalCount(self):
+		return self.totalCount
+
 	def raiseStatusFlag(self, flag):
 		assert isinstance(flag, jobStatus)
-		self.log.debug("raised %s" % (	flag))
+		self.log.debug("raised %s" % (flag))
 		self.status |= flag
+		self.onEvent(events.job.STATUS_CHANGED, job = self)
 
 	def lowerStatusFlag(self, flag):
 		assert isinstance(flag, jobStatus)
+		self.log.debug("lower %s" % (flag))
 		self.status &= -1-flag
+		self.onEvent(events.job.STATUS_CHANGED, job = self)
 
 	def getStatus(self):
 		return self.status
 
-	def getID(self):
+	def getStatusString(self):
+		if self.status == 0:
+			return _("待機中")
+		if self.status & jobStatus.PROCESS_COMPLETE:
+			return _("完了")
+		if not (self.status & jobStatus.SOURCE_END):
+			return _("待機中")
+		if not (self.status & jobStatus.CONVERT_STARTED):
+			return _("待機中")
+		if not (self.status & jobStatus.CONVERT_COMPLETE):
+			return _("準備中")
+		if not (self.status & jobStatus.PROCESS_STARTED):
+			return _("認識待ち")
+		else:
+			return _("認識中")
+
+	def getId(self):
 		return self._id
+
+	#
+	# for view
+	#
+	def __getitem__(self, key):
+		if key == 0:
+			return self.getName()
+		if key == 1:
+			return self.getStatusString()
+		if key == 2:
+			return "%d/%d" % (self.getProcessedCount(), self.getTotalCount())
+		if key == 3:
+			return type(self._engine).getName()
+		raise KeyError
+
+	def __setitem__(self, key, value):
+		raise NotImplementedError
+
+	def __len__(self):
+		return 4
+
+
+class virtualAllItemJob(job):
+	"""
+		App.pyにてリスト先頭にInsertされ、「すべて」として表示される架空のジョブ
+	"""
+
+	def __init__(self):
+		self._path = None
+		self._id = 0
+		self._temp = None
+		self._engine = None
+		self._name = _("すべて")
+		self.onEvent = None
+		self.log = getLogger("%s.job-%s" % (constants.APP_NAME, self.getId()))
+		self.log.info("created job named %s" % (self.getName()))
+		self.convertQueue = queue.Queue()
+		self.processQueue = queue.Queue()
+		self.processedItem = []
+		self.status = jobStatus(0)
+		self.totalCount = 0
+
+	def __getitem__(self, key):
+		# エンジン名は表示できない
+		if key == 1:
+			return ""
+		if key == 2:
+			return "%d/%d" % (self.getProcessedCount(), self.getTotalCount())
+		if key == 3:
+			return ""
+		return super().__getitem__(key)
+
+	def getProcessedCount(self):
+		ret = 0
+		for job in globalVars.jobList[1:]:
+			ret += job.getProcessedCount()
+		return ret
+
+	def getTotalCount(self):
+		ret = 0
+		for job in globalVars.jobList[1:]:
+			ret += job.getTotalCount()
+		return ret
+
 
 class item:
 	def __init__(self, path):

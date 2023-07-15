@@ -12,7 +12,7 @@ class fileSource(sourceBase):
 
 	def _run(self):
 		for file in self.fileList:
-			job = jobObjects.job(file, False)
+			job = jobObjects.job(file, False, self, self.engine)
 			self.onJobCreated(job)
 			item = jobObjects.item(file)
 			job.addCreatedItem(item)

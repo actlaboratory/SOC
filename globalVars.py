@@ -14,5 +14,7 @@ update = None
 # ocrManager.manager
 manager = None
 
+jobList = []
+
 dtwain = None
 

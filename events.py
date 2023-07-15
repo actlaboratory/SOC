@@ -11,6 +11,7 @@ class job(Enum):
 	PROCESS_STARTED = auto()
 	PROCESS_COMPLETED = auto()
 	CANCELED = auto()
+	STATUS_CHANGED = auto()
 
 class engine(Enum):
 	INITIALIZED = auto()

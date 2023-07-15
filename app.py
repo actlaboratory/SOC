@@ -71,6 +71,8 @@ class Main(AppBase.MainBase):
 		globalVars.update = update.update()
 		import ocrManager
 		globalVars.manager = ocrManager.manager()
+		import jobObjects
+		globalVars.jobList.append(jobObjects.virtualAllItemJob())
 		return
 
 	def getTmpDir(self):

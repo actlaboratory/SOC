@@ -60,16 +60,11 @@ class MainView(BaseView):
 		self.initialized = True
 
 	def initializeVariables(self):
-		self.jobs = [None]
 		self.pages = [[]]
 		self.selectedPages = [0]
 		self.texts = [""]
 		self.cursors = [0]
 
-		self.jobIds = []
-		self.jobStatuses = []
-		self.processedCounts = []
-		self.totalCounts = []
 		self.currentJob = -1
 		self.currentPage = -1
 
@@ -78,20 +73,22 @@ class MainView(BaseView):
 
 		# 進行状況ページ
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.VERTICAL,label=_("進行状況"),style=wx.ALL|wx.EXPAND,proportion=1,margin=0)
-		self.statusList, dummy = page.listCtrl(_("状況"), textLayout=None, sizerFlag=wx.EXPAND, proportion=1)
-		self.statusList.AppendColumn(_("名前"))
-		self.statusList.AppendColumn(_("状態"))
-		self.statusList.AppendColumn(_("認識済みページ数"))
-		self.statusList.AppendColumn(_("OCRエンジン"))
+		self.statusList, dummy = page.virtualListCtrl(_("状況"), proportion=1, sizerFlag=wx.EXPAND)
+		self.statusList.AppendColumn(_("名前"), width=300)
+		self.statusList.AppendColumn(_("状態"), width=150)
+		self.statusList.AppendColumn(_("認識済みページ数"), width=100)
+		self.statusList.AppendColumn(_("OCRエンジン"), width=300)
+		self.statusList.setList(globalVars.jobList)
+
 		page.GetPanel().Layout()
 
 		# 認識結果ページ
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.HORIZONTAL,label=_("認識結果"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
 		creator = views.ViewCreator.ViewCreator(self.viewMode, page.GetPanel(), page.GetSizer(), orient=wx.VERTICAL, proportion=1, style=wx.EXPAND)
 		self.selectorIdentifier = "selector"
-		self.jobCtrl, dummy = creator.listCtrl(_("認識済みファイル"), self.itemFocused, proportion=1, sizerFlag=wx.EXPAND)
+		self.jobCtrl, dummy = creator.virtualListCtrl(_("認識済みファイル"), self.itemFocused, proportion=1, sizerFlag=wx.EXPAND)
+		self.jobCtrl.setList(globalVars.jobList)
 		self.jobCtrl.AppendColumn(_("ファイル名"))
-		self.jobCtrl.Append([MSG_ALL])
 		self.jobCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
 		self.menu.keymap.Set(self.selectorIdentifier, self.jobCtrl)
 
@@ -122,9 +119,6 @@ class MainView(BaseView):
 			cursor = self.cursors[jobIdx][pageIdx]
 		self.text.SetValue(text)
 		self.text.SetInsertionPoint(cursor)
-
-	def getJobIdx(self, job):
-		return self.jobs.index(job)
 
 	def itemFocused(self, event):
 		cursor = self.text.GetInsertionPoint()
@@ -165,39 +159,9 @@ class MainView(BaseView):
 	def addJob(self, job, engine):
 		global nextJobIndex
 		name = job.getName()
-		status = _("準備中")
 		processedCount = 0
 		totalCount = 0
-		self.jobIds.insert(nextJobIndex, job.getID())
-		self.statusList.InsertItem(nextJobIndex, "")
-		self.statusList.SetItem(nextJobIndex, 0, name)
-		self.jobStatuses.insert(nextJobIndex, status)
-		self.statusList.SetItem(nextJobIndex, 1, status)
-		self.processedCounts.insert(nextJobIndex, processedCount)
-		self.totalCounts.insert(nextJobIndex, totalCount)
-		self.statusList.SetItem(nextJobIndex, 2, "%d/%d" % (processedCount, totalCount))
-		self.statusList.SetItem(nextJobIndex, 3, engine.getName())
 		nextJobIndex += 1
-
-	def setProcessedCount(self, index, processed):
-		self.processedCounts[index] = processed
-		self.statusList.SetItem(index, 2, "%d/%d" % (self.processedCounts[index], self.totalCounts[index]))
-
-	def getProcessedCount(self, index):
-		return self.processedCounts[index]
-
-	def setTotalCount(self, index, total):
-		self.totalCounts[index] = total
-		self.statusList.SetItem(index, 2, "%d/%d" % (self.processedCounts[index], self.totalCounts[index]))
-
-	def getTotalCount(self, index):
-		return self.totalCounts[index]
-
-	def getJobIdIndex(self, id):
-		return self.jobIds.index(id)
-
-	def getJobStatus(self, index):
-		return self.jobStatuses[index]
 
 	def onContextMenu(self, event):
 		if self.jobCtrl.GetFocusedItem() < 0:

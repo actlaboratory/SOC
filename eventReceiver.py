@@ -4,6 +4,7 @@ import logging
 
 import constants
 import events
+import globalVars
 import views.main
 
 class EventReceiver:
@@ -14,18 +15,15 @@ class EventReceiver:
 			events.job.CREATED: self.onJobCreated,
 			events.item.PROCESSED: self.onItemProcessed,
 			events.job.PROCESS_COMPLETED: self.onJobProcessed,
+			events.job.STATUS_CHANGED: self.updateListCtrl,
 			events.item.ADDED: self.onItemAdded,
-			events.item.CONVERTED: self.onItemConverted,
-			events.job.PROCESS_STARTED: self.onJobProcessStarted,
-			events.job.CONVERT_STARTED: self.onJobConversionStarted,
-			events.job.CONVERT_COMPLETED: self.onJobConverted,
 		}
 		self.counts = {}
 
 	def onEvent(self, event, task, job=None, item=None, source=None, engine=None, converter=None):
 		self.log.debug("event: %s" % event)
 		if event not in self.callbacks.keys():
-			self.log.warning("Unknown event: %s" % event)
+			self.log.debug("Unknown event: %s" % event)
 			return
 		func = self.callbacks[event]
 		if func is None:
@@ -35,11 +33,10 @@ class EventReceiver:
 			func(task, job, item, source, engine, converter)
 
 	def onJobCreated(self, task, job, item, source, engine, converter):
-		engine = task.getEngine()
-		self.mainView.addJob(job, engine)
-		# job
-		self.mainView.jobs.append(job)
-		self.mainView.jobCtrl.Append([job.getName()])
+		globalVars.app.hMainView.jobCtrl.Append(job)
+		globalVars.app.hMainView.statusList.SetItemCount(globalVars.app.hMainView.jobCtrl.GetItemCount())
+		globalVars.app.hMainView.statusList.RefreshItem(globalVars.app.hMainView.statusList.index(job))
+
 		# page
 		self.mainView.pages.append([None])
 		self.mainView.selectedPages.append(0)
@@ -48,10 +45,17 @@ class EventReceiver:
 		# cursor
 		self.mainView.cursors.append([0])
 
+	def updateListCtrl(self, task, job, item, source, engine, converter):
+		globalVars.app.hMainView.jobCtrl.RefreshItem(globalVars.app.hMainView.jobCtrl.index(job))
+		globalVars.app.hMainView.statusList.RefreshItem(globalVars.app.hMainView.statusList.index(job))
+		# すべて の中も更新
+		globalVars.app.hMainView.jobCtrl.RefreshItem(0
+		globalVars.app.hMainView.statusList.RefreshItem(0)
+
 	def onItemProcessed(self, task, job, item, source, engine, converter):
-		index = self.mainView.getJobIdIndex(job.getID())
-		self.mainView.setProcessedCount(index, self.mainView.getProcessedCount(index) + 1)
-		jobIdx = self.mainView.getJobIdx(job)
+		self.updateListCtrl(task, job, item, source, engine, converter)
+		jobIdx = globalVars.app.hMainView.jobCtrl.index(job)
+
 		# page
 		self.mainView.pages[jobIdx].append(item)
 		if jobIdx == self.mainView.jobCtrl.GetFocusedItem():
@@ -69,46 +73,8 @@ class EventReceiver:
 		self.mainView.cursors[jobIdx].append(0)
 
 	def onJobProcessed(self, task, job, item, source, engine, converter):
-		index = self.mainView.getJobIdIndex(job.getID())
-		status = _("完了")
-		self.mainView.jobStatuses[index] = status
-		self.mainView.statusList.SetItem(index, 1, status)
+		# TODO: 通知音再生
+		pass
 
 	def onItemAdded(self, task, job, item, source, engine, converter):
-		id = job.getID()
-		index = self.mainView.getJobIdIndex(id)
-		self.mainView.setTotalCount(index, self.mainView.getTotalCount(index) + 1)
-		self.counts[id] = self.counts.get(id, 0) + 1
-
-	def onItemConverted(self, task, job, item, source, engine, converter):
-		id = job.getID()
-		index = self.mainView.getJobIdIndex(id)
-		tmp = self.counts[id] - 1
-		if tmp < 0:
-			self.mainView.setTotalCount(index, self.mainView.getTotalCount(index) + 1)
-			return
-		self.counts[id] = tmp
-
-	def onJobProcessStarted(self, task, job, item, source, engine, converter):
-		index = self.mainView.getJobIdIndex(job.getID())
-		if self.mainView.getJobStatus(index) != _("認識待ち"):
-			return
-		status = _("認識中")
-		self.mainView.jobStatuses[index] = status
-		self.mainView.statusList.SetItem(index, 1, status)
-
-	def onJobConversionStarted(self, task, job, item, source, engine, converter):
-		index = self.mainView.getJobIdIndex(job.getID())
-		if self.mainView.getJobStatus(index) != _("待機中"):
-			return
-		status = _("準備中")
-		self.mainView.jobStatuses[index] = status
-		self.mainView.statusList.SetItem(index, 1, status)
-
-	def onJobConverted(self, task, job, item, source, engine, converter):
-		index = self.mainView.getJobIdIndex(job.getID())
-		if self.mainView.getJobStatus(index) != _("準備中"):
-			return
-		status = _("認識待ち")
-		self.mainView.jobStatuses[index] = status
-		self.mainView.statusList.SetItem(index, 1, status)
+		self.updateListCtrl(task, job, item, source, engine, converter)
