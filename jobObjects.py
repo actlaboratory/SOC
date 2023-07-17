@@ -1,16 +1,16 @@
-from os.path import basename
-import errorCodes
-import constants
+
+
+import namedPipe
 import os
+import queue
 import re
 import subprocess
-import namedPipe
-import globalVars
-import datetime
-import util
-from enum import IntFlag, auto
-import queue
+
+import constants
 import events
+import globalVars
+
+from enum import IntFlag, auto
 from logging import getLogger
 
 next_job_id = 1
@@ -33,9 +33,10 @@ class job():
 		self.log.info("created job named %s" % (self.getName()))
 		self.convertQueue = queue.Queue()
 		self.processQueue = queue.Queue()
-		self.processedItem = []
+		self.processedItem = [virtualAllPageItem(self)]
 		self.status = jobStatus(0)
 		self.totalCount = 0
+		self.selectedPage = 0
 
 	def setOnEvent(self, callback):
 		assert callable(callback)
@@ -44,9 +45,18 @@ class job():
 	def getName(self):
 		return self._name
 
+	def getPath(self):
+		return self._path
+
+	def getSelectedPage(self):
+		return self.selectedPage 
+
 	def setName(self, name):
 		self._name = name
 		self.onEvent(events.job.NAME_CHANGED, job = self)
+
+	def setSelectedPage(self, page):
+		self.selectedPage = page
 
 	def addCreatedItem(self, item):
 		self.log.debug("item added")
@@ -63,8 +73,9 @@ class job():
 
 	def addConvertedItem(self, item):
 		self.processQueue.put(item)
-		self.onEvent(events.item.CONVERTED, job = self, item = item)
 		self.totalCount += 1
+		self.onEvent(events.item.CONVERTED, job = self, item = item)
+		globalVars.jobList[0].addConvertedItem(item)
 
 	def getProcessItem(self):
 		item = self.processQueue.get(block=True)
@@ -75,9 +86,11 @@ class job():
 		return item
 
 	def addProcessedItem(self, item):
-		self.processedItem.append(item)
-		self.onEvent(events.item.PROCESSED, job = self, item = item)
 		self.log.debug("item processed")
+		item.setPageNumber(self.getProcessedCount() + 1)
+		self.processedItem.append(item)
+		globalVars.jobList[0].addProcessedItem(self,item)
+		self.onEvent(events.item.PROCESSED, job = self, item = item)
 
 	def endSource(self):
 		self.convertQueue.put(None)
@@ -96,16 +109,13 @@ class job():
 		self.onEvent(events.job.PROCESS_COMPLETED, job = self)
 
 	def getAllItemText(self):
-		text = ""
-		for item in self.processedItem:
-			text += item.getText()
-		return text
+		return self.processedItem[0].getText()
 
 	def getProcessedItems(self):
 		return self.processedItem
 
 	def getProcessedCount(self):
-		return len(self.processedItem)
+		return len(self.processedItem) -1
 
 	def getTotalCount(self):
 		return self.totalCount
@@ -174,26 +184,49 @@ class virtualAllItemJob(job):
 		self._path = None
 		self._id = 0
 		self._temp = None
-		self._engine = None
-		self._name = _("すべて")
+		self._name = _("(すべて)")
 		self.onEvent = None
 		self.log = getLogger("%s.job-%s" % (constants.APP_NAME, self.getId()))
 		self.log.info("created job named %s" % (self.getName()))
-		self.convertQueue = queue.Queue()
-		self.processQueue = queue.Queue()
-		self.processedItem = []
-		self.status = jobStatus(0)
-		self.totalCount = 0
+		self.processedItem = [virtualAllPageItem(self)]
+		self.selectedPage = 0
 
-	def __getitem__(self, key):
-		# エンジン名は表示できない
-		if key == 1:
-			return ""
-		if key == 2:
-			return "%d/%d" % (self.getProcessedCount(), self.getTotalCount())
-		if key == 3:
-			return ""
-		return super().__getitem__(key)
+	def getPath(self):
+		raise NotImplementedError
+
+	def addCreatedItem(self, item):
+		raise NotImplementedError
+
+	def getConvertItem(self):
+		raise NotImplementedError
+
+	def addConvertedItem(self, item):
+		self.onEvent(events.item.CONVERTED, job = self, item = item)
+
+	def getProcessItem(self):
+		raise NotImplementedError
+
+	def addProcessedItem(self, parentJob, item):
+		# 全体の中でのインデックスを数えてくる
+		# まずは対象ジョブより上に対象ジョブ以外のジョブがあれば、そいつらのページ全部
+		idx = 0
+		for i in globalVars.jobList:
+			if i == parentJob:
+				break;
+			idx += i.getProcessedCount()
+		# 対象ジョブの対象ページより前のページ
+		idx += parentJob.getProcessedCount() - 1
+		self.processedItem.insert(idx,item)
+		self.onEvent(events.item.PROCESSED, job = self, item = item)
+
+	def endSource(self):
+		raise NotImplementedError
+
+	def endConvert(self):
+		raise NotImplementedError
+
+	def endEngine(self):
+		raise NotImplementedError
 
 	def getProcessedCount(self):
 		ret = 0
@@ -207,11 +240,35 @@ class virtualAllItemJob(job):
 			ret += job.getTotalCount()
 		return ret
 
+	def raiseStatusFlag(self, flag):
+		raise NotImplementedError
+
+	def lowerStatusFlag(self, flag):
+		raise NotImplementedError
+
+	def getStatus(self):
+		raise NotImplementedError
+
+	def getStatusString(self):
+		raise NotImplementedError
+
+	def __getitem__(self, key):
+		# ステータスとエンジン名は表示できない
+		if key == 1:
+			return ""
+		if key == 2:
+			return "%d/%d" % (self.getProcessedCount(), self.getTotalCount())
+		if key == 3:
+			return ""
+		return super().__getitem__(key)
+
 
 class item:
 	def __init__(self, path):
 		self.path = path
 		self.done = False
+		self.pageNumber = 1
+		self.cursorPos = 0
 
 	def getPath(self):
 		return self.path
@@ -237,7 +294,8 @@ class item:
 			# 埋め込みテキストの含まれるPDFであるか判定
 			pipeServer = namedPipe.Server(constants.PIPE_NAME)
 			pipeServer.start()
-			subprocess.run(("pdftotext", self.getPath(), pipeServer.getFullName()))
+			subprocess.run(("pdftotext", "-enc", "UTF-8", self.getPath(), pipeServer.getFullName()))
+
 			list = pipeServer.getNewMessageList()
 			pipeServer.exit()
 			text = list[0]
@@ -247,15 +305,81 @@ class item:
 				format = constants.FORMAT_PDF_IMAGE
 		self.format = format
 
-	def setText(self, text):
-		self.text = text
-		self.done = True
+	def getCursorPos(self):
+		return self.cursorPos
+
+	def getPageNumber(self):
+		return self.pageNumber
 
 	def getText(self):
 		return self.text
 
 	def isDone(self):
 		return self.done
+
+	def setCursorPos(self, pos):
+		self.cursorPos = pos
+
+	def setPageNumber(self, pageNumber):
+		self.pageNumber = pageNumber
+
+	def setText(self, text):
+		self.text = text
+		self.done = True
+
+	def __getitem__(self, key):
+		if key == 0:
+			return _("%dページ" % self.getPageNumber())
+		raise KeyError
+
+	def __setitem__(self, key, value):
+		raise NotImplementedError
+
+	def __len__(self):
+		return 1
+
+
+
+class virtualAllPageItem(item):
+	def __init__(self, job):
+		self.job = job
+		self.pageNumber = -1
+		self.cursorPos = 0
+
+	def getPath(self):
+		raise NotImplementedError
+
+	def getFormat(self):
+		raise NotImplementedError
+
+	def hasGrayScaleFile(self):
+		raise NotImplementedError
+
+	def setGrayScaleFile(self, path):
+		raise NotImplementedError
+
+	def getGrayScaleFile(self):
+		raise NotImplementedError
+
+	def _register_format(self):
+		raise NotImplementedError
+
+	def setText(self, text):
+		raise NotImplementedError
+
+	def getText(self):
+		ret = ""
+		for item in self.job.getProcessedItems()[1:]:
+			ret += item.getText()+"\n"
+		return ret
+
+	def isDone(self):
+		raise NotImplementedError
+
+	def __getitem__(self, key):
+		if key == 0:
+			return _("(すべて)")
+		raise KeyError
 
 class jobStatus(IntFlag):
 	SOURCE_END = auto()

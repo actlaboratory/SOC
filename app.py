@@ -48,6 +48,7 @@ class Main(AppBase.MainBase):
 		if self.config.getboolean(self.hMainView.identifier,"maximized",False):
 			self.hMainView.hFrame.Maximize()
 		self.hMainView.Show()
+		globalVars.jobList[0].setOnEvent(self.hMainView.evtReceiver.onEvent)
 		if len(sys.argv) < 2:
 			return True
 		import views.new

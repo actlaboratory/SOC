@@ -13,14 +13,14 @@ class EventReceiver:
 		self.log = logging.getLogger("%s.%s" % (constants.LOG_PREFIX, "eventReceiver"))
 		self.callbacks = {
 			events.job.CREATED: self.onJobCreated,
-			events.item.PROCESSED: self.onItemProcessed,
 			events.job.PROCESS_COMPLETED: self.onJobProcessed,
 			events.job.STATUS_CHANGED: self.updateListCtrl,
-			events.item.ADDED: self.onItemAdded,
+			events.item.CONVERTED: self.updateListCtrl,
+			events.item.PROCESSED: self.onItemProcessed,
 		}
 		self.counts = {}
 
-	def onEvent(self, event, task, job=None, item=None, source=None, engine=None, converter=None):
+	def onEvent(self, event, job=None, item=None, source=None, engine=None, converter=None):
 		self.log.debug("event: %s" % event)
 		if event not in self.callbacks.keys():
 			self.log.debug("Unknown event: %s" % event)
@@ -30,51 +30,28 @@ class EventReceiver:
 			self.log.debug("Skipped event: %s" % event)
 		else:
 			self.log.debug("Processing event: %s" % event)
-			func(task, job, item, source, engine, converter)
+			func(job, item, source, engine, converter)
 
-	def onJobCreated(self, task, job, item, source, engine, converter):
-		globalVars.app.hMainView.jobCtrl.Append(job)
-		globalVars.app.hMainView.statusList.SetItemCount(globalVars.app.hMainView.jobCtrl.GetItemCount())
-		globalVars.app.hMainView.statusList.RefreshItem(globalVars.app.hMainView.statusList.index(job))
+	def onJobCreated(self, job, item, source, engine, converter):
+		self.mainView.jobCtrl.Append(job)
+		self.mainView.statusList.SetItemCount(self.mainView.jobCtrl.GetItemCount())
+		self.mainView.statusList.RefreshItem(self.mainView.statusList.index(job))
 
-		# page
-		self.mainView.pages.append([None])
-		self.mainView.selectedPages.append(0)
-		# text
-		self.mainView.texts.append(["",])
-		# cursor
-		self.mainView.cursors.append([0])
-
-	def updateListCtrl(self, task, job, item, source, engine, converter):
-		globalVars.app.hMainView.jobCtrl.RefreshItem(globalVars.app.hMainView.jobCtrl.index(job))
-		globalVars.app.hMainView.statusList.RefreshItem(globalVars.app.hMainView.statusList.index(job))
-		# すべて の中も更新
-		globalVars.app.hMainView.jobCtrl.RefreshItem(0
-		globalVars.app.hMainView.statusList.RefreshItem(0)
-
-	def onItemProcessed(self, task, job, item, source, engine, converter):
-		self.updateListCtrl(task, job, item, source, engine, converter)
-		jobIdx = globalVars.app.hMainView.jobCtrl.index(job)
-
-		# page
-		self.mainView.pages[jobIdx].append(item)
-		if jobIdx == self.mainView.jobCtrl.GetFocusedItem():
-			self.mainView.pageCtrl.Append([_("%dページ") % (self.mainView.pageCtrl.GetItemCount())])
-			if self.mainView.pageCtrl.GetFocusedItem() < 0:
-				self.mainView.pageCtrl.Focus(0)
-				self.mainView.pageCtrl.Select(0)
-			self.mainView.pageCtrl.Enable()
-		# text
-		text = item.getText()
-		self.mainView.texts[jobIdx].append(text)
-		self.mainView.texts[jobIdx][0] += text
-		self.mainView.texts[0] += text
-		# cursor
-		self.mainView.cursors[jobIdx].append(0)
-
-	def onJobProcessed(self, task, job, item, source, engine, converter):
+	def onJobProcessed(self, job, item, source, engine, converter):
 		# TODO: 通知音再生
 		pass
 
-	def onItemAdded(self, task, job, item, source, engine, converter):
-		self.updateListCtrl(task, job, item, source, engine, converter)
+	def updateListCtrl(self, job, item, source, engine, converter):
+		self.mainView.jobCtrl.RefreshItem(self.mainView.jobCtrl.index(job))
+		self.mainView.statusList.RefreshItem(self.mainView.statusList.index(job))
+
+	def onItemProcessed(self, job, item, source, engine, converter):
+		# ジョブ一覧とステータス一覧の認識済みページ数を更新
+		self.updateListCtrl(job, item, source, engine, converter)
+		# 当該ジョブを閲覧中の場合のみ
+		if self.mainView.getCurrentJob() == job:
+			#ページ一覧を更新
+			self.mainView.pageCtrl.SetItemCount(job.getProcessedCount() + 1)
+			# 最初のページの追加の場合、ページ一覧を有効化
+			if job.getProcessedCount() == 1:
+				self.mainView.pageCtrl.Enable()

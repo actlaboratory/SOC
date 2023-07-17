@@ -27,17 +27,13 @@ from views import (authorizing, new, processingDialog, resultDialog, settings,
                    versionDialog, OcrDialog)
 from .base import *
 
-MSG_ALL = "（全て）"
-IDX_ALL = 0
-
-nextJobIndex = 0
-
 class MainView(BaseView):
 	def __init__(self):
 		super().__init__("mainView")
 		self.log.debug("created")
 		self.events=Events(self,self.identifier)
 		evtReceiver = eventReceiver.EventReceiver(self)
+		self.evtReceiver = evtReceiver
 		globalVars.manager.setOnEvent(evtReceiver.onEvent)
 		askEvtReceiver = askEventReceiver.AskEventReceiver()
 		globalVars.manager.setOnAskEvent(askEvtReceiver.onEvent)
@@ -54,19 +50,7 @@ class MainView(BaseView):
 		self.menu.Enable(menuItemsStore.getRef("COPY_TEXT"), False)
 		self.menu.Enable(menuItemsStore.getRef("SAVE"), False)
 
-		self.initialized = False
-		self.initializeVariables()
 		self.installControls()
-		self.initialized = True
-
-	def initializeVariables(self):
-		self.pages = [[]]
-		self.selectedPages = [0]
-		self.texts = [""]
-		self.cursors = [0]
-
-		self.currentJob = -1
-		self.currentPage = -1
 
 	def installControls(self):
 		tabCtrl = self.creator.tabCtrl(_("ページ切替"),sizerFlag=wx.ALL|wx.EXPAND, proportion=1, margin=0)
@@ -86,82 +70,73 @@ class MainView(BaseView):
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.HORIZONTAL,label=_("認識結果"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
 		creator = views.ViewCreator.ViewCreator(self.viewMode, page.GetPanel(), page.GetSizer(), orient=wx.VERTICAL, proportion=1, style=wx.EXPAND)
 		self.selectorIdentifier = "selector"
+
 		self.jobCtrl, dummy = creator.virtualListCtrl(_("認識済みファイル"), self.itemFocused, proportion=1, sizerFlag=wx.EXPAND)
 		self.jobCtrl.setList(globalVars.jobList)
 		self.jobCtrl.AppendColumn(_("ファイル名"))
 		self.jobCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
 		self.menu.keymap.Set(self.selectorIdentifier, self.jobCtrl)
 
-		self.pageCtrl, dummy = creator.listCtrl(_("ページ選択"), self.itemFocused, proportion=1, sizerFlag=wx.EXPAND)
-		self.pageCtrl.AppendColumn(_("ページ"))
-		self.pageCtrl.Append([MSG_ALL])
+		self.pageCtrl, dummy = creator.virtualListCtrl(_("ページ選択"), self.itemFocused, proportion=1, sizerFlag=wx.EXPAND)
+		self.pageCtrl.AppendColumn(_("ページ"), width=250)
+		self.pageCtrl.setList([])
 		self.pageCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
 		self.menu.keymap.Set(self.selectorIdentifier, self.pageCtrl)
 		self.pageCtrl.Disable()
 
 		creator = views.ViewCreator.ViewCreator(self.viewMode, page.GetPanel(), page.GetSizer(), orient=wx.VERTICAL, proportion=1, style=wx.EXPAND)
 		self.text, dummy = creator.inputbox(_("認識結果"), style=wx.TE_READONLY|wx.TE_MULTILINE, proportion=1, sizerFlag=wx.EXPAND)
+		self.text.Bind(wx.EVT_KILL_FOCUS, self.onLeaveTextCtrl)
 		self.text.Disable()
 
 		page.GetPanel().Layout()
 
 
 	def updateText(self):
-		jobIdx = self.jobCtrl.GetFocusedItem()
-		if jobIdx < 0:
+		item = self.getCurrentItem()
+		if not item:
 			return
-		if jobIdx == 0:
-			text = self.texts[jobIdx]
-			cursor = self.cursors[jobIdx]
-		else:
-			pageIdx = self.pageCtrl.GetFocusedItem()
-			text = self.texts[jobIdx][pageIdx]
-			cursor = self.cursors[jobIdx][pageIdx]
-		self.text.SetValue(text)
-		self.text.SetInsertionPoint(cursor)
+		self.text.SetValue(item.getText())
+		self.text.SetInsertionPoint(item.getCursorPos())
 
 	def itemFocused(self, event):
-		cursor = self.text.GetInsertionPoint()
-		if self.currentJob >= 0:
-			if type(self.cursors[self.currentJob]) == list:
-				if self.currentPage >= 0:
-					self.cursors[self.currentJob][self.currentPage] = cursor
-			else:
-				self.cursors[self.currentJob] = cursor
 		self.menu.Enable(menuItemsStore.getRef("COPY_TEXT"), True)
 		self.menu.Enable(menuItemsStore.getRef("SAVE"), True)
 		self.text.Enable()
-		jobIdx = self.jobCtrl.GetFocusedItem()
-		hasMultiplePages = len(self.pages[jobIdx]) > 1
+		job = self.getCurrentJob()
+		if not job:
+			return
 		obj = event.GetEventObject()
 		if obj == self.jobCtrl:
 			# ジョブが選択された
+			self.pageCtrl.setList(job.getProcessedItems())
+			hasMultiplePages = job.getProcessedCount() > 1
 			if hasMultiplePages:
-				self.pageCtrl.DeleteAllItems()
-				self.pageCtrl.Append([MSG_ALL])
-				for i in range(1, len(self.pages[jobIdx])):
-					self.pageCtrl.Append([_("%dページ") % i])
-				self.pageCtrl.Focus(self.selectedPages[jobIdx])
-				self.pageCtrl.Select(self.selectedPages[jobIdx])
+				self.pageCtrl.Focus(job.getSelectedPage())
+				self.pageCtrl.Select(job.getSelectedPage())
 				self.pageCtrl.Enable()
 			else:
 				self.pageCtrl.Disable()
-				self.pageCtrl.DeleteAllItems()
-				self.pageCtrl.Append([MSG_ALL])
 			self.updateText()
 		elif obj == self.pageCtrl:
 			# ページが選択された
-			self.selectedPages[jobIdx] = self.pageCtrl.GetFocusedItem()
+			job.setSelectedPage(self.pageCtrl.GetFocusedItem())
 			self.updateText()
-		self.currentJob = self.jobCtrl.GetFocusedItem()
-		self.currentPage = self.pageCtrl.GetFocusedItem()
 
-	def addJob(self, job, engine):
-		global nextJobIndex
-		name = job.getName()
-		processedCount = 0
-		totalCount = 0
-		nextJobIndex += 1
+	def getCurrentItem(self):
+		job = self.getCurrentJob()
+		if not job:
+			return None
+		focus = self.pageCtrl.GetFocusedItem()
+		if focus < 0:
+			return None
+		return job.getProcessedItems()[focus]
+
+	def getCurrentJob(self):
+		focus = self.jobCtrl.GetFocusedItem()
+		if focus < 0:
+			return None
+		return globalVars.jobList[focus]
 
 	def onContextMenu(self, event):
 		if self.jobCtrl.GetFocusedItem() < 0:
@@ -175,14 +150,12 @@ class MainView(BaseView):
 		])
 		event.GetEventObject().PopupMenu(menu, event)
 
-	def getText(self):
-		jobIdx = self.jobCtrl.GetFocusedItem()
-		if jobIdx < 0:
-			return ""
-		elif jobIdx == 0:
-			return self.texts[0]
-		else:
-			return self.texts[jobIdx][self.pageCtrl.GetFocusedItem()]
+	def onLeaveTextCtrl(self, event):
+		item = self.getCurrentItem()
+		if not item:
+			return
+		item.setCursorPos(self.text.GetInsertionPoint())
+		event.Skip()
 
 class Menu(BaseMenu):
 	def Apply(self,target):
@@ -300,6 +273,6 @@ class Events(BaseEvents):
 		if selected == menuItemsStore.getRef("COPY_TEXT"):
 			if self.parent.jobCtrl.GetFocusedItem() < 0:
 				return
-			text = self.parent.getText()
+			text = self.parent.text.GetValue()
 			with clipboardHelper.Clipboard() as c:
 				c.set_unicode_text(text)

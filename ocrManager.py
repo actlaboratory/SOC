@@ -50,7 +50,7 @@ class manager():
 				self.runningConverterIndex = -1
 			else:
 				raise exception("タスクの管理でエラーが発生しました。", self.runningSourceIndex)
-		wx.CallAfter(self.higherOnEvent,event,task = task,job = job, item = item, engine = engine, source = source, converter = converter)
+		wx.CallAfter(self.higherOnEvent,event,job = job, item = item, engine = engine, source = source, converter = converter)
 
 	def setOnAskEvent(self, callback):
 		assert callable(callback)
