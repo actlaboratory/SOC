@@ -14,8 +14,7 @@ import views.ViewCreator
 
 from logging import getLogger
 from views.baseDialog import *
-from sources import file, scanner
-from engines import google, tesseract
+from sources import file, scanner, clipboard
 from simpleDialog import errorDialog
 
 class Dialog(BaseDialog):
@@ -51,6 +50,10 @@ class Dialog(BaseDialog):
 		self.open = vCreator.button(_("追加"), self.open)
 		self.delete = vCreator.button(_("削除"), self.onDelete)
 
+
+		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,label=_("クリップボード"))
+
+
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,label=_("スキャナ"))
 		self.scannerList, self.scannerListStatic = creator.listCtrl(_("スキャナ一覧"), style = wx.LC_REPORT,sizerFlag=wx.EXPAND | wx.ALL)
 		self.scannerList.AppendColumn(_("名前"),width=550)
@@ -60,6 +63,7 @@ class Dialog(BaseDialog):
 		self.blankPageDetect = creator.checkbox(_("白紙を検出する"))
 		self.duplex = creator.checkbox(_("利用可能な場合両面スキャンを使用する"))
 
+		# エンジンの設定
 		settingAreaCreator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.creator.GetSizer(),views.ViewCreator.FlexGridSizer,10, 2)
 		self.engine, self.engineStatic = settingAreaCreator.combobox(_("OCRエンジン"), [i.getName() for i in engines.getEngines()], self.onEngineSelect, state = 0)
 		settingAreaCreator.AddEmptyCell()
@@ -120,6 +124,9 @@ class Dialog(BaseDialog):
 			source = file.fileSource(self.files)
 		elif sourceStr == _("スキャナ"):
 			source = scanner.scannerSource(self.scannerList.GetItemText(self.scannerList.GetFocusedItem()), blankPageDetect=self.blankPageDetect.GetValue(), isDuplex=self.duplex.GetValue())
+		elif sourceStr == _("クリップボード"):
+			source = clipboard.ClipboardSource()
+
 		# engine
 		engine = engines.getEngines()[self.engine.GetSelection()]()
 
