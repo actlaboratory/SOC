@@ -5,7 +5,7 @@ from array import array
 import win32clipboard
 import win32api
 
-falconHelper=cdll.LoadLibrary("viewhelper.dll")
+helper=cdll.LoadLibrary("viewhelper.dll")
 
 
 class Clipboard(object):
@@ -57,7 +57,7 @@ class Clipboard(object):
 		size = GlobalSize(handle)
 		if handle == c_void_p(0) and get_last_error() != 0:
 			raise WindowsError()
-		data = create_string_buffer(size)  # '\0'���������Ă���
+		data = create_string_buffer(size)  # '\0'?????????????
 		GlobalLock = kernel32.GlobalLock
 		GlobalLock.restype = c_void_p
 		GlobalUnlock = kernel32.GlobalUnlock
@@ -65,7 +65,7 @@ class Clipboard(object):
 		if pointer == c_void_p(0) and get_last_error() != 0:
 			raise WindowsError()
 		try:
-			falconHelper.copyMemory(data, handle, size)
+			helper.copyMemory(data, handle, size)
 		finally:
 			GlobalUnlock(pointer)
 		return data.raw
@@ -86,7 +86,7 @@ class Clipboard(object):
 		size = GlobalSize(handle)
 		if handle == c_void_p(0) and get_last_error() != 0:
 			raise WindowsError()
-		data = create_string_buffer(size)  # '\0'���������Ă���
+		data = create_string_buffer(size)  # '\0'?????????????
 		GlobalLock = kernel32.GlobalLock
 		GlobalLock.restype = c_void_p
 		GlobalUnlock = kernel32.GlobalUnlock
@@ -123,7 +123,7 @@ class Clipboard(object):
 			if pointer == c_void_p(0):
 				raise WindowsError()
 			try:
-				falconHelper.copyMemory(pointer, data, len(data))
+				helper.copyMemory(pointer, data, len(data))
 			finally:
 				GlobalUnlock(handle)
 			SetClipboardData = user32.SetClipboardData
@@ -180,7 +180,7 @@ class Clipboard(object):
 		user32 = windll.user32
 		IsClipboardFormatAvailable = user32.IsClipboardFormatAvailable
 		IsClipboardFormatAvailable.restype = c_bool
-		return IsClipboardFormatAvailable(format_name).raw
+		return IsClipboardFormatAvailable(format)
 
 	def get_format_name(self, format, expand_size=256):
 		user32 = windll.user32
