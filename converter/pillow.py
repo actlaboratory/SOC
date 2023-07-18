@@ -11,7 +11,7 @@ class pillow(converterBase):
 	def convert(self, target_format):
 		self.log.info("running converter...")
 		item_list = []
-		for img in ImageSequence.Iterator(Image.open(item.getPath())):
+		for img in ImageSequence.Iterator(Image.open(self.item.getPath())):
 			if target_format == constants.FORMAT_BMP:
 				path = util.getTmpFilePath(".bmp")
 			elif target_format == constants.FORMAT_PNG:
