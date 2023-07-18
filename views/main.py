@@ -110,13 +110,9 @@ class MainView(BaseView):
 		if obj == self.jobCtrl:
 			# ジョブが選択された
 			self.pageCtrl.setList(job.getProcessedItems())
-			hasMultiplePages = job.getProcessedCount() > 1
-			if hasMultiplePages:
-				self.pageCtrl.Focus(job.getSelectedPage())
-				self.pageCtrl.Select(job.getSelectedPage())
-				self.pageCtrl.Enable()
-			else:
-				self.pageCtrl.Disable()
+			self.pageCtrl.Focus(job.getSelectedPage())
+			self.pageCtrl.Select(job.getSelectedPage())
+			self.pageCtrl.Enable()
 			self.updateText()
 		elif obj == self.pageCtrl:
 			# ページが選択された
