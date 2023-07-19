@@ -23,8 +23,7 @@ import menuItemsStore
 import update
 
 from simpleDialog import *
-from views import (authorizing, new, processingDialog, resultDialog, settings,
-                   versionDialog, OcrDialog)
+from views import (authorizing, new, settings, versionDialog)
 from .base import *
 
 class MainView(BaseView):
