@@ -3,6 +3,11 @@ pywin32
 winpaths
 pdf2image
 google-api-python-client == 1.10
+google-auth==1.14.1
+google-api-core==1.17.0
+googleapis-common-protos==1.51.0
+protobuf==3.11.3
+pyparsing==2.4.7
 PyInstaller==5.3
 requests
 requests_oauthlib
@@ -10,4 +15,5 @@ pillow == 7.1.2
 https://github.com/actlaboratory/diff_archiver/archive/v1.0.1.zip
 https://github.com/actlaboratory/dtwain-python/archive/0.1.0.zip
 https://github.com/actlaboratory/named-pipe/archive/v1.0.5.zip
-https://github.com/actlaboratory/proxyUtil/archive/0.2.3.zip
+https://github.com/actlaboratory/proxyUtil/archive/0.2.4.zip
+pyperclip
