@@ -86,23 +86,32 @@ class Dialog(BaseDialog):
 		error = False
 		add = False
 		for file in files:
-			suffix = os.path.splitext(file)[1][1:].lower()
 			if os.path.isdir(file):
-				error=True
-				continue
-			if suffix in constants.EXT_TO_FORMAT.keys():
-				if file in self.files:
-					continue
-				self.files.append(file)
-				self.filebox.Append(os.path.basename(file))
-				add = True
+				for tp in os.walk(file, False):
+					for file in tp[2]:
+						if self._addFile(tp[0] + "\\" + file):
+							add = True
 			else:
-				error = True
+				if self._addFile(file):
+					add = True
+				else:
+					error = True
 		if error:
 			if add:
 				errorDialog(_("対応していないフォーマットのファイルは除外され、一部のファイルのみ追加されました。"))
 			else:
 				errorDialog(_("このフォーマットのファイルには対応していないため、追加できませんでした。"))
+
+	def _addFile(self,file):
+		if not os.path.isfile(file):
+			return False
+		if file in self.files:
+			return True
+		if os.path.splitext(file)[1][1:].lower() not in constants.EXT_TO_FORMAT.keys():
+			return False
+		self.files.append(file)
+		self.filebox.Append(os.path.basename(file))
+		return True
 
 	def onDelete(self, event=None):
 		index = self.filebox.GetSelection()
