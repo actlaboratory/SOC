@@ -118,14 +118,14 @@ class BaseMenu(object):
 				tmp+=v+"\n"
 			dialog(_("エラー"),tmp)
 
-	def ApplyShortcut(self,window=None):
+	def ApplyShortcut(self, window=None, event=None):
 		"""
 			キーマップ上のショートカットキーの更新を反映する
 			windowが指定されていれば、そのウィンドウに更新されたショートカットキーを割り当てる
 		"""
 		self.acceleratorTable=self.keymap.GetTable(self.keymap_identifier)
 		if window:
-			self.keymap.Set(self.keymap_identifier,window)
+			self.keymap.Set(self.keymap_identifier, window, event)
 
 	def Block(self,ref):
 		"""
@@ -285,6 +285,11 @@ class BaseMenu(object):
 		for menu,id in self.hMenuBar.GetMenus():
 			self._addMenuItemList(menu,ret)
 		return ret
+
+	def setCallbacks(self, items):
+		"""メニューバーなしのショートカットをまとめてコールバック登録する"""
+		for k,v in items.items():
+			self.callbacks[menuItemsStore.getRef(k)] = v
 
 	def getCallback(self,ref_id):
 		if ref_id in self.callbacks:

@@ -12,7 +12,7 @@ defaultKeymap["mainView"]={
 }
 defaultKeymap["fileList"] = {
 	"DELETE": "DELETE",
-	"PAST": "ctrl+V",
+	"PASTE": "ctrl+V",
 }
 defaultKeymap["selector"] = {
 	"COPY_TEXT": "CTRL+C",

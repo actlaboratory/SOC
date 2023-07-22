@@ -5,12 +5,14 @@ import dtwain
 import os
 import wx
 
+import clipboard as c
 import engines
 import defaultKeymap
 import globalVars
 import keymap
 import task
 import views.ViewCreator
+import views.base
 
 from logging import getLogger
 from views.baseDialog import *
@@ -41,9 +43,12 @@ class Dialog(BaseDialog):
 		vCreator=views.ViewCreator.ViewCreator(self.viewMode,hCreator.GetPanel(),hCreator.GetSizer(),wx.VERTICAL,style=wx.EXPAND)
 
 		self.filebox, self.list = vCreator.listbox(_("ファイル一覧"), (), None,-1,0,(450,200),sizerFlag=wx.ALL,proportion=1,margin=10)
-		fileListKeymap = keymap.KeymapHandler(defaultKeymap.defaultKeymap)
-		acceleratorTable = fileListKeymap.GetTable("fileList")
-		self.filebox.SetAcceleratorTable(acceleratorTable)
+		self.fileboxMenu = views.base.BaseMenu("fileList")
+		self.fileboxMenu.ApplyShortcut(self.filebox, self.onKeyEvent)
+		self.fileboxMenu.setCallbacks({
+			"DELETE": self.onDelete,
+			"PASTE" : self.onPaste,
+		})
 		self.filebox.SetDropTarget(DropTarget(self))	#D&Dの受け入れ
 
 		vCreator=views.ViewCreator.ViewCreator(self.viewMode,hCreator.GetPanel(),hCreator.GetSizer(),wx.VERTICAL,20)
@@ -52,7 +57,6 @@ class Dialog(BaseDialog):
 
 
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,label=_("クリップボード"))
-
 
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.tab,None,wx.VERTICAL,label=_("スキャナ"))
 		self.scannerList, self.scannerListStatic = creator.listCtrl(_("スキャナ一覧"), style = wx.LC_REPORT,sizerFlag=wx.EXPAND | wx.ALL)
@@ -122,6 +126,9 @@ class Dialog(BaseDialog):
 		self.filebox.SetSelection(index-1)
 		return
 
+	def onPaste(self, event=None):
+		self.addFiles(c.ClipboardFile().GetFileList())
+
 	def onEngineSelect(self, event=None):
 		self.engineConfigButton.Enable(engines.getEngines()[self.engine.GetSelection()].getSettingDialog() != None)
 		return
@@ -148,6 +155,11 @@ class Dialog(BaseDialog):
 		d.Initialize(self.wnd)
 		d.Show()
 
+	def onKeyEvent(self, event):
+		"""メニュー項目が選択されたときのイベントハンドら。"""
+		callback = self.fileboxMenu.getCallback(event.GetId())
+		if callback:
+			callback(event)
 
 # D&D受入関連
 class DropTarget(wx.DropTarget):

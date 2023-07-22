@@ -20,4 +20,6 @@ dic={
 	# for Context Menu
 	"COPY_TEXT": _("本文のコピー(&C)"),
 	"SAVE": _("表示中のテキストをファイルに保存(&S)"),
+	"PASTE": _("貼り付け(&P)"),
+	"DELETE": _("削除(&D)"),
 }

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#Falcon clipboard utility
+# clipboard utility
 #Copyright (C) 2019 Yukio Nozawa <personal@nyanchangames.com>
 import struct
 import clipboardHelper
