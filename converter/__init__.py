@@ -1,14 +1,15 @@
 import queue
-from . import pillow
-from .pdf2image import pdf2image
-import jobObjects
-from jobObjects import jobStatus
 import threading
-from .constants import converterStatus
-import constants
-import globalVars
-import events
 import time
+
+import constants
+import events
+import jobObjects
+
+from .converterStatus import converterStatus
+from .pdf2image import pdf2image
+from . import pillow
+
 
 converter_list = [pillow.pillow, pdf2image]
 
@@ -57,10 +58,14 @@ class converter(threading.Thread):
 
 	def _convertItem(self, item):
 		if item.getFormat() & self.engineSupportedFormats:
+			# 返還不要
 			return item
 		for converter in converter_list:
 			if not (converter.getSupportedFormats() & item.getFormat()):
+				# コンバータが未対応なので別のを試す
 				continue
+
+			# 変換先形式を決める
 			for format in constants.IMAGE_FORMAT_LIST:
 				if (converter.getConvertableFormats() & format) & (self.engineSupportedFormats & format):
 					c = converter(item)

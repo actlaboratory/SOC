@@ -7,7 +7,7 @@ import globalVars
 import util
 
 class pdf2image(converterBase):
-	_SUPPORTED_FORMATS = constants.FORMAT_PDF_ALL
+	_SUPPORTED_FORMATS = constants.FORMAT_PDF_ALL | constants.FORMAT_PDF_MULTI_PAGE
 	_CONVERTABLE_FORMATS = constants.FORMAT_BMP | constants.FORMAT_PNG | constants.FORMAT_GIF | constants.FORMAT_JPEG
 
 	def convert(self, target_format):

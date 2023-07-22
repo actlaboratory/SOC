@@ -289,9 +289,23 @@ class item:
 
 	def _register_format(self):
 		ext = os.path.splitext(self.getPath())[1][1:]
-		format = constants.EXT_TO_FORMAT.get(ext.lower(), constants.FORMAT_UNKNOWN)
+		self.format = constants.EXT_TO_FORMAT.get(ext.lower(), constants.FORMAT_UNKNOWN)
 		if format == constants.FORMAT_PDF_UNKNOWN:
-			# 埋め込みテキストの含まれるPDFであるか判定
+			# ページ数を確認
+			pipeServer = namedPipe.Server(constants.PIPE_NAME)
+			pipeServer.start()
+			subprocess.run(("pdfinfo", "-enc", "UTF-8", self.getPath(), pipeServer.getFullName()))
+
+			list = pipeServer.getNewMessageList()
+			pipeServer.exit()
+			m =re.search(r'^ages: *(\d+)',list[0])
+			print(m)
+			print(m.group(1))
+			if int(m.group(1)) > 1:
+				self.format = constants.FORMAT_PDF_MULTI_PAGE
+				return
+
+			# 単一ページの場合は埋め込みテキストの含まれるPDFであるか判定
 			pipeServer = namedPipe.Server(constants.PIPE_NAME)
 			pipeServer.start()
 			subprocess.run(("pdftotext", "-enc", "UTF-8", self.getPath(), pipeServer.getFullName()))
@@ -300,10 +314,9 @@ class item:
 			pipeServer.exit()
 			text = list[0]
 			if re.search(r'[^\f\n\r]', text) == None:
-				format = constants.FORMAT_PDF_TEXT
+				self.format = constants.FORMAT_PDF_TEXT
 			else:
-				format = constants.FORMAT_PDF_IMAGE
-		self.format = format
+				self.format = constants.FORMAT_PDF_IMAGE
 
 	def getCursorPos(self):
 		return self.cursorPos
