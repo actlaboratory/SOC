@@ -8,12 +8,9 @@ defaultKeymap={}
 defaultKeymap["mainView"]={
 	"NEW": "ctrl+n",
 	"SAVE": "ctrl+s",
-	"EXIT": "ctrl+X",
+	"EXIT": "",
 }
 defaultKeymap["fileList"] = {
 	"DELETE": "DELETE",
 	"PASTE": "ctrl+V",
-}
-defaultKeymap["selector"] = {
-	"COPY_TEXT": "CTRL+C",
 }

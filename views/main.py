@@ -42,7 +42,6 @@ class MainView(BaseView):
 			700,
 			self.app.config.getint(self.identifier,"positionX"),
 			self.app.config.getint(self.identifier,"positionY"),
-			style=wx.SYSTEM_MENU | wx.CAPTION | wx.CLOSE_BOX | wx.CLIP_CHILDREN | wx.BORDER_STATIC
 		)
 
 		self.InstallMenuEvent(Menu(self.identifier),self.events.OnMenuSelect)
@@ -68,22 +67,19 @@ class MainView(BaseView):
 		# 認識結果ページ
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.HORIZONTAL,label=_("認識結果"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
 		creator = views.ViewCreator.ViewCreator(self.viewMode, page.GetPanel(), page.GetSizer(), orient=wx.VERTICAL, proportion=1, style=wx.EXPAND)
-		self.selectorIdentifier = "selector"
 
 		self.jobCtrl, dummy = creator.virtualListCtrl(_("認識済みファイル"), self.itemFocused, proportion=1, sizerFlag=wx.EXPAND)
 		self.jobCtrl.setList(globalVars.jobList)
-		self.jobCtrl.AppendColumn(_("ファイル名"))
+		self.jobCtrl.AppendColumn(_("ファイル名"), width=250)
 		self.jobCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
-		self.menu.keymap.Set(self.selectorIdentifier, self.jobCtrl)
 
 		self.pageCtrl, dummy = creator.virtualListCtrl(_("ページ選択"), self.itemFocused, proportion=1, sizerFlag=wx.EXPAND)
 		self.pageCtrl.AppendColumn(_("ページ"), width=250)
 		self.pageCtrl.setList([])
 		self.pageCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
-		self.menu.keymap.Set(self.selectorIdentifier, self.pageCtrl)
 		self.pageCtrl.Disable()
 
-		creator = views.ViewCreator.ViewCreator(self.viewMode, page.GetPanel(), page.GetSizer(), orient=wx.VERTICAL, proportion=1, style=wx.EXPAND)
+		creator = views.ViewCreator.ViewCreator(self.viewMode, page.GetPanel(), page.GetSizer(), orient=wx.VERTICAL, proportion=3, style=wx.EXPAND)
 		self.text, dummy = creator.inputbox(_("認識結果"), style=wx.TE_READONLY|wx.TE_MULTILINE, proportion=1, sizerFlag=wx.EXPAND)
 		self.text.Bind(wx.EVT_KILL_FOCUS, self.onLeaveTextCtrl)
 		self.text.Disable()
@@ -138,7 +134,7 @@ class MainView(BaseView):
 			return
 		menu = wx.Menu()
 		menu.Bind(wx.EVT_MENU, self.events.OnMenuSelect)
-		baseMenu = BaseMenu(self.selectorIdentifier)
+		baseMenu = BaseMenu("context")
 		baseMenu.RegisterMenuCommand(menu, [
 			"COPY_TEXT",
 			"SAVE",
@@ -160,24 +156,27 @@ class Menu(BaseMenu):
 		self.hSettingMenu=wx.Menu()
 		self.hHelpMenu = wx.Menu()
 		#ファイルメニューの中身
-		self.RegisterMenuCommand(self.hFileMenu, [
-			"NEW",
-			"COPY_TEXT",
-			"SAVE",
-			"EXIT",
-		])
+		self.RegisterMenuCommand(self.hFileMenu, {
+			"NEW": self.parent.events.newJob,
+			"COPY_TEXT": self.parent.events.copyText,
+			"SAVE": self.parent.events.saveText,
+			"EXIT": self.parent.events.exit,
+		})
+
 		#設定メニューの中身
-		self.RegisterMenuCommand(self.hSettingMenu, [
-			"GOOGLE",
-			"SENDREGIST",
-			"SETTINGS",
-		])
+		self.RegisterMenuCommand(self.hSettingMenu, {
+			"GOOGLE": self.parent.events.googleAuth,
+			"SENDREGIST": self.parent.events.registSendMenu,
+			"SETTINGS": self.parent.events.setting,
+		})
+
 		#ヘルプメニューの中身
-		self.RegisterMenuCommand(self.hHelpMenu, [
-			"HOMEPAGE",
-			"UPDATE",
-			"ABOUT",
-		])
+		self.RegisterMenuCommand(self.hHelpMenu, {
+			"HOMEPAGE": self.parent.events.openDevelopperWebSite,
+			"UPDATE": self.parent.events.update,
+			"ABOUT": self.parent.events.about,
+		})
+
 		#メニューバーの生成
 		self.hMenuBar.Append(self.hFileMenu, _("ファイル(&F)"))
 		self.hMenuBar.Append(self.hSettingMenu,_("設定(&S)"))
@@ -187,86 +186,69 @@ class Menu(BaseMenu):
 			self.hMenuBar.Enable(menuItemsStore.getRef("GOOGLE"), False)
 
 class Events(BaseEvents):
-	def Exit(self, event = None):
+	def newJob(self, event):
+		d = new.Dialog()
+		d.Initialize()
+		d.Show()
+
+	def copyText(self, event):
+		if self.parent.jobCtrl.GetFocusedItem() < 0:
+			return
+		text = self.parent.text.GetValue()
+		with clipboardHelper.Clipboard() as c:
+			c.set_unicode_text(text)
+
+	def saveText(self, event):
+		if self.parent.jobCtrl.GetFocusedItem() < 0:
+			return
+		d = wx.FileDialog(self.parent.hFrame, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT, wildcard=_("テキストファイル(*.txt)") + "|*.txt|" + _("全てのファイル(*.*)") + "|*.*")
+		if d.ShowModal() == wx.ID_CANCEL:
+			return
+		try:
+			with open(d.GetPath(), "w") as f:
+				f.write(self.parent.text.getValue())
+		except IOError as e:
+			errorDialog(_("保存に失敗しました。詳細: %s") % (e))
+
+	def exit(self, event = None):
 		self.parent.hFrame.Close()
 
-	def OnMenuSelect(self,event):
-		"""メニュー項目が選択されたときのイベントハンドら。"""
-		#ショートカットキーが無効状態のときは何もしない
-		if not self.parent.shortcutEnable:
-			event.Skip()
-			return
+	def googleAuth(self, event):
+		authorizeDialog = authorizing.authorizeDialog()
+		authorizeDialog.Initialize()
+		status = authorizeDialog.Show()
 
-		selected=event.GetId()#メニュー識別しの数値が出る
+		if status==errorCodes.OK:
+			self.parent.menu.hMenuBar.Enable(menuItemsStore.getRef("GOOGLE"), False)
+		elif status == errorCodes.CANCELED_BY_USER:
+			dialog(_("キャンセルしました。"))
+		elif status==errorCodes.IO_ERROR:
+			dialog(_("認証に成功しましたが、ファイルの保存に失敗しました。ディレクトリのアクセス権限などを確認してください。"),_("認証結果"))
+		elif status==errorCodes.CANCELED:
+			dialog(_("ブラウザが閉じられたため、認証をキャンセルしました。"),_("認証結果"))
+		elif status==errorCodes.NOT_AUTHORIZED:
+			dialog(_("認証が拒否されました。"),_("認証結果"))
+		else:
+			dialog(_("不明なエラーが発生しました。"),_("エラー"))
 
-		if selected == menuItemsStore.getRef("NEW"):
-			d = new.Dialog()
-			d.Initialize()
-			d.Show()
-		if selected == menuItemsStore.getRef("SAVE"):
-			if self.parent.jobCtrl.GetFocusedItem() < 0:
-				return
-			text = self.parent.getText()
-			d = wx.FileDialog(self.parent.hFrame, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT, wildcard=_("テキストファイル(*.txt)") + "|*.txt|" + _("全てのファイル(*.*)") + "|*.*")
-			if d.ShowModal() == wx.ID_CANCEL:
-				return
-			path = d.GetPath()
-			try:
-				with open(path, "w") as f:
-					f.write(text)
-			except IOError as e:
-				errorDialog(_("保存に失敗しました。詳細: %s") % (e))
-		if selected == menuItemsStore.getRef("EXIT"):
-			self.Exit()
-		if selected == menuItemsStore.getRef("DELETE"):
-			self.onDelete()
-		if selected == menuItemsStore.getRef("PAST"):
-			c=clipboard.ClipboardFile()
-			pathList = c.GetFileList()
-			self.parent.app.addFileList(pathList)
-			return
-		if selected==menuItemsStore.getRef("GOOGLE"):
-			authorizeDialog = authorizing.authorizeDialog()
-			authorizeDialog.Initialize()
-			status = authorizeDialog.Show()
+	def setting(self, event):
+		d = settingsDialog.Dialog()
+		d.Initialize()
+		d.Show()
 
-			if status==errorCodes.OK:
-				self.parent.menu.hMenuBar.Enable(menuItemsStore.getRef("GOOGLE"), False)
-			elif status == errorCodes.CANCELED_BY_USER:
-				dialog(_("キャンセルしました。"))
-			elif status==errorCodes.IO_ERROR:
-				dialog(_("認証に成功しましたが、ファイルの保存に失敗しました。ディレクトリのアクセス権限などを確認してください。"),_("認証結果"))
-			elif status==errorCodes.CANCELED:
-				dialog(_("ブラウザが閉じられたため、認証をキャンセルしました。"),_("認証結果"))
-			elif status==errorCodes.NOT_AUTHORIZED:
-				dialog(_("認証が拒否されました。"),_("認証結果"))
-			else:
-				dialog(_("不明なエラーが発生しました。"),_("エラー"))
-			return
+	def registSendMenu(self, event):
+		shortCut = os.environ["APPDATA"]+"\\Microsoft\\Windows\\SendTo\\"+_("SOCで文字認識を開始.lnk")
+		ws = win32com.client.Dispatch("wscript.shell")
+		scut=ws.CreateShortcut(shortCut)
+		scut.TargetPath=sys.argv[0]
+		scut.Save()
+		dialog(_("送るメニューの登録が完了しました。送るメニューから「SOCで文字認識を開始」で実行できます。"), _("完了"))
 
-		if selected == menuItemsStore.getRef("SETTINGS"):
-			d = settingsDialog.Dialog()
-			d.Initialize()
-			d.Show()
+	def openDevelopperWebSite(self, event):
+		webbrowser.open(constants.APP_DEVELOPERS_URL)
 
-		if selected == menuItemsStore.getRef("HOMEPAGE"):
-			webbrowser.open(constants.APP_DEVELOPERS_URL)
-			return
-		if selected == menuItemsStore.getRef("SENDREGIST"):
-			shortCut = os.environ["APPDATA"]+"\\Microsoft\\Windows\\SendTo\\"+_("SOCで文字認識を開始.lnk")
-			ws = win32com.client.Dispatch("wscript.shell")
-			scut=ws.CreateShortcut(shortCut)
-			scut.TargetPath=sys.argv[0]
-			scut.Save()
-			dialog(_("送るメニューの登録が完了しました。送るメニューから「SOCで文字認識を開始」で実行できます。"), _("完了"))
-		if selected == menuItemsStore.getRef("ABOUT"):
-			versionDialog.versionDialog()
+	def about(self, event):
+		versionDialog.versionDialog()
 
-		if selected == menuItemsStore.getRef("UPDATE"):
-			update.checkUpdate()
-		if selected == menuItemsStore.getRef("COPY_TEXT"):
-			if self.parent.jobCtrl.GetFocusedItem() < 0:
-				return
-			text = self.parent.text.GetValue()
-			with clipboardHelper.Clipboard() as c:
-				c.set_unicode_text(text)
+	def update(self, event):
+		update.checkUpdate()
