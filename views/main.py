@@ -23,7 +23,7 @@ import menuItemsStore
 import update
 
 from simpleDialog import *
-from views import (authorizing, new, settings, versionDialog)
+from views import (authorizing, new, settingsDialog, versionDialog)
 from .base import *
 
 class MainView(BaseView):
@@ -245,10 +245,9 @@ class Events(BaseEvents):
 			return
 
 		if selected == menuItemsStore.getRef("SETTINGS"):
-			settingDialog = settings.settingsDialog()
-			settingDialog.Initialize()
-			settingDialog.Show(True)
-			settingDialog.Destroy()
+			d = settingsDialog.Dialog()
+			d.Initialize()
+			d.Show()
 
 		if selected == menuItemsStore.getRef("HOMEPAGE"):
 			webbrowser.open(constants.APP_DEVELOPERS_URL)
