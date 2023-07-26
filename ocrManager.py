@@ -1,12 +1,12 @@
-import time
-import queue
-from logging import exception, getLogger
-import constants
-from sources.constants import sourceStatus
-from engines.constants import engineStatus
-from task import taskStatus
-import events
+# OCR manager
+
 import wx
+
+import constants
+import events
+
+from logging import exception, getLogger
+
 
 class manager():
 	def __init__(self):
@@ -73,7 +73,3 @@ class manager():
 		if self.runningConverterIndex == -1:
 			task.startConverter()
 			self.runningConverterIndex = len(self.tasks) - 1
-
-	def getTasks(self):
-		return self.tasks
-

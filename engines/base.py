@@ -1,17 +1,18 @@
 #engine base
 
 import queue
-import time
 import threading
+import time
+
+import askEvent
 import constants
-from logging import getLogger, setLogRecordFactory
-import errorCodes
-import converter
-from .constants import engineStatus
 import events
 import jobObjects
-from jobObjects import jobStatus
-import askEvent
+
+from logging import getLogger
+
+from .constants import engineStatus
+
 
 class engineBase(threading.Thread):
 	"""
@@ -52,9 +53,6 @@ class engineBase(threading.Thread):
 	def setOnAskEvent(self, callback):
 		assert callable(callback)
 		self.onAskEvent = callback
-
-	def initable(self):
-		return True
 
 	def initialize(self, *args, **kwargs):
 		self._init(*args, **kwargs)

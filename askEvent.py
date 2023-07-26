@@ -1,3 +1,5 @@
+# ask event
+
 import queue
 
 class askEventBase:
@@ -24,7 +26,6 @@ class askEventBase:
 	def getResult(self, wait = True):
 		result = self._result_queue.get(wait)
 		return result
-
 
 	def getTitle(self):
 		return self._title

@@ -1,12 +1,15 @@
 #sourceBase
+
 import threading
-from logging import getLogger
-import constants
-from sources.constants import sourceStatus
-import queue
-import time
-import events
+
 import askEvent
+import constants
+import events
+
+from logging import getLogger
+
+from sources.constants import sourceStatus
+
 
 class sourceBase(threading.Thread):
 	def __init__(self, identifier):
@@ -22,9 +25,6 @@ class sourceBase(threading.Thread):
 	def setOnAskEvent(self, callback):
 		assert callable(callback)
 		self.onAskEvent = callback
-
-	def initable(self):
-		return True
 
 	def _init(self):
 		return

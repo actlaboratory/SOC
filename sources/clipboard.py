@@ -1,7 +1,6 @@
 # clipboard source
 
 import os
-import time
 import wx
 
 import globalVars
@@ -10,7 +9,6 @@ import jobObjects
 from clipboardHelper import *
 
 from .base import sourceBase, sourceAskEvent
-from .constants import sourceStatus
 
 class ClipboardSource(sourceBase):
 	def __init__(self):
