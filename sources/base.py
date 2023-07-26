@@ -64,11 +64,9 @@ class sourceBase(threading.Thread):
 	def _final(self):
 		return
 
-	def ask(self, askEvent):
-		event = askEvent(self)
+	def ask(self, event):
 		self.onAskEvent(event)
-		result = event.getResult()
-		return result
+		return event.getResult()
 
 	def raiseStatusFlag(self, flag):
 		assert isinstance(flag, sourceStatus)

@@ -55,7 +55,7 @@ class scannerSource(sourceBase):
 		while True:
 			time.sleep(0.01)
 			self._scan(job)
-			res = self.ask(scanContinueNotFeeder)
+			res = self.ask(scanContinueNotFeeder())
 			if res == scanContinueNotFeeder._SCAN_NOT_CONTINUE:
 				break
 			elif res == scanContinueNotFeeder._SCAN_CONTINUE_NEW_FILE:
@@ -73,7 +73,7 @@ class scannerSource(sourceBase):
 		while True:
 			if self._isScannerEmpty():
 				if job_created:
-					res = self.ask(scanContinue)
+					res = self.ask(scanContinue())
 					if res == scanContinue._SCAN_NOT_CONTINUE:break
 					elif res == scanContinue._SCAN_CONTINUE:continue
 					elif res == scanContinue._SCAN_CONTINUE_NEW_FILE:
@@ -81,7 +81,7 @@ class scannerSource(sourceBase):
 						job = jobObjects.job(None, True, self, self.engine)
 						self.onJobCreated(job)
 				else:
-					res = self.ask(scannerNoPaper)
+					res = self.ask(scannerNoPaper())
 					if res == scannerNoPaper._CANCEL:break
 				continue
 			if not job_created:

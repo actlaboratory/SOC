@@ -3,6 +3,7 @@
 import os
 import wx
 
+import askEvent
 import globalVars
 import jobObjects
 
@@ -18,15 +19,14 @@ class ClipboardSource(sourceBase):
 	def _run(self):
 		with Clipboard() as c:
 			if not c.is_format_available(ClipboardFormats.dib):
-				raise Exception("not Available")
+				self.ask(askEvent.notice(_("クリップボードから読込"), _("クリップボードに画像が保存されていません。")))
+				return
 			data = c.get_data(ClipboardFormats.dib)
 		fn = os.path.join(globalVars.app.getTmpDir(), "clipboard.bmp")
 		with open(fn, "wb") as f:
 			f.write(data)
 
-		job = jobObjects.job(fn, False, self, self.engine)
+		job = jobObjects.job(fn, True, self, self.engine)
 		self.onJobCreated(job)
-		item = jobObjects.item(fn)
-		job.addCreatedItem(item)
+		job.addCreatedItem(jobObjects.item(fn))
 		job.endSource()
-		return

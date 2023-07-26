@@ -1,5 +1,7 @@
 # ask event
 
+import wx
+
 import queue
 
 class askEventBase:
@@ -7,12 +9,8 @@ class askEventBase:
 	_selection_to_result = {}
 	_title = ""
 
-	def __init__(self, obj):
-		self.eventObject = obj
+	def __init__(self):
 		self._result_queue = queue.Queue()
-
-	def getEventObject(self):
-		return self.eventObject
 
 	def getMessage(self):
 		return self._message
@@ -29,3 +27,12 @@ class askEventBase:
 
 	def getTitle(self):
 		return self._title
+
+class notice(askEventBase):
+	def __init__(self, title, message):
+		self._title = title
+		self._message = message
+		self._selection_to_result = {
+			_("OK"): wx.ID_OK,
+		}
+		super().__init__()
