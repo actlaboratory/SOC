@@ -1,7 +1,7 @@
+# converter base class
+
 from logging import getLogger
-import globalVars
-import os
-import uuid
+
 
 class converterBase():
 	_SUPPORTED_FORMATS = 0
@@ -22,4 +22,3 @@ class converterBase():
 
 	def convert(self, target_format):
 		raise NotImplementedError()
-

@@ -1,6 +1,7 @@
 #sourceBase
 
 import threading
+import wx
 
 import askEvent
 import constants
@@ -66,6 +67,8 @@ class sourceBase(threading.Thread):
 
 	def ask(self, event):
 		self.onAskEvent(event)
+		if event.getSelectionCount() <= 1:
+			return wx.ID_OK
 		return event.getResult()
 
 	def raiseStatusFlag(self, flag):

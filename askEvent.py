@@ -15,18 +15,20 @@ class askEventBase:
 	def getMessage(self):
 		return self._message
 
+	def getSelectionCount(self):
+		return len(self._selection_to_result)
+
 	def getSelections(self):
 		return self._selection_to_result
 
-	def setResult(self, result):
-		self._result_queue.put(result)
-
-	def getResult(self, wait = True):
-		result = self._result_queue.get(wait)
-		return result
-
 	def getTitle(self):
 		return self._title
+
+	def getResult(self, wait = True):
+		return self._result_queue.get(wait)
+
+	def setResult(self, result):
+		self._result_queue.put(result)
 
 class notice(askEventBase):
 	def __init__(self, title, message):

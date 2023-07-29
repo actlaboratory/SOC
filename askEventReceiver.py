@@ -7,7 +7,7 @@ import winsound
 
 # 文字数制限
 L_TITLE = 50
-L_MESSAGE = 100
+L_MESSAGE = 300
 L_BUTTON = 30
 
 class AskEventReceiver:

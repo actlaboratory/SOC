@@ -82,7 +82,14 @@ def GetWidthCount(s):
     """
             文字列sの幅を半角=1・全角=2で計算して返す。
             計算方法は_GetWidth()に準じる
+            複数行文字列の場合、最も長い行の結果を返す
     """
+    result = 0
+    for l in s.split("\n"):
+        result = max(result, _GetWidthCount(l))
+    return result
+
+def _GetWidthCount(s):
     result = 0
     cursor = 0
     bytes = bytearray(s.encode())

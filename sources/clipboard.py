@@ -1,7 +1,6 @@
 # clipboard source
 
 import os
-import wx
 
 import askEvent
 import globalVars
