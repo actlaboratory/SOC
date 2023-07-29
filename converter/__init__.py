@@ -1,10 +1,14 @@
 import queue
 import threading
 import time
+import wx
 
+import askEvent
 import constants
 import events
 import jobObjects
+
+from logging import getLogger
 
 from .converterStatus import converterStatus
 from .pdf2image import pdf2image
@@ -17,9 +21,21 @@ class converter(threading.Thread):
 	def __init__(self, engineSupportedFormats):
 		self.engineSupportedFormats = engineSupportedFormats
 		super().__init__()
+		self.log = getLogger("%s.convertor" % constants.LOG_PREFIX)
 		self.jobQueue = queue.Queue()
+		self.onAskEvent = None
 		self.onEvent = None
 		self.status = converterStatus(0)
+
+	def ask(self, event):
+		self.onAskEvent(event)
+		if event.getSelectionCount() <= 1:
+			return wx.ID_OK
+		return event.getResult()
+
+	def setOnAskEvent(self, callback):
+		assert callable(callback)
+		self.onAskEvent = callback
 
 	def setOnEvent(self, callback):
 		assert callable(callback)
@@ -70,6 +86,9 @@ class converter(threading.Thread):
 				if (converter.getConvertableFormats() & format) & (self.engineSupportedFormats & format):
 					c = converter(item)
 					return c.convert(format)
+		# 変換できない
+		self.log.error("cannot convert:" + str(format) + " to " + str(self.engineSupportedFormats))
+		self.ask(askEvent.notice(_("ファイル形式エラー"), _("指定されたファイルとエンジンの形式の組み合わせが不正です。\nファイルの形式に対応したエンジンを指定してください。")))
 
 	def addJob(self, job):
 		self.jobQueue.put(job)
@@ -87,4 +106,3 @@ class converter(threading.Thread):
 
 	def getStatus(self):
 		return self.status
-
