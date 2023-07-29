@@ -290,17 +290,9 @@ class item:
 	def _register_format(self):
 		ext = os.path.splitext(self.getPath())[1][1:]
 		self.format = constants.EXT_TO_FORMAT.get(ext.lower(), constants.FORMAT_UNKNOWN)
-		if format == constants.FORMAT_PDF_UNKNOWN:
-			# ページ数を確認
-			pipeServer = namedPipe.Server(constants.PIPE_NAME)
-			pipeServer.start()
-			subprocess.run(("pdfinfo", "-enc", "UTF-8", self.getPath(), pipeServer.getFullName()))
-
-			list = pipeServer.getNewMessageList()
-			pipeServer.exit()
-			m =re.search(r'^ages: *(\d+)',list[0])
-			print(m)
-			print(m.group(1))
+		if self.format == constants.FORMAT_PDF_UNKNOWN:
+			info = (subprocess.run((os.getcwd() + "/poppler/bin/pdfinfo", "-enc", "UTF-8", self.getPath()), capture_output=True, text=True, encoding="UTF-8", errors="replace").stdout)
+			m =re.search(r'^Pages: *(\d+)', info, re.MULTILINE)
 			if int(m.group(1)) > 1:
 				self.format = constants.FORMAT_PDF_MULTI_PAGE
 				return
@@ -308,12 +300,12 @@ class item:
 			# 単一ページの場合は埋め込みテキストの含まれるPDFであるか判定
 			pipeServer = namedPipe.Server(constants.PIPE_NAME)
 			pipeServer.start()
-			subprocess.run(("pdftotext", "-enc", "UTF-8", self.getPath(), pipeServer.getFullName()))
+			subprocess.run((os.getcwd() + "/poppler/bin/pdftotext", "-enc", "UTF-8", self.getPath(), pipeServer.getFullName()))
 
 			list = pipeServer.getNewMessageList()
 			pipeServer.exit()
 			text = list[0]
-			if re.search(r'[^\f\n\r]', text) == None:
+			if len(text) > 0:
 				self.format = constants.FORMAT_PDF_TEXT
 			else:
 				self.format = constants.FORMAT_PDF_IMAGE

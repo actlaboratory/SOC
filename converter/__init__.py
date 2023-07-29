@@ -75,6 +75,7 @@ class converter(threading.Thread):
 	def _convertItem(self, item):
 		if item.getFormat() & self.engineSupportedFormats:
 			# 返還不要
+			self.log.info("convert is not needed")
 			return item
 		for converter in converter_list:
 			if not (converter.getSupportedFormats() & item.getFormat()):
@@ -85,9 +86,10 @@ class converter(threading.Thread):
 			for format in constants.IMAGE_FORMAT_LIST:
 				if (converter.getConvertableFormats() & format) & (self.engineSupportedFormats & format):
 					c = converter(item)
+					self.log.info("use:"+str(converter))
 					return c.convert(format)
 		# 変換できない
-		self.log.error("cannot convert:" + str(format) + " to " + str(self.engineSupportedFormats))
+		self.log.error("cannot convert:" + str(item.getFormat()) + " to " + str(self.engineSupportedFormats))
 		self.ask(askEvent.notice(_("ファイル形式エラー"), _("指定されたファイルとエンジンの形式の組み合わせが不正です。\nファイルの形式に対応したエンジンを指定してください。")))
 
 	def addJob(self, job):

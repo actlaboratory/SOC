@@ -53,7 +53,7 @@ FORMAT_TIFF = 0x10
 FORMAT_PDF_UNKNOWN = 0x20
 FORMAT_PDF_TEXT = 0x40
 FORMAT_PDF_IMAGE = 0x80
-FORMAT_PDF_MULTI_PAGE = 100
+FORMAT_PDF_MULTI_PAGE = 0x100
 # 単一ページPDFなら何でもOK
 FORMAT_PDF_ALL = FORMAT_PDF_TEXT | FORMAT_PDF_IMAGE
 
@@ -78,7 +78,7 @@ EXT_TO_FORMAT = {
 
 #build関連定数
 BASE_PACKAGE_URL = "https://github.com/actlaboratory/SOC/releases/download/0.5.0/SOC-0.5.0.zip"
-PACKAGE_CONTAIN_ITEMS = ("tesseract-ocr", "poppler")
+PACKAGE_CONTAIN_ITEMS = ("tesseract-ocr", "poppler", "share")
 NEED_HOOKS = ("tools/hook-googleapiclient.py",)
 STARTUP_FILE = "SOC.py"
 
