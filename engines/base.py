@@ -88,7 +88,8 @@ class engineBase(threading.Thread):
 			item = job.getProcessItem()
 			if item == None:
 				break
-			self._recognize(item)
+			if not job.hasCancelFlag():
+				self._recognize(item)
 			job.addProcessedItem(item)
 		self.onEvent(events.engine.JOBPROCESS_COMPLETE, engine = self, job = job)
 		job.endEngine()

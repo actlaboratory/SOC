@@ -61,6 +61,8 @@ class MainView(BaseView):
 		self.statusList.AppendColumn(_("認識済みページ数"), width=100)
 		self.statusList.AppendColumn(_("OCRエンジン"), width=300)
 		self.statusList.setList(globalVars.jobList)
+		self.statusList.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
+		self.statusList.Bind(wx.EVT_MENU, self.events.OnMenuSelect)
 
 		page.GetPanel().Layout()
 
@@ -72,11 +74,11 @@ class MainView(BaseView):
 		self.jobCtrl.setList(globalVars.jobList)
 		self.jobCtrl.AppendColumn(_("ファイル名"), width=250)
 		self.jobCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
+		self.jobCtrl.Bind(wx.EVT_MENU, self.events.OnMenuSelect)
 
 		self.pageCtrl, dummy = creator.virtualListCtrl(_("ページ選択"), self.itemFocused, proportion=1, sizerFlag=wx.EXPAND)
 		self.pageCtrl.AppendColumn(_("ページ"), width=250)
 		self.pageCtrl.setList([])
-		self.pageCtrl.Bind(wx.EVT_CONTEXT_MENU, self.onContextMenu)
 		self.pageCtrl.Disable()
 
 		creator = views.ViewCreator.ViewCreator(self.viewMode, page.GetPanel(), page.GetSizer(), orient=wx.VERTICAL, proportion=3, style=wx.EXPAND)
@@ -130,15 +132,19 @@ class MainView(BaseView):
 		return globalVars.jobList[focus]
 
 	def onContextMenu(self, event):
-		if self.jobCtrl.GetFocusedItem() < 0:
-			return
 		menu = wx.Menu()
-		menu.Bind(wx.EVT_MENU, self.events.OnMenuSelect)
-		baseMenu = BaseMenu("context")
-		baseMenu.RegisterMenuCommand(menu, [
-			"COPY_TEXT",
-			"SAVE",
-		])
+		menu.SetInvokingWindow(event.GetEventObject())
+		self.menu.RegisterMenuCommand(menu, {
+			"COPY_TEXT": self.events.copyText,
+			"SAVE": self.events.saveText,
+			"CANCEL": self.events.cancelJob,
+		})
+		if event.GetEventObject() == self.statusList:
+			menu.Enable(menuItemsStore.getRef("SAVE"),False)
+			menu.Enable(menuItemsStore.getRef("COPY_TEXT"),False)
+		job = globalVars.jobList[event.GetEventObject().GetFocusedItem()]
+		if event.GetEventObject().GetFocusedItem() == 0 or job.isDone() or job.hasCancelFlag():
+			menu.Enable(menuItemsStore.getRef("CANCEL"),False)
 		event.GetEventObject().PopupMenu(menu, event)
 
 	def onLeaveTextCtrl(self, event):
@@ -209,6 +215,15 @@ class Events(BaseEvents):
 				f.write(self.parent.text.getValue())
 		except IOError as e:
 			errorDialog(_("保存に失敗しました。詳細: %s") % (e))
+
+	def cancelJob(self, event):
+		obj = event.GetEventObject()
+		if type(obj) == wx.Menu:
+			obj = obj.GetInvokingWindow()
+		idx = obj.GetFocusedItem()
+		if idx < 0:
+			return
+		globalVars.jobList[idx].cancel()
 
 	def exit(self, event = None):
 		self.parent.hFrame.Close()

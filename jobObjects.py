@@ -1,4 +1,5 @@
-
+# job objects
+#Copyright (C) 2023 yamahubuki <itiro.ishino@gmail.com>
 
 import namedPipe
 import os
@@ -34,6 +35,7 @@ class job():
 		self.convertQueue = queue.Queue()
 		self.processQueue = queue.Queue()
 		self.processedItem = [virtualAllPageItem(self)]
+		self.processedItemCount = 0
 		self.status = jobStatus(0)
 		self.totalCount = 0
 		self.selectedPage = 0
@@ -41,6 +43,11 @@ class job():
 	def setOnEvent(self, callback):
 		assert callable(callback)
 		self.onEvent = callback
+
+	def cancel(self):
+		if self.isDone():
+			return
+		self.raiseStatusFlag(jobStatus.CANCEL)
 
 	def getName(self):
 		return self._name
@@ -50,6 +57,14 @@ class job():
 
 	def getSelectedPage(self):
 		return self.selectedPage 
+
+	def hasCancelFlag(self):
+		if self.getStatus() & jobStatus.CANCEL:
+			return True
+		return False
+
+	def isDone(self):
+		return (self.status & jobStatus.PROCESS_COMPLETE) > 0
 
 	def setName(self, name):
 		self._name = name
@@ -87,8 +102,10 @@ class job():
 
 	def addProcessedItem(self, item):
 		self.log.debug("item processed")
-		item.setPageNumber(self.getProcessedCount() + 1)
+		item.setPageNumber(len(self.getProcessedItems()))
 		self.processedItem.append(item)
+		if item.isDone():
+			self.processedItemCount += 1
 		globalVars.jobList[0].addProcessedItem(self,item)
 		self.onEvent(events.item.PROCESSED, job = self, item = item)
 
@@ -107,15 +124,13 @@ class job():
 		self.raiseStatusFlag(jobStatus.PROCESS_COMPLETE)
 		self.log.debug("process completed")
 		self.onEvent(events.job.PROCESS_COMPLETED, job = self)
-
-	def getAllItemText(self):
-		return self.processedItem[0].getText()
+		self.lowerStatusFlag(jobStatus.CANCEL) # 完了したのでキャンセルフラグはもういらない
 
 	def getProcessedItems(self):
 		return self.processedItem
 
 	def getProcessedCount(self):
-		return len(self.processedItem) -1
+		return self.processedItemCount
 
 	def getTotalCount(self):
 		return self.totalCount
@@ -138,8 +153,13 @@ class job():
 	def getStatusString(self):
 		if self.status == 0:
 			return _("待機中")
-		if self.status & jobStatus.PROCESS_COMPLETE:
-			return _("完了")
+		if self.isDone():
+			if self.processedItemCount == self.getTotalCount():
+				return _("完了")
+			else:
+				return _("取消済")
+		if self.hasCancelFlag():
+				return _("取消中")
 		if not (self.status & jobStatus.SOURCE_END):
 			return _("待機中")
 		if not (self.status & jobStatus.CONVERT_STARTED):
@@ -265,10 +285,11 @@ class virtualAllItemJob(job):
 
 class item:
 	def __init__(self, path):
-		self.path = path
-		self.done = False
+		self.path = path # 画像パス
+		self.done = False # 認識完了していればTrue。認識待ちやキャンセルズミはFalse
 		self.pageNumber = 1
 		self.cursorPos = 0
+		self.text = "" # 認識結果テキスト
 
 	def getPath(self):
 		return self.path
@@ -334,7 +355,10 @@ class item:
 
 	def __getitem__(self, key):
 		if key == 0:
-			return _("%dページ" % self.getPageNumber())
+			name = _("%dページ" % self.getPageNumber())
+			if not self.isDone():
+				name += _("(未処理)")
+			return name
 		raise KeyError
 
 	def __setitem__(self, key, value):
@@ -342,7 +366,6 @@ class item:
 
 	def __len__(self):
 		return 1
-
 
 
 class virtualAllPageItem(item):
@@ -387,8 +410,9 @@ class virtualAllPageItem(item):
 		raise KeyError
 
 class jobStatus(IntFlag):
-	SOURCE_END = auto()
-	CONVERT_STARTED = auto()
-	CONVERT_COMPLETE = auto()
-	PROCESS_STARTED = auto()
-	PROCESS_COMPLETE = auto()
+	SOURCE_END = auto() # ソース処理完了
+	CONVERT_STARTED = auto() # 変換処理開始
+	CONVERT_COMPLETE = auto() # 変換処理完了
+	PROCESS_STARTED = auto() #認識処理開始
+	PROCESS_COMPLETE = auto() # 認識処理完了
+	CANCEL = auto() # キャンセルの要求がなされた
