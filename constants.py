@@ -78,7 +78,7 @@ EXT_TO_FORMAT = {
 
 #build関連定数
 BASE_PACKAGE_URL = "https://github.com/actlaboratory/SOC/releases/download/0.5.0/SOC-0.5.0.zip"
-PACKAGE_CONTAIN_ITEMS = ("tesseract-ocr", "poppler", "share")
+PACKAGE_CONTAIN_ITEMS = ("tesseract-ocr", "poppler")
 NEED_HOOKS = ("tools/hook-googleapiclient.py",)
 STARTUP_FILE = "SOC.py"
 
