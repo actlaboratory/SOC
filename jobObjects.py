@@ -154,7 +154,7 @@ class job():
 		if self.status == 0:
 			return _("待機中")
 		if self.isDone():
-			if self.processedItemCount == self.getTotalCount():
+			if self.processedItemCount == self.getTotalCount() and self.convertQueue.empty():
 				return _("完了")
 			else:
 				return _("取消済")

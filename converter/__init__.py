@@ -59,6 +59,8 @@ class converter(threading.Thread):
 	def _convertJob(self, job: jobObjects.job):
 		while True:
 			time.sleep(0.01)
+			if job.hasCancelFlag():
+				break
 			item = job.getConvertItem()
 			if item == None:
 				break
