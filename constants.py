@@ -51,8 +51,11 @@ FORMAT_BMP = 0x4
 FORMAT_GIF = 0x8
 FORMAT_TIFF = 0x10
 FORMAT_PDF_UNKNOWN = 0x20
+
+# 単一ページPDF
 FORMAT_PDF_TEXT = 0x40
 FORMAT_PDF_IMAGE = 0x80
+# 複数ページPDF
 FORMAT_PDF_MULTI_PAGE = 0x100
 # 単一ページPDFなら何でもOK
 FORMAT_PDF_ALL = FORMAT_PDF_TEXT | FORMAT_PDF_IMAGE
@@ -65,6 +68,8 @@ IMAGE_FORMAT_LIST = [
 	FORMAT_PNG,
 	FORMAT_GIF,
 	FORMAT_JPEG,
+	FORMAT_PDF_TEXT,
+	FORMAT_PDF_IMAGE,
 ]
 #ファイル形式と拡張子の辞書
 EXT_TO_FORMAT = {
@@ -88,4 +93,4 @@ UPDATER_VERSION = "1.0.0"
 UPDATER_URL = "https://github.com/actlaboratory/updater/releases/download/1.0.0/updater.zip"
 UPDATER_WAKE_WORD = "hello"
 #pipe関係
-PIPE_NAME = "SocPdfTextCheck"
+PIPE_NAME_PREFIX = "SOC-PIPE-"

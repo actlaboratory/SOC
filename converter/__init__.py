@@ -13,15 +13,15 @@ from logging import getLogger
 from .converterStatus import converterStatus
 from .pdf2image import pdf2image
 from . import pillow
+from .pdfSplit import pdfSplit
 
-
-converter_list = [pillow.pillow, pdf2image]
+converter_list = [pillow.pillow, pdf2image, pdfSplit]
 
 class converter(threading.Thread):
 	def __init__(self, engineSupportedFormats):
 		self.engineSupportedFormats = engineSupportedFormats
 		super().__init__()
-		self.log = getLogger("%s.convertor" % constants.LOG_PREFIX)
+		self.log = getLogger("%s.convertorThread" % constants.LOG_PREFIX)
 		self.jobQueue = queue.Queue()
 		self.onAskEvent = None
 		self.onEvent = None
@@ -65,20 +65,19 @@ class converter(threading.Thread):
 			if item == None:
 				break
 			converted_item = self._convertItem(item)
-			if type(converted_item) == jobObjects.item:
-				pillow.convertGrayScale(converted_item)
-				job.addConvertedItem(converted_item)
-			elif type(converted_item) == list:
-				for itm in converted_item:
+			if type(converted_item) != list:
+				raise NotImplementedError("convertor must be return list<item>")
+			for itm in converted_item:
+				if itm.getFormat() & constants.FORMAT_PDF_ALL > 0:
 					pillow.convertGrayScale(itm)
-					job.addConvertedItem(itm)
+				job.addConvertedItem(itm)
 		job.endConvert()
 
 	def _convertItem(self, item):
 		if item.getFormat() & self.engineSupportedFormats:
 			# 返還不要
 			self.log.info("convert is not needed")
-			return item
+			return [item]
 		for converter in converter_list:
 			if not (converter.getSupportedFormats() & item.getFormat()):
 				# コンバータが未対応なので別のを試す
@@ -93,6 +92,7 @@ class converter(threading.Thread):
 		# 変換できない
 		self.log.error("cannot convert:" + str(item.getFormat()) + " to " + str(self.engineSupportedFormats))
 		self.ask(askEvent.notice(_("ファイル形式エラー"), _("指定されたファイルとエンジンの形式の組み合わせが不正です。\nファイルの形式に対応したエンジンを指定してください。")))
+		return []
 
 	def addJob(self, job):
 		self.jobQueue.put(job)

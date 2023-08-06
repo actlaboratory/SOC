@@ -5,6 +5,7 @@ import namedPipe
 import os
 import queue
 import subprocess
+import uuid
 
 import constants
 import events
@@ -318,12 +319,13 @@ class item:
 				return
 
 			# 単一ページの場合は埋め込みテキストの含まれるPDFであるか判定
-			pipeServer = namedPipe.Server(constants.PIPE_NAME)
+			pipeServer = namedPipe.Server(constants.PIPE_NAME_PREFIX + "PdfTextCheck" + str(uuid.uuid4()))
 			pipeServer.start()
 			subprocess.run((os.getcwd() + "/poppler/bin/pdftotext", "-enc", "UTF-8", self.getPath(), pipeServer.getFullName()))
 
 			list = pipeServer.getNewMessageList()
 			pipeServer.exit()
+			pipeServer.close()
 			text = list[0]
 			if len(text) > 0:
 				self.format = constants.FORMAT_PDF_TEXT
