@@ -4,12 +4,12 @@
 import namedPipe
 import os
 import queue
-import re
 import subprocess
 
 import constants
 import events
 import globalVars
+import popplerUtil
 
 from enum import IntFlag, auto
 from logging import getLogger
@@ -312,9 +312,8 @@ class item:
 		ext = os.path.splitext(self.getPath())[1][1:]
 		self.format = constants.EXT_TO_FORMAT.get(ext.lower(), constants.FORMAT_UNKNOWN)
 		if self.format == constants.FORMAT_PDF_UNKNOWN:
-			info = (subprocess.run((os.getcwd() + "/poppler/bin/pdfinfo", "-enc", "UTF-8", self.getPath()), capture_output=True, text=True, encoding="UTF-8", errors="replace").stdout)
-			m =re.search(r'^Pages: *(\d+)', info, re.MULTILINE)
-			if int(m.group(1)) > 1:
+			info = popplerUtil.getInfo(self.getPath())
+			if ("Pages" in info) and int(info["Pages"]) > 1:
 				self.format = constants.FORMAT_PDF_MULTI_PAGE
 				return
 
