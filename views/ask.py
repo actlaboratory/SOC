@@ -28,7 +28,10 @@ class Dialog(BaseDialog):
 		self.buttons = {}
 		creator=views.ViewCreator.ViewCreator(self.viewMode,self.panel,self.sizer,wx.HORIZONTAL,20,style=wx.ALL|wx.ALIGN_CENTER,margin=20)
 		for k, v in self.selections.items():
-			b = creator.button(k, self.onButtonPressed, proportion=1, sizerFlag=wx.EXPAND)
+			if len(self.selections) == 1:
+				b = creator.closebutton(k, self.onButtonPressed, proportion=1, sizerFlag=wx.EXPAND)
+			else:
+				b = creator.button(k, self.onButtonPressed, proportion=1, sizerFlag=wx.EXPAND)
 			self.buttons[b] = v
 
 	def onButtonPressed(self, event):
