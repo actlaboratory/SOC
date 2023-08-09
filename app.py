@@ -28,7 +28,7 @@ class Main(AppBase.MainBase):
 
 	def initialize(self):
 		"""アプリを初期化する。"""
-		self.tmpDir = tempfile.TemporaryDirectory()
+		self.initTempDir()
 		# プロキシの設定を適用
 		self.proxyEnviron = proxyUtil.virtualProxyEnviron()
 		self.setProxyEnviron()
@@ -56,6 +56,21 @@ class Main(AppBase.MainBase):
 		dialog.Initialize(sys.argv[1:])
 		dialog.Show()
 		return True
+
+	def initTempDir(self):
+		dir = None
+		setting = os.path.expandvars(self.config.getstring("ocr", "tmpdir", ""))
+		try:
+			if setting:
+				os.makedirs(setting, exist_ok=True)
+				if os.access(setting,os.W_OK):
+					dir = setting
+				else:
+					self.log.error("setting tempdir %s access failed" % setting)
+		except Exception as e:
+			self.log.error(str(e))
+		self.tmpDir = tempfile.TemporaryDirectory(dir=dir)
+		self.log.info("tmpdir path:" + self.tmpDir.name)
 
 	def setProxyEnviron(self):
 		if self.config.getboolean("proxy", "usemanualsetting", False) == True:

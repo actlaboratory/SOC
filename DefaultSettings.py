@@ -19,7 +19,7 @@ class DefaultSettings:
 			"locale": loc,
 			"update": True,
 			"timeout": 3,
-			"debug": True
+			"debug": False,
 		}
 
 		config["view"]={
@@ -39,7 +39,7 @@ class DefaultSettings:
 		}
 
 		config["ocr"] = {
-			"tmpdir": os.path.join(os.environ["TEMP"], "soc"),
+			"tmpdir": "%temp%\\SOC\\",
 			"saveSourceDir": True,
 			"savedir": os.path.join(os.environ["userprofile"], "Documents")
 		}
