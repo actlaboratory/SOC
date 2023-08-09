@@ -14,7 +14,6 @@ import task
 import views.ViewCreator
 import views.base
 
-from logging import getLogger
 from views.baseDialog import *
 from sources import file, scanner, clipboard
 from simpleDialog import errorDialog
@@ -124,7 +123,6 @@ class Dialog(BaseDialog):
 		self.filebox.Delete(index)
 		del self.files[index]
 		self.filebox.SetSelection(index-1)
-		return
 
 	def onPaste(self, event=None):
 		self.addFiles(c.ClipboardFile().GetFileList())
@@ -145,6 +143,8 @@ class Dialog(BaseDialog):
 
 		# engine
 		engine = engines.getEngines()[self.engine.GetSelection()]()
+
+		self.log.info("start with source:"+sourceStr + "engine:" + engine.getName())
 
 		# task
 		globalVars.manager.addTask(task.task(source, engine))
