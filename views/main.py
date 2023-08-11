@@ -38,8 +38,8 @@ class MainView(BaseView):
 		globalVars.manager.setOnAskEvent(askEvtReceiver.onEvent)
 		super().Initialize(
 			constants.APP_NAME,
-			660,
-			700,
+			self.app.config.getint(self.identifier,"sizeX",960,800),
+			self.app.config.getint(self.identifier,"sizeY",600,600),
 			self.app.config.getint(self.identifier,"positionX"),
 			self.app.config.getint(self.identifier,"positionY"),
 		)
@@ -48,6 +48,7 @@ class MainView(BaseView):
 		self.menu.Enable(menuItemsStore.getRef("COPY_TEXT"), False)
 		self.menu.Enable(menuItemsStore.getRef("SAVE"), False)
 
+		self.lastScale = (0,0)
 		self.installControls()
 
 	def installControls(self):
@@ -68,8 +69,8 @@ class MainView(BaseView):
 
 		# 認識結果ページ
 		page = views.ViewCreator.ViewCreator(self.viewMode,tabCtrl,None,wx.HORIZONTAL,label=_("認識結果"),style=wx.ALL|wx.EXPAND,proportion=1,margin=20)
-		creator = views.ViewCreator.ViewCreator(self.viewMode, page.GetPanel(), page.GetSizer(), orient=wx.VERTICAL, proportion=1, style=wx.EXPAND)
 
+		creator = views.ViewCreator.ViewCreator(self.viewMode, page.GetPanel(), page.GetSizer(), orient=wx.VERTICAL, proportion=1, style=wx.EXPAND)
 		self.jobCtrl, dummy = creator.virtualListCtrl(_("認識済みファイル"), self.itemFocused, proportion=1, sizerFlag=wx.EXPAND)
 		self.jobCtrl.setList(globalVars.jobList)
 		self.jobCtrl.AppendColumn(_("ファイル名"), width=250)
@@ -80,6 +81,12 @@ class MainView(BaseView):
 		self.pageCtrl.AppendColumn(_("ページ"), width=250)
 		self.pageCtrl.setList([])
 		self.pageCtrl.Disable()
+
+		creator = views.ViewCreator.ViewCreator(self.viewMode, page.GetPanel(), page.GetSizer(), orient=wx.VERTICAL, proportion=3, style=wx.EXPAND|wx.LEFT|wx.RIGHT)
+		creator.AddSpace(-1)
+		self.imageView = creator.staticBitmap(_("ページ画像"), bitmap=wx.NullBitmap,proportion=1, sizerFlag=wx.EXPAND)
+		self.imageView.Bind(wx.EVT_SIZE, self.updateImageLator)
+		creator.AddSpace(-1)
 
 		creator = views.ViewCreator.ViewCreator(self.viewMode, page.GetPanel(), page.GetSizer(), orient=wx.VERTICAL, proportion=3, style=wx.EXPAND)
 		self.text, dummy = creator.inputbox(_("認識結果"), style=wx.TE_READONLY|wx.TE_MULTILINE, proportion=1, sizerFlag=wx.EXPAND)
@@ -96,6 +103,34 @@ class MainView(BaseView):
 		self.text.SetValue(item.getText())
 		self.text.SetInsertionPoint(item.getCursorPos())
 
+	def updateImageLator(self,event):
+		wx.CallAfter(self.updateImage)
+
+	def updateImage(self, event=None):
+		item = self.getCurrentItem()
+		if not item:
+			return
+		try:
+			if (item.getFormat() | constants.FORMAT_PDF_ALL)>0:
+				image = wx.Image(item.getPath())
+				x = self.imageView.GetContainingSizer().GetSize()[0] / image.GetWidth()
+				y = self.imageView.GetContainingSizer().GetSize()[1] / image.GetHeight()
+				scale = max(0.001,min(x,y))	# 0になると後続でエラーなのでmaxで対策
+				self.imageView.SetBitmap(
+					image.Rescale(
+						int(image.GetWidth()*scale),
+						int(image.GetHeight()*scale)
+					).ConvertToBitmap()
+				)
+				if self.lastScale != (x,y):
+					self.lastScale = (x,y)
+					self.imageView.GetParent().Layout()
+				return
+		except NotImplementedError as e:
+			pass
+		self.imageView.SetBitmap(wx.NullBitmap)
+		self.lastScale = (0,0)
+
 	def itemFocused(self, event):
 		self.menu.Enable(menuItemsStore.getRef("COPY_TEXT"), True)
 		self.menu.Enable(menuItemsStore.getRef("SAVE"), True)
@@ -111,10 +146,12 @@ class MainView(BaseView):
 			self.pageCtrl.Select(job.getSelectedPage())
 			self.pageCtrl.Enable()
 			self.updateText()
+			self.updateImage()
 		elif obj == self.pageCtrl:
 			# ページが選択された
 			job.setSelectedPage(self.pageCtrl.GetFocusedItem())
 			self.updateText()
+			self.updateImage()
 
 	def getCurrentItem(self):
 		job = self.getCurrentJob()
@@ -267,3 +304,9 @@ class Events(BaseEvents):
 
 	def update(self, event):
 		update.checkUpdate()
+
+	def WindowResize(self,event):
+		#ウィンドウがアクティブでない時(ウィンドウ生成時など)のイベントは無視
+		if self.parent.hFrame.IsActive():
+			self.parent.imageView.SetBitmap(wx.NullBitmap)
+		super().WindowResize(event)

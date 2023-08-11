@@ -26,6 +26,7 @@ from views.viewObjectBase import notebookBase
 from views.viewObjectBase import textCtrlBase
 from views.viewObjectBase import spinCtrlBase
 from views.viewObjectBase import sliderBase
+from views.viewObjectBase import staticBitmapBase
 from views.viewObjects import clearSlider
 from views.viewObjects import gridBagSizer
 
@@ -67,7 +68,8 @@ class ViewCreatorBase():
 			"gauge": wx.Gauge,
 			"spinCtrl": spinCtrlBase.spinCtrl,
 			"slider": sliderBase.slider,
-			"clear_slider": clearSlider.clearSlider
+			"clear_slider": clearSlider.clearSlider,
+			"static_bitmap": staticBitmapBase.staticBitmap,
 		}
 		
 		#表示モード
@@ -513,6 +515,13 @@ class ViewCreatorBase():
 			Add(sizer,hSlider,proportion,sizerFlag,margin)
 		self.AddSpace()
 		return hSlider,hStaticText
+
+	def staticBitmap(self,text, bitmap=wx.NullBitmap, style=0, size=(-1,-1), sizerFlag=wx.ALL | wx.ALIGN_CENTER_VERTICAL, proportion=0,margin=5):
+		staticBitmap=self.winObject["static_bitmap"](self.parent, wx.ID_ANY, size=size,  style=style, name=text)
+		self._setFace(staticBitmap)
+		Add(self.sizer,staticBitmap,proportion,sizerFlag,margin)
+		self.AddSpace()
+		return staticBitmap
 
 	"""
 	def webView(self):

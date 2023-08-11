@@ -37,6 +37,7 @@ class BaseView(object):
 		_winxptheme.SetWindowTheme(self.hFrame.GetHandle(),"","")
 		self.hFrame.Bind(wx.EVT_MOVE_END,self.events.WindowMove)
 		self.hFrame.Bind(wx.EVT_SIZE,self.events.WindowResize)
+		self.hFrame.Bind(wx.EVT_MAXIMIZE,self.events.WindowResize)
 		self.hFrame.Bind(wx.EVT_CLOSE,self.events.OnExit)
 		self.MakePanel(space)
 
